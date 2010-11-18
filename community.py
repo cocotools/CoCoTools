@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Implementation of Newman's community detection algorithm
-# see Newman, MEJ (2009) PNAS 103(23):8577-8582
+# see Newman, MEJ (2006) PNAS 103(23):8577-8582
 
 import networkx as nx
 import numpy as np
