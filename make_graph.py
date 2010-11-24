@@ -1,21 +1,21 @@
 #!/usr/bin/python
 
-# Implementation of Newman's community detection algorithm
-# see Newman, MEJ (2006) PNAS 103(23):8577-8582
+# Implementation of Newman's community detection algorithm.
+# See Newman, MEJ (2006) PNAS 103(23):8577-8582.
+# Original script contributed in ticket #158 in NetworkX Developer Zone.
 
 import networkx as nx
 import numpy as np
 from numpy import linalg as LA
 
+## FUNCTIONS ##
+
+#COMPUTE ONE ELEMENT OF B (MODULARITY MATRIX) FROM EQUATION 3
 def bg(g,i,j,nbunch):
-  # returns the modularity matrix for a subset of nodes
-  # as defined in Eq. 6 in the paper
   def a(i,j):
-    # returns the adjacency matrix element for network g
     if j in g.neighbors(i): return 1
     else: return 0
   def b(i,j):
-    # returns an element of the modularity matrix, defined in Eq. 3 of the paper
     m = len(g.edges())
     return (a(i,j) - 1.0*g.degree(i)*g.degree(j)/(2*m))
   if i == j and len(nbunch) < len(g):
@@ -23,8 +23,8 @@ def bg(g,i,j,nbunch):
   else:
     return b(i,j)
 
+#PERFORM VARIATION ON K-L ALGORITHM FROM PAGE 8580
 def klRefine(s,B):
-  # Kernighan-Lin refinement, described on pg. 8580
   def flip(v,pos):
     newv = v.copy()
     newv[pos] = -1*v[pos]
@@ -43,15 +43,14 @@ def klRefine(s,B):
       break
   return sBest
 
+#TRY TO SPLIT INTO TWO BEST COMMUNITIES
 def split(g,nbunch,errorMargin=100,doKL=True):
   B = np.array([[bg(g,i,j,nbunch) for j in nbunch] for i in nbunch])
-  w,v = LA.eigh(B) # returns eigenvalues, eigenvectors
+  w,v = LA.eigh(B)
   nb1 = []
   nb2 = []
   i = list(w).index(max(w))
-  # s as defined on pg. 8579
   s = np.array([(1 if x > 0 else -1) for x in v[:,i]])
-  # dQ as in eq. 2 and 5
   dQ = np.dot(np.dot(s,B),s)/(4*len(g.edges()))
   if dQ <= errorMargin*np.finfo(np.double).eps:
     return False 
@@ -67,6 +66,7 @@ def split(g,nbunch,errorMargin=100,doKL=True):
       nb2.append(nbunch[j])
   return (nb1,nb2)
 
+#TRY TO SPLIT THE RESULTANT COMMUNITIES FURTHER
 def recursive(g,nbunch):
   nb = split(g,nbunch)
   if not nb:
@@ -77,37 +77,34 @@ def recursive(g,nbunch):
     recursive(g,nb[0])
     recursive(g,nb[1])
 
+#RETURN THE FINAL Q (MODULARITY VALUE) WITH THE COMMUNITIES
+#AND THEIR MEMBERS
 def detect_communities(g):
   global resultList
   resultList = []
   global Q
   Q = 0
   recursive(g,g.nodes())  
-  return Q,resultList
-      
-################################################################################
-## Test code
-################################################################################
 
-if __name__ == '__main__':
-  def draw_nodes(g,fileName):
-    colorList = [0]*len(g.nodes())
-    for nbunch in resultList:
-      for n in nbunch:
-        colorList[g.nodes().index(n)] = resultList.index(nbunch)
-    import matplotlib.pyplot as plt
-    plt.figure(figsize=(8,8))
-    pos = nx.graphviz_layout(g,prog='neato')
-    nx.draw(g,pos,node_color=colorList,with_labels=False)
-    plt.savefig(fileName)
+##MAIN SCRIPT##
 
-  g = nx.heawood_graph()
-  myQ = detect_communities(g)
-  print "Q = ",myQ[0]
-  draw_nodes(g,"heawood.png")
+#MAKE THE GRAPH
 
+labels_fname = str(raw_input('Enter names file: '))
+edges_fname = str(raw_input('Enter edges file: '))
 
-  
+g = nx.DiGraph() 
 
+with open(labels_fname) as labels: 
+  for line in labels:
+    num, acronym = line.split()
+    num = int(num)
+    g.add_node(num, acronym=acronym)
 
+edges = np.loadtxt(edges_fname)
 
+g.add_edges_from(edges)
+
+detect_communities(g)
+
+print '\nModularity results available as variables Q and resultList.'

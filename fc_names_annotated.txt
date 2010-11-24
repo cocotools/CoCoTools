@@ -1,5 +1,6 @@
 Notes:  - References are most recent papers in CoCoMac Literature output
 	- Regions w/out edges to other FC regions are commented out
+	- Leaves w/out edges to leaves are double commented out
 
 #- 78 FL#2 (Kotter & Wanke, 2001, Phil. Trans. R. Soc. Lond. B Biol. Sci.)
 	- 79 belt_sm (Cippolloni & Pandya, 1999, J. Comp. Neurol.)
@@ -59,7 +60,7 @@ Notes:  - References are most recent papers in CoCoMac Literature output
 		- 133 6V (Romanski et al., 1999, Nat. Neurosci.)
 			- 134 F5 Lateral (Marconi et al., 2001, Cereb. Cortex)
 			- 135 PrCO (McFarland & Haber, 2002, J. Neurosci.)
-			- 136 4c (Paxinos et al., 2000, atlas)
+			##- 136 4c (Paxinos et al., 2000, atlas)
 			- 137 6Vb Lateral (Lewis & van Essen, 2000, J. Comp. Neurol.)
 			- 138 6Va Lateral (Carmichael & Price, 1995, J. Comp. Neurol.)
 			- 139 F4 Lateral --> "caudal ventral premotor" (Marconi et al., 2001, Cereb. Cortex)
