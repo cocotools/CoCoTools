@@ -94,13 +94,14 @@ detect_communities(mg.make_graph())
 
 ##MAKE PRETTY RESULTS FILE##
 
-#results = open(str(raw_input('Enter name for results file: ')), 'w')
+results = open(str(raw_input('Enter name for results file: ')), 'w')
 
-#results.write('Newman 2006 Modularity Results\n\n')
+results.write('Newman 2006 Modularity Results for {0}\n\n'.format(str(raw_input('Enter edges file again: '))))
 
-#with open(str(raw_input('Enter the names file again: ')), 'r') as labels:
-  ##WRITE SOMETHING TO TURN THE NUMBERS IN resultList INTO CORRESPONDING ACRONYMS
+results.write('Q = {0}\n\n'.format(Q))
 
-#for x in range(len(resultList)):
-#  results.write('Community #'+str(x+1))
-#  results.write(#WRITE THE ACRONYMS IN THE CORRESPONDING COMMUNITY FROM resultList, ONE PER LINE
+for x in range(len(resultList)):
+  results.write('Community #'+str(x+1)+':\n')
+  for y in range(len(resultList[x])):
+    results.write(str(resultList[x][y])+'\n')
+  results.write('\n')

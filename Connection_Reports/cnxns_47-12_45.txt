@@ -1,0 +1,18 @@
+All Affs and Effs for 47/12 and 45
+
+Afferents for 47/12: 
+
+['11', '10', '13', '24', 'F5', 'TEa#3', '46', '32', '44', 'AITv', '36', 'CITv', '6#1', '9/46v', '9', '45A', '45B']
+
+Efferents for 47/12: 
+
+['46', '9/46v', '8A', '8B', '9', '9/46d', '8Ad']
+
+Afferents for 45: 
+
+['MDfi', 'Iam', 'VLm', '7b', 'VLo', '46v', 'LIP', 'AL#4', 'M9', '24', 'PS', 'MDl', 'L#1', '46', 'Pul#1', 'SI#2', 'PL#3', 'CL#4', 'CM#2', 'PIT', 'PM#3', 'VAmc', 'VApc', 'CITv', 'Hyp', 'Pf#2', 'X', 'PGm', 'MD', '6D', '8B', '6V']
+
+Efferents for 45: 
+
+['8A', '14r', '10o', '7a', 'Pu', '46v', '12l', '12m', '12o', '12r', '36', 'LIP', 'IPL', 'Iai', 'AL#4', 'Cd', 'M9', '7b', '24', 'PS', '24c', 'L#1', '46', 'Pul#1', 'SI#2', 'CL#4', 'V4', 'Ld#2', 'PIT', 'TFM', '13a', 'PGm', 'Pu_r', 'TFL', '11l', 'CITv', '11', 'MD', '6D', 'F7', '8B', 'Ldi', 'MDmc', '6M', 'MDmf', '13L', '36r']
+
