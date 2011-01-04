@@ -1,8 +1,12 @@
+"""See which connections of a region its subregions do not have."""
+
 import make_graph
 
 g = make_graph.make_graph()
 
-output = str(raw_input('Name output file: '))
+output = open(str(raw_input('Name output file: ')),'w')
+
+output.write('Unique = not possessed by children\n\n')
 
 parent = str(raw_input('First parent: '))
 
@@ -51,12 +55,12 @@ while parent != 'xxx':
     for eff in p_e:
         if eff not in c_e:
             p_e_unique.append(eff)
-
-    with open(output,'w') as file:
-        file.write('Unique = not possessed by children\n\n')
-        file.write('{0} Unique Affs:\n\n'.format(parent))
-        file.write(str(p_a_unique)+'\n\n')
-        file.write('{0} Unique Effs:\n\n'.format(parent))
-        file.write(str(p_e_unique)+'\n\n')
+        
+    output.write('{0} Unique Affs:\n\n'.format(parent))
+    output.write(str(p_a_unique)+'\n\n')
+    output.write('{0} Unique Effs:\n\n'.format(parent))
+    output.write(str(p_e_unique)+'\n\n')
 
     parent = str(raw_input('Next Parent: (Type xxx to stop.) '))
+
+output.close()

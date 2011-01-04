@@ -1,76 +1,98 @@
 Notes:  - References are most recent papers in CoCoMac Literature output
+- regions we don't want are commented out
+- ones that need cleaning are preceded by $
+- ones we're not sure about are preceded by ?
+- NOTE: big prob. that cocomac doesn't include disjoint (or borders, so as not to include all other regions) as a relationship. say A is defined as a parent of B one time in 1905, and forever afterward the two are considered disjoint. cocomac will still regard B as within A. this is what happened with 8 and 45.
 
-- 78 FL#2 (Kotter & Wanke, 2001, Phil. Trans. R. Soc. Lond. B Biol. Sci.)
-	- 79 belt_sm (Cippolloni & Pandya, 1999, J. Comp. Neurol.)
-	- 80 Pfc (Liu et al., 2002, J. Comp. Neurol.)
-		- 81 PFCorb (Kotter & Wanke, 2001, Phil. Trans. R. Soc. Lond. B Biol. Sci.)
-			- 82 14 (McFarland & Haber, 2002, J. Neurosci.)
-				- 83 14O Orbital (Paxinos et al., 2000, atlas)
-				- 84 14r Orbital (Carmichael & Price, 1995, J. Comp. Neurol.)
-			- 85 OFap Orbital (Morecraft et al., 1992, J. Comp. Neurol.)
-			- 86 OFO (Cavada et al., 2000, Cereb. Cortex)
-				- 87 ProM#2 Lateral/Orbital (Cippolloni & Pandya, 1999, J. Comp. Neurol.)
-				- 88 Gu Orbital (Paxinos et al., 2000, atlas)
-			- 89 13 (McFarland & Haber, 2002, J. Neurosci.)
-				- 90 13L Orbital (McFarland & Haber, 2002, J. Neurosci.)
-				- 91 13M Orbital (McFarland & Haber, 2002, J. Neurosci.)
-				- 92 13a Orbital (McFarland & Haber, 2002, J. Neurosci.)
-		- 93 32  -ACC remove intitally add this and 24 later (Takada et al., 2004, Eur. J. Neurosci.)
-		- 94 FD#1 (Mesulam et al., 1983, J. Comp. Neurol.)
-			- 95 10 (Stefanacci & Amaral, 2000, J. Comp. Neurol.)
-				- 96 10m Medial (Paxinos et al., 2000, atlas)
-				- 97 10v Lateral (Paxinos et al., 2000, atlas) 
-				- 98 10d Lateral (Paxinos et al., 2000, atlas)
-				- 99 10o Orbital (Carmichael & Price, 1995, J. Comp. Neurol.)
-			- 100 12 (McFarland & Haber, 2002, J. Neurosci.)
-				- 101 12o Orbital (McFarland & Haber, 2002, J. Neurosci.)
-				- 102 12m Orbital (Carmichael & Price, 1995, J. Comp. Neurol.)
-				- 103 47/12 Lateral (Paxinos et al., 2000, atlas)
-				- 104 12r Orbital (Carmichael & Price, 1995, J. Comp. Neurol.)
-				- 105 12l Orbital (McFarland & Haber, 2002, J. Neurosci.)
-			- 106 11 (McFarland & Haber, 2002, J. Neurosci.)
-				- 107 11l Orbital (McFarland & Haber, 2002, J. Neurosci.)
-				- 108 11m Orbital (McFarland & Haber, 2002, J. Neurosci.)
-			- 109 9 (Takada et al., 2004, Eur. J. Neurosci.)
-				- 110 L9 Lateral ? don't know what diff D9 or L9? (Barbas & Pandya, 1989, J. Comp. Neurol.)
-				- 111 M9 Medial (Barbas & Pandya, 1989, J. Comp. Neurol.)
-				- 112 D9 Lateral ? don't know what diff D9 or L9? (Barbas et al., 1999, J. Comp. Neurol.)
-			- 113 46 (Takada et al., 2004, Eur. J. Neurosci.) (HAS UNIQUE CONNECTIONS)
-				- 114 46v Lateral (Marconi et al., 2001, Cereb. Cortex)
-				- 115 46d Lateral (Marconi et al., 2001, Cereb. Cortex)
-				- 116 PS Lateral (McGuire et al., 1991, Cereb. Cortex) (only CoCoMac relation: subarea of W40-46) REMOVED
-				- 117 46f Lateral ? don't know diff (McGuire et al., 1991, Cereb. Cortex)
-				- 118 46vr Lateral ? don't know diff (Preuss & Goldman-Rakic, 1991, J. Comp. Neurol.)
-				- 119 46dr Lateral ? don't know diff (Preuss & Goldman-Rakic, 1991, J. Comp. Neurol.)
-				- 120 9/46 (Petrides & Pandya, 1999, Eur. J. Neurosci.)
-					- 121 9/46v Lateral (Paxinos et al., 2000, atlas)
-					- 122 9/46d Lateral (Paxinos et al., 2000, atlas)
-		- 123 8 (Marconi et al., 2003, Eur. J. Neurosci.)
-			- 124 FEF (Disbrow et al., 2003, J. Comp. Neurol.)
-				- 125 45 (McFarland & Haber, 2002, J. Neurosci.)
-					- 126 45A Lateral (Paxinos et al., 2000, atlas)
-					- 127 45B Lateral (Paxinos et al., 2000, atlas)
-				- 128 8A (Paxinos et al., 2000, atlas)
-					- 129 8Ad Lateral (Paxinos et al., 2000, atlas)
-					- 130 8Ac Lateral (Lewis & van Essen, 2000, J. Comp. Neurol.)
-			- 131 8B Lateral (Takada et al., 2004, Eur. J. Neurosci.)
-	- 132 6#1 (Stefanacci & Amaral, 2000, J. Comp. Neurol.)
-		- 133 6V (Romanski et al., 1999, Nat. Neurosci.)
-			- 134 F5 Lateral (Marconi et al., 2001, Cereb. Cortex)
-			- 135 PrCO (McFarland & Haber, 2002, J. Neurosci.)
-			- 136 4c (Paxinos et al., 2000, atlas)
-			- 137 6Vb Lateral (Lewis & van Essen, 2000, J. Comp. Neurol.)
-			- 138 6Va Lateral (Carmichael & Price, 1995, J. Comp. Neurol.)
-			- 139 F4 Lateral --> "caudal ventral premotor" (Marconi et al., 2001, Cereb. Cortex)
-		- 140 44 Lateral (Paxinos et al., 2000, atlas)
-		- 141 6b-beta Lateral (Arikuni et al., 1994, Neurosci. Res.)
-		- 142 6D (Lewis & van Essen, 2000, J. Comp. Neurol.)
-			- 143 F7 Lateral --> rostral premotor area 6 (Marconi et al., 2001, Cereb. Cortex)
-			- 144 F2 Lateral --> caudal premotor area 6 (Marconi et al., 2001, Cereb. Cortex)
-		- 145 6M (Morecraft et al., 2004, J. Comp. Neurol.)
-			- 146 F3 (Marconi et al., 2001, Cereb. Cortex)
-				- 147 SMAr Medial --> preSMA (McGuire et al., 1991, Cereb. Cortex)
-				- 148 SMAc Medial --> SMA (McGuire et al., 1991, Cereb. Cortex)
-			- 149 M2-HL (Morecraft & van Hoesen, 1992, J. Comp. Neurol.)
-			- 150 M2-FL (Morecraft & van Hoesen, 1992, J. Comp. Neurol.)
-			- 151 F6 (Marconi et al., 2001, Cereb. Cortex)
+#FL#2
+	belt_sm
+	#Pfc
+		#PFCorb
+			14 (grew over time; M&S dumped M14 here)
+				14O
+				14r (not in PP94)
+			OFap = BGDR99-PAll, distinct strip of cortex along corpus callosum, see figures of BP89-PAll
+			#OFO
+				ProM#2
+				Gu (PP94 claims G spans some rostral insula as well)
+			13 (no controversy)
+				13L
+				13M
+				13a
+		32 (B05-32 = W40-25)
+		#FD#1
+			10 (no controversy)
+				10m 
+				10v 
+				10d
+				10o
+			$12 (largest delineation overlapped 45)
+				12o
+				12m
+				47/12 (= W40-12 - PP94-45A; M&S stuck 47/12L & 47/12O here)
+				12r
+				12l
+			11 (no controversy)
+				11l
+				11m
+			$9 (shrunk over time; largest delineations overlapped 46 and 8B)
+				L9
+				M9
+				D9
+			$46 (shrunk over time; largest delineation overlapped 9 and 45)
+				46v
+				46d
+				PS
+				46f
+				46vr 
+				46dr
+				9/46
+					9/46v
+					9/46d
+		8 (parent of 45 only in B05 and B09; otherwise disjoint; B05-8 and BP89-8 = W40-8A; see how it's defined in papers that report its connections)
+			#FEF (messy combo of parts of 45 and 8, see PP02; most-responsive area of FEF is in 8)
+				45
+					45A (not in W40-45; in W40-12 and W40-46)
+					45B
+				8A (Modha and Singh put child 8Av's connections here)
+					8Ad
+					8Ac
+			8B (W40-8B is in B05-9 and BP89-9)
+	6#1 (includes 6a-alpha and 6b-alpha, which BB47 considered = to FCBm (= B09-44))
+		6V
+			F5
+			PrCO
+			4c
+			6Vb
+			6Va
+			F4
+		44 (of course disjoint from 6 in PP94 scheme)
+		6b-beta
+		6D 
+			F7
+			F2 
+		6M 
+			F3 
+				SMAr 
+				SMAc 
+			M2-HL 
+			M2-FL 
+			F6
+CgG#2
+	24 (no controversy)
+		24c
+		24d
+		24b
+		24a
+	23
+		23c
+		23b
+		TSA
+		23a
+	26
+		29
+			CML
+			29d
+			29a-c
+		30
+	25 (see note next to 32)
