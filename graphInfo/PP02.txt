@@ -1,0 +1,31 @@
+retrograde injections in:
+- caudal 45 (some leakage into 44) (1)
+- lateral 47/12 (some leakage into 45) (3)
+- caudal orbital 47/12 (4)
+- rostral orbital 47/12 (5)
+- 45 (some leakage into 47/12) (2)
+- 9/46v (6)
+
+afferents:
+(1): 9/46v, 46, 47/12, 10, 11, 13, 8Ad, 8B, 6, 6V, 9, 24, 24c, ProM, SII (S2 in CoCoMac), Insula, PG (PG#1), POa (LIP), ProK, TS1 (ST1), TS2 (ST2), TS3 (ST3), paAlt, Tpt, TAa, TPO, PGa, TEa (TEa#3), FST
+
+(2): all those in (1), 8Av (8A), 14, 32, 45B, 44, PaI (Pi#1), Reit (Ri#1), TL (36?)
+
+(3): 10, 8Av (8A), 45, 13, 11, 10, 14, 46, 8B, 9, 24, 32, Pro (TPPro), TS1 (ST1), TS2 (ST2), TAa, TPO, PGa, IPa, TEa (TEa#3), TE1 (AITv), rostral TL (36r?), perirhinal cortex (Per#1)
+
+(4): 9/46v, 45, 13, 11, 9, 10, 32, 24, 44, 6V, SII (S2), Insula, TEa (TEa#3), TE1 (AITv), TE2 (CITv), perirhinal cortex (Per#1), TL (36?)
+
+(5): 9/46v, 45, 13, 11, 24, 44, 6V, SII (S2), Insula, PF (PF#1), TEa (TEa#3), TE1 (AITv), TE2 (CITv), perirhinal cortex (Per#1), TL (36?)
+
+(6): 47/12, 13, 11, 24a, 24c, 6V, 44, ProM (ProM#2), 1 (1#1), 2 (2#1), SII (S2), Idg, PF (PF#1), PFG (PFG#1), POa (LIP)
+
+mapping:
+- SDGM89-FEF & CBM00-FEF dorsal to PP02-45 along anterior bank of AS
+- PP02-47/12 = W40-12
+- SP89a-12 overlaps PP02-45
+- W40-45 overlaps B05-8, VV19-8, BP89-8
+- SMKB95-8A = dorsal part of FEF
+- SMKB95-45 = ventral part of FEF
+- PP02-FEF < PP02-8 caudal
+- W40-45 includes ventral part of FEF
+- PP02-45 = part of PP88-12, RBG99-12
