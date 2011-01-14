@@ -1,0 +1,106 @@
+Unique = not possessed by children
+
+14 Unique Affs:
+
+['MDdc', 'Csl', 'TG', 'IL#2', 'STS', 'OFC', '46v', 'Clc', 'Cs#2', 'TPproD', 'Pcn', '46d', 'VLm', 'PT#2', 'M9', '24', 'Bla', 'Ia#2', 'A1', 'PAa', 'Idg', 'Pros.', 'ENT', 'ST1', 'ST2', 'ST3', '8', 'Amyg', 'TE', 'VA', 'Cif', 'PM#3', 'VL', 'Cim', 'AN', 'Pi#1', 'AHA', 'Re', 'Pf#2', 'PrS', 'D9', 'X', 'Li', '29a-c', 'B#2', 'MB', '11', 'MD', 'MDpm', '12', 'Cdc', 'ML', 'CA1', 'MDmc', 'MDpc', '36', '35', 'ABvm', 'OFap', 'MDcd']
+
+14 Unique Effs:
+
+['24c', '12l', 'Lv', 'M9', 'Ld#2', '24', 'EC#2', '23', 'STSd', 'A1', 'TFL', 'ST1', 'ST2', 'TG', 'TFM', '10', 'VAmc', '23b', '23c', 'ENT', 'STS', 'Lvl', '11', 'MD', '8B', 'Ldi', 'MDmc', '36', 'D9', '9/46d', '36r']
+
+OFO Unique Affs:
+
+['24']
+
+OFO Unique Effs:
+
+['24']
+
+13 Unique Affs:
+
+['STS', '46v', 'Li', 'Re', 'Pcn', 'PT#2', 'Bla', '24', 'PAC2', 'Pul#1', 'Ia#2', 'SI#2', 'TG', 'Amyg', 'CM#2', 'A', 'VA', 'PM#3', 'VAmc', 'CITv', 'Hyp', 'Pf#2', 'PrS', 'Hip', '29a-c', 'MB', 'Clc', 'Cdc', 'MDmc', 'ABvm', 'ME#1']
+
+13 Unique Effs:
+
+['MDfi', 'VLm', '47/12', 'CITv', 'belt_sm', 'Re', 'PT#2', 'M9', 'belt_s', '24', 'Pul#1', 'MI-of', 'A1', 'PAa', 'PL#3', 'TFL', '36r', '14O', 'ST1', 'TPPro', 'TFM', 'ST2', '10', 'PM#3', 'Cim', '23c', '9/46v', '23b', 'D9', 'Li', 'MDpm', '14', 'Cs#2', '8B', '31', 'TG', 'ProM#2', '9/46d', 'SG']
+
+10 Unique Affs:
+
+['MDfi', 'STS', 'TEa#3', '46v', '7#1', 'Li', 'TPproD', 'Pcn', '46d', 'AL#4', 'PT#2', 'STSd', '24', '11', 'STPg', '23', 'Pul#1', '29', 'AM#1', 'V2', 'A2', 'ST1', 'ST2', 'ST3', '8', '3a', 'TE', 'VA', 'PS', 'PM#3', 'Gu', 'CITv', 'ENT', 'TG', 'Idg', '13', 'B#2', 'Clc', 'MD', 'MG', '12', '14', 'PFCorb', '8B', 'L#1', 'AITv', '35', 'Ig#1', '25', 'SG']
+
+10 Unique Effs:
+
+['MDmc', '47/12', 'STS', 'L#1', 'Lv', '46d', 'AL#4', 'M9', 'Ld#2', '24', 'PS', '24c', '23', '46', 'STSd', 'TPg', 'A1', 'ST1', 'TH', '9', '14O', 'TFM', 'ST2', 'TFL', '23c', 'ENT', 'TG', 'Lvl', 'L9', 'MD', '14', '8B', '31', 'MDpc', '6V', 'D9', '9/46d', '36r', 'Ldi']
+
+12 Unique Affs:
+
+['MDl', 'STSd', 'PS', 'L#2', 'STPg', 'SI#2', 'A2', 'TG', 'Hyp', 'PrS', 'STS', '29a-c', '6V', 'LIP', 'S#1']
+
+12 Unique Effs:
+
+['MDmc', '24a', '7b', '7a', '24b', 'Ld#2', '36', 'Lv', 'LIP', 'belt_s', 'PS', 'EC#2', 'STSd', 'Pu', 'MI-of', 'TFL', 'TH', 'TG', 'TE', 'PIT', 'TFM', 'belt_sm', 'ProM#2', 'CITv', 'ENT', 'STS', 'Lvl', 'MD', 'Pu_c', 'F7', 'Ldi', '36r', 'AITd']
+
+11 Unique Affs:
+
+['MDdc', 'Re', 'Pcn', '24', '23', 'Pul#1', 'PAa', 'Amyg', 'TPPro', 'TEa#3', 'IPa', 'Cif', 'TPO', 'VAmc', 'Pf#2', 'PrS', 'B#2', 'MDmc', 'Ig#1', 'LIP', 'MDfi', 'Csl', 'MDmf', 'AL#4', '10v', 'PS', 'PM#3', 'PAC#1', 'MD', 'PG#1', '8B', 'ML', 'S2', 'S1', '46v', 'Clc', '46d', 'L#1', 'PL#3', '10', '13', '12', '14', 'PFCorb', 'MB', 'AITv', 'IL#2', '7b', 'PGa', 'Li', 'Cs#2', 'Bla', 'ST1', 'TG', 'TE', 'VA', 'VL', 'CITv', 'AN', 'STS', 'Idg', 'Cdc', 'CA1', 'MDpc', 'TPdgd', 'S#1']
+
+11 Unique Effs:
+
+['MDfi', '7b', '47/12', 'LIP', 'AL#4', 'M9', 'Ld#2', '24', 'PS', '24c', '23', '46', 'STSd', 'TFL', 'TH', '9', 'TG', '10', '23c', 'ENT', 'STS', 'Lvl', 'TFM', 'MD', '14', '31', 'L#1', '25', '9/46v', '9/46d', '36r', 'Ldi']
+
+9 Unique Affs:
+
+['MDfi', '30', '14r', 'MDl', '24b', 'PGm', '7#1', 'Li', 'Bla', 'TAa', '24a', '8Ad', 'PS', '47/12', 'STPg', 'STSd', 'A2', 'TG', 'Amyg', 'TE', 'VA', '13a', 'PM#3', 'TPO', 'VAmc', 'VApc', '23a', '24c', '23b', 'PrS', 'STS', '29a-c', 'B#2', 'MD', 'F7', 'MDmc', 'MDpc', 'IPL', 'L#1', '9/46d', 'SG']
+
+9 Unique Effs:
+
+['MDdc', '30', 'VLm', '10o', 'VLo', '24b', 'PGm', '12l', '12o', 'Lv', '12r', 'LIP', 'TFM', 'PMm', 'PMl', '14r', 'Cd', '8Ad', 'Ld#2', '24', 'PS', '47/12', '23', '46', 'STSd', '29d', '24a', 'SI#2', 'TFL', 'TH', 'PECg', 'TF', 'Pu', 'VA', '13a', 'Cd_g', 'Pu_r', '10', '11m', 'VAmc', '23a', '24c', '23c', 'PLd', 'ENT', '23b', 'PrS', 'STS', 'Li', '46d', '29a-c', 'Iai', '11', 'MD', 'Pu_c', 'F7', '31', '8A', 'MDpc', '6M', '13L', '25', 'L#1', '9/46d', '36r', 'Ldi']
+
+46 Unique Affs:
+
+['Ri#1', 'Ia#2', 'STSd', 'SI#2', 'VLps', 'PIT', '13a', 'Hyp', 'TF', 'PrS', 'V6A', '1#1', 'IPL', 'Ig#1', 'TPOr', 'MDfi', '24d', 'VLm', '24c', '24b', 'Insula', 'CM#2', 'Opt', '23c', 'MDl', 'STS', 'Clau', 'STPg', 'PEm', 'FEF', '29a-c', 'F6', '6M', 'AITd', '14r', '7b', '7a', 'CIT', 'DP', 'PaS', 'V4', 'ST1', 'TE', 'TPOc', '23a', '23b', 'AN', 'AV', 'Cdc', '2#1']
+
+46 Unique Effs:
+
+['12r', 'Pcn', 'STSd', 'OAa', 'SI#2', 'PECg', 'PIT', 'TEa#3', '13a', 'IPa', 'VAmc', 'TF', 'X', 'V6A', 'Pu_c', '13L', 'LIP', '24d', 'VLm', '10o', '24c', '24b', 'VLc', '10d', 'TSA', '10v', 'Ld#2', 'Pu_r', 'Opt', '11m', '11l', 'ENT', 'MD', '36', '36r', 'TEm', 'S2', 'TPOr', 'PMl', 'PMm', 'FEF', 'MST', 'PLd', 'F2', 'PGop', '6M', 'Cd', 'Ldi', 'AITd', '14r', '7b', '7a', 'Li', 'Lv', '24a', 'CIT', 'DP', 'EC#2', 'V4', 'TH', 'TG', 'TE', 'VA', 'TPOc', 'TPOi', '23a', '23b', '23c', 'STS', 'TFM', 'TFL', 'Cd_g', 'MDpc', '2#1', 'Cd_t']
+
+45 Unique Affs:
+
+['MDfi', 'Iam', 'VLm', '7b', 'VLo', '46v', 'AL#4', 'M9', '24', 'PS', 'MDl', 'L#1', '46', 'Pul#1', 'SI#2', 'PL#3', 'CL#4', 'CM#2', 'PM#3', 'VAmc', 'VApc', 'CITv', 'Hyp', 'Pf#2', 'X', 'MD', '6D', '8B', '6V']
+
+45 Unique Effs:
+
+['14r', '10o', 'Pu', '46v', '12l', '12m', '12o', '12r', '36', 'IPL', 'Iai', 'AL#4', 'Cd', 'M9', '7b', '24', 'PS', '24c', 'L#1', 'Pul#1', 'SI#2', 'CL#4', 'V4', 'Ld#2', 'TFM', '13a', 'PGm', 'Pu_r', 'TFL', '11l', 'CITv', '11', 'MD', '6D', 'Ldi', 'MDmc', '6M', 'MDmf', '13L', '36r']
+
+8A Unique Affs:
+
+['PGa', '24a', '24b', 'AITv', 'SMAr', '46v', 'Li', 'V3A', 'IPa', 'V3d', '46d', '10v', 'PS', 'MDl', 'V3v', 'PO#4', '45', 'V2', 'A1', 'PL#3', 'MT', 'SPL', 'VPL', '3a', 'PIT', '24', 'CL#4', 'MTp', 'Pa#2', '10', 'V4', 'PM#3', 'MST', '1#1', '23b', '23c', 'V4t', 'LIPe', '23a', 'Ri#1', 'CITd', 'MD', 'MG', '12', '6D', 'F5', 'TEa#3', 'PG#1', 'MDpc', '6M', 'MDmf', 'PI#3', 'LIPi', 'VIP', 'L#1', 'FST', '45B', 'SG', '4c']
+
+8A Unique Effs:
+
+['24d', '24a', '24c', '24b', 'TAa', '46d', '24', 'PS', 'L#1', 'Pul#1', 'A1', 'CL#4', 'ST2', 'Pa#2', 'TPO', '23a', '23b', 'paAc', 'SMAr', '6D', 'F7', '6M', '6V']
+
+6V Unique Affs:
+
+['12o', '6D', 'Pul#1', 'PEm', '3a', 'VA', '10', '23c', '8', 'Ri#1', '1#1', '12', 'LGN', 'F6', 'F7', 'PGop', '8A', '6M', '2#1', 'ProM#2']
+
+6V Unique Effs:
+
+['M9', '46', '45', 'PEm', '12']
+
+6D Unique Affs:
+
+['46v', 'Tha']
+
+6D Unique Effs:
+
+['7b', '12m', 'IPL', '46d', 'M9', '7a', '45', 'CL#4', 'VLps', '13a', 'Sub.Th', 'FD#1', 'VPL', '7#1', '13L', 'D9']
+
+6M Unique Affs:
+
+['MDdc', '7b', '12l', '12o', 'Pul#1', '45', 'LIP', 'SPL', 'VPM', 'VPI', 'CL#4', 'PrCO', '9', 'Tpt', 'Pf#2', 'FD#1', '7#1', 'MG', '12', '2#1', 'MDmf', '4c']
+
+6M Unique Effs:
+
+['7b', '12o', 'LIP', 'M9', '24c', 'SPL', '9', 'TSA', '3#1', '12', 'IPL', '8B', 'ProM#2', 'MSTd']
+
