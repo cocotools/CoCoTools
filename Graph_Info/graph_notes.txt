@@ -1,9 +1,0 @@
-lowest: - original: all lowest-level M & S regions
-- removed: PS
-
-lat_med: - original: hand-picked selection of lateral and medial FC regions
-
-fc: - original: all lowest-level FC regions
-- removed: those without connections to other FC regions
-
-cocomac: - original: all M & S regions
