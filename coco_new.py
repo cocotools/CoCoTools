@@ -23,13 +23,14 @@ REST = ['MB#2', 'Tha', 'Insula', 'M1', 'S1', 'S2', 'PR#4', '7#1', 'PCip',
 def graph():
     f = open(HOME_DIR+'edges/cocomac_named_edges.pck','r')
     edges = pickle.load(f)
+    f.close()
     g = nx.DiGraph()
     g.add_edges_from(edges)
     return g
 
 def get_all_children(region, hier):
     try:
-        children = hier[region]
+        children = hier[region][:]
         for child in hier[region]:
             children += get_all_children(child, hier)
         return children

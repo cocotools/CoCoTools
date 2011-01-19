@@ -116,20 +116,3 @@ def startAtZero(output, input):
             newFile.write(str(pred)+' '+str(succ)+'\n')
     newFile.close()
 
-def anneal(argv = sys.argv):
-    map(reload, [util, dm])
-    homedir = '/home/despo/dbliss/cocomac/simAnneal/results/'
-    temperature = 0.1
-    temp_scaling = 0.9995
-    tmin = 1e-4
-    g = makeGraph()
-    g = dm.simulated_annealing(g, temperature = temperature, temp_scaling = \
-                               temp_scaling, tmin = tmin, extra_info = False)
-    modArray = g.modularity()
-    modNumArray = len(g)
-    pName = '%sfinalPartition.pck' % homedir
-    pOut = open(pName, 'w')
-    pickle.dump(g.index, pOut)
-    pOut.close()
-    np.save('%smodArray.npy' % homedir, modArray)
-    np.save('%smodNumArray.npy' % homedir, modNumArray)
