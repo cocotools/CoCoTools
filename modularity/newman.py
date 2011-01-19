@@ -1,13 +1,16 @@
 #!/usr/bin/python
 
-""" Creates a graph from a nodes text file and an edges text file.
-Also implements Newman's community detection algorithm
-(see Newman, MEJ, 2006, PNAS 103(23):8577-8582).
-Original script contributed in ticket #158 in NetworkX Developer Zone."""
+"""This is an implementation of Newman's community detection algorithm.
+
+See Newman, MEJ, 2006, PNAS 103(23):8577-8582. The original script was
+contributed in ticket #158 in NetworkX Developer Zone.
+
+"""
+
+import pickle
 
 import networkx as nx
 import numpy as np
-import make_graph as mg
 from numpy import linalg as LA
 
 ## FUNCTIONS ##
@@ -86,22 +89,20 @@ def detect_communities(g):
   resultList = []
   global Q
   Q = 0
-  recursive(g,g.nodes())  
+  recursive(g,g.nodes())
+  return resultList, Q
 
 ##RUN IT##
 
-detect_communities(mg.make_graph())
+home_dir = '/home/despo/dbliss/cocomac/'
+f = open(home_dir+'graphs/pfc_graph.pck','r')
+g = pickle.load(f)
+f.close()
+g = g.to_undirected()
+partition, q = detect_communities(g)
 
-##MAKE PRETTY RESULTS FILE##
-
-results = open(str(raw_input('Enter name for results file: ')), 'w')
-
-results.write('Newman 2006 Modularity Results for {0}\n\n'.format(str(raw_input('Enter edges file again: '))))
-
-results.write('Q = {0}\n\n'.format(Q))
-
-for x in range(len(resultList)):
-  results.write('Community #'+str(x+1)+':\n')
-  for y in range(len(resultList[x])):
-    results.write(str(resultList[x][y])+'\n')
-  results.write('\n')
+##PICKLE THE RESULTS##
+f = open(home_dir+'modularity/results/within_pfc/newman.pck','w')
+pickle.dump(partition, f)
+pickle.dump(q, f)
+f.close()
