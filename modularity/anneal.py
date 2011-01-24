@@ -19,7 +19,7 @@ def anneal(argv = sys.argv):
     temperature = 0.1
     temp_scaling = 0.9995
     tmin = 1e-4
-    f = open(homedir+'pfc_graph.pck','r')
+    f = open(homedir+'graphs/lateral_graph.pck','r')
     g = pickle.load(f)
     f.close()
     g = g.to_undirected()
@@ -27,12 +27,12 @@ def anneal(argv = sys.argv):
                                temp_scaling, tmin = tmin, extra_info = False)
     modArray = g.modularity()
     modNumArray = len(g)
-    pName = '%smodularity/results/within_pfc/finalPartition.pck' % homedir
+    pName = '%smodularity/results/within_pfc/lateral_final_partition.pck' % homedir
     pOut = open(pName, 'w')
     pickle.dump(g.index, pOut)
     pOut.close()
-    np.save('%smodArray.npy' % homedir, modArray)
-    np.save('%smodNumArray.npy' % homedir, modNumArray)
+    np.save('%slateral_mod_array.npy' % homedir, modArray)
+    np.save('%slateral_mod_num_array.npy' % homedir, modNumArray)
 
 if __name__ == '__main__':
     anneal()
