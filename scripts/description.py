@@ -9,14 +9,14 @@ import numpy as np
 
 import coco
 
-OTHER_TYPE = 'pfc'
-TARGET = '6V'
-EDGE_TYPE = 'eff'
+OTHER_TYPE = 'post' # 'pfc' or 'post'
+TARGET = '6V' # member of our PFC
+EDGE_TYPE = 'eff' # 'aff' or 'eff'
 
 HOME_DIR = '/home/despo/dbliss/cocomac/'
 
-if OTHER_TYPE == 'rest':
-    f = open('%sposterior_cortex.pck' % HOME_DIR,'r')
+if OTHER_TYPE == 'post':
+    f = open('%sdescription/posterior_coords.pck' % HOME_DIR,'r')
 else:
     f = open('%sdescription/our_pfc_coords.pck' % HOME_DIR,'r')
 nodes_with_coords = pickle.load(f)
@@ -51,7 +51,6 @@ for connection in connections_refined:
         edges.append([connection, TARGET])
     else:
         edges.append([TARGET, connection])
-
 if '/' in TARGET:
     for_file = TARGET.replace('/','-')
 else:
