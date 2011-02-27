@@ -1,23 +1,21 @@
-#!/usr/local/epd-6.2-2/bin/python
+#!/bin/env python
 
 """Our version of E & C's simulated annealing script.
 
 """
 
-import os
 import pickle
 import copy
 
 import networkx as nx
 import numpy as np
 
-homedir = '/home/despo/dbliss/cocomac/'
-os.chdir('%sbrainx/' % homedir)
-
 from brainx import detect_modules as dm
 
 def sa():
     """Run SA on a given graph and pickle the results."""
+
+    homedir = '/home/despo/dbliss/cocomac/'
 
     # Open graph to be analyzed.
     f = open('%sgraphs/lateral_graph.pck' % homedir)
