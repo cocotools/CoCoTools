@@ -1,0 +1,611 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by GulGarak (Cardasia Airlines) -->
+<!--           =================================================
+               XML specification for export of data from CoCoMac DB
+               version 1.0
+               written by KE Stephan and K Rybacki, February 2002
+               adapted by K Rybacki and R Kotter 2004
+               =================================================
+     -->
+<!--041028 Added Annotations for SQL Server. This was done for Dokumentation purpose first. In the current version it would not work with the XMLSQL extensions of SQL Server.-->
+<xsd:schema targetNamespace="http://www.cocomac.org" xmlns:sql="urn:schemas-microsoft-com:mapping-schema" xmlns="http://www.cocomac.org" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0">
+	<!-- ================= root element of the schema ================== -->
+	<xsd:element name="CoCoMacExport">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Header" type="tHeader"/>
+				<xsd:element name="BibliographicData" type="tLiterature" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="MapData" type="tMapData" minOccurs="0"/>
+				<xsd:element name="ExperimentalData" type="tExpData" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="ProcessedConnectivityData" type="tProcessedConnectivityData" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- ================= Header data ================== -->
+	<xsd:complexType name="tHeader">
+		<xsd:sequence>
+			<xsd:element name="Creator" type="xsd:string"/>
+			<xsd:element name="CoCoMacVersion" type="xsd:string"/>
+			<xsd:element name="ExportDate" type="xsd:dateTime"/>
+			<xsd:element name="DataType" type="tDataType" maxOccurs="unbounded"/>
+			<xsd:element name="Feedback" type="tFeedback" minOccurs="0"/>
+			<xsd:element name="ORT_Parameters" type="xsd:string" minOccurs="0">
+				<!-- at the moment the 'Parameters' element is simply a string – I will still define a specifc type  tAnalysisParameters when we have decided which parameters to include exactly -->
+			</xsd:element>
+			<xsd:element name="Comments" type="tMemoString" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tDataType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="BibliographicData"/>
+			<xsd:enumeration value="BrainMapData"/>
+			<xsd:enumeration value="InterMapRelations_originalData"/>
+			<xsd:enumeration value="InterMapRelations_analyzedData"/>
+			<xsd:enumeration value="ConnectivityData_originalData"/>
+			<xsd:enumeration value="ConnectivityData_analyzedData"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tFeedback">
+		<xsd:sequence>
+			<xsd:element name="Query" type="tQuery"/>
+			<xsd:element name="Results" type="tString10"/>
+			<xsd:element name="Error" type="tError" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tQuery">
+		<xsd:sequence>
+			<xsd:element name="HttpString" type="tMemoString" minOccurs="0"/>
+			<xsd:element name="SearchString" type="tMemoString" minOccurs="0"/>
+			<xsd:element name="SqlString" type="tMemoString" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tError">
+		<xsd:sequence>
+			<xsd:element name="ErrorText" type="tString255" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ================= bibliographic data ================== -->
+	<xsd:complexType name="tLiterature">
+		<xsd:sequence>
+			<xsd:element name="ID" type="tString10" sql:relation="Literature" sql:field="ID" sql:datatype="text"/>
+			<xsd:element name="Authors" type="tAuthors"/>
+			<xsd:element name="Title" type="tString255" sql:relation="Literature" sql:field="Title"/>
+			<xsd:element name="Year" type="tYear" sql:relation="Literature" sql:field="Year"/>
+			<xsd:choice>
+				<xsd:element name="Journal" type="tReference_Journal"/>
+				<xsd:element name="Book" type="tReference_Book"/>
+				<xsd:element name="Chapter" type="tReference_Chapter"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tAuthors">
+		<xsd:sequence>
+			<xsd:element name="Author" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Initials" type="tString10" sql:relation="Literature_Authors" sql:field="Initials"/>
+						<xsd:element name="LastName" type="tString50" sql:relation="Literature_Authors" sql:field="LastName"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tReference_Journal">
+		<xsd:sequence>
+			<xsd:element name="JournalName" type="tString50" sql:relation="Literature_JournalArticles" sql:field="Journal"/>
+			<xsd:element name="Volume" type="tString10" sql:relation="Literature_JournalArticles" sql:field="Volume"/>
+			<xsd:element name="Pages" type="tString10" sql:relation="Literature_JournalArticles" sql:field="Pages"/>
+			<xsd:element name="PubMedID" type="xsd:unsignedLong" minOccurs="0" sql:relation="Literature_JournalArticles" sql:field="PMID"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tReference_Book">
+		<xsd:sequence>
+			<xsd:element name="Publisher" type="tString50" sql:relation="Literature_Books" sql:field="Publisher"/>
+			<xsd:element name="Place" type="tString50" sql:relation="Literature_Books" sql:field="Place"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tReference_Chapter">
+		<xsd:sequence>
+			<xsd:element name="Pages" type="tString10" sql:relation="Literature_BookChapters" sql:field="Pages"/>
+			<xsd:element name="Editors" type="tString255" sql:relation="Literature_BookChapters" sql:field="Editors"/>
+			<xsd:element name="BookTitle" type="tString255" sql:relation="Literature_BookChapters" sql:field="Book_Title"/>
+			<xsd:element name="Publisher" type="tString50" sql:relation="Literature_BookChapters" sql:field="Publisher"/>
+			<xsd:element name="Place" type="tString50" sql:relation="Literature_BookChapters" sql:field="Place"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ================= mapping data ================== -->
+	<xsd:complexType name="tMapData">
+		<xsd:sequence>
+			<xsd:element name="BrainMap" type="tBrainMap" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="PrimaryRelation" type="tPrimaryRelation" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="IntegratedPrimaryRelation" type="tIntegratedPrimaryRelation" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ResultingRelation" type="tResultingRelation" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tBrainMap">
+		<xsd:sequence>
+			<xsd:element name="IDBrainMap" type="tString10" sql:relation="BrainMaps" sql:field="ID"/>
+			<xsd:element name="BrainSiteList">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="BrainSite" type="tGeneralBrainSite" minOccurs="0" maxOccurs="unbounded" sql:relation="BrainMaps_BrainSites" sql:field="ID">
+							<!--In This Brain Site Type all fields are in this Table.-->
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Comments" type="tMemoString" minOccurs="0" sql:relation="BrainMaps" sql:field="Comments"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tPrimaryRelation">
+		<xsd:complexContent>
+			<xsd:extension base="tInterMapRelation">
+				<xsd:sequence>
+					<xsd:element name="Reference" type="tReference_Relation" minOccurs="0" maxOccurs="unbounded">
+						<!--These fields are files from Intermaprelations and InterMapRelations_References-->
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tIntegratedPrimaryRelation">
+		<xsd:complexContent>
+			<xsd:extension base="tInterMapRelation">
+				<xsd:sequence>
+					<xsd:element name="PDC" type="tPDC_Relation" minOccurs="0"/>
+					<xsd:element name="History" minOccurs="0">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="PrimaryRelation" type="tPrimaryRelation" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tResultingRelation">
+		<xsd:sequence>
+			<xsd:element name="SourceBrainSite" type="tGeneralBrainSite"/>
+			<xsd:element name="TargetBrainSite" type="tGeneralBrainSite"/>
+			<xsd:element name="PathCategory" type="tPathCategory" minOccurs="0"/>
+			<xsd:element name="PDC" type="tPDC_Relation" minOccurs="0"/>
+			<xsd:element name="RelationInPath" maxOccurs="unbounded">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Order" type="xsd:positiveInteger"/>
+						<xsd:element name="Relation" type="tIntegratedPrimaryRelation"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tPathCategory">
+		<xsd:restriction base="xsd:integer">
+			<xsd:pattern value="[0-5]|[11-15]|[21-25]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tInterMapRelation">
+		<xsd:sequence>
+			<xsd:element name="SourceBrainSite" type="tGeneralBrainSite" sql:relation="InterMapRelations" sql:field="BrainSite_A">
+				<!--Only true for Primary Relations!-->
+			</xsd:element>
+			<xsd:element name="TargetBrainSite" type="tGeneralBrainSite" sql:relation="InterMapRelations" sql:field="BrainSite_B">
+				<!--Only true for Primary Relations!-->
+			</xsd:element>
+			<xsd:element name="RC" type="tRC"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tReference_Relation">
+		<xsd:complexContent>
+			<xsd:extension base="tReference_Data">
+				<xsd:sequence>
+					<xsd:element name="PDC" type="tPDC_Relation" minOccurs="0" sql:relation="InterMapRelations_References" sql:field="PDC_Relation">
+						<!--Only true for Primary Relations!-->
+						<!-- The Child Elements have to be filled with this information. Only true for Primary Relations!-->
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="tRC">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="I"/>
+			<xsd:enumeration value="S"/>
+			<xsd:enumeration value="L"/>
+			<xsd:enumeration value="O"/>
+			<xsd:enumeration value="C"/>
+			<xsd:enumeration value="E"/>
+			<xsd:enumeration value="W"/>
+			<xsd:enumeration value="U"/>
+			<xsd:enumeration value="X"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tPDC_Relation">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[A-R]|[a-r]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ================= experimental data ================== -->
+	<xsd:complexType name="tExpData">
+		<xsd:sequence>
+			<xsd:element name="ID_Literature" type="tString10" sql:relation="Methods" sql:field="ID_Literature"/>
+			<xsd:element name="Method" type="tMethod" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tMethod">
+		<xsd:sequence>
+			<xsd:element name="TracerSubstance" type="tTracerSubstance" sql:relation="Methods" sql:field="TracerSubstance"/>
+			<xsd:element name="BilateralUse" type="xsd:boolean" sql:relation="Methods" sql:field="BilateralUse_Tracer"/>
+			<xsd:element name="InjectionMethod" type="tInjectionMethod" sql:relation="Methods" sql:field="InjectionMethod"/>
+			<xsd:element name="SurvivalTime" type="tString10" sql:relation="Methods" sql:field="SurvivalTime"/>
+			<xsd:element name="Thickness_Sections" type="tString10" sql:relation="Methods" sql:field="Thickness_Sections"/>
+			<xsd:element name="Animals" type="tMethods_Animals" minOccurs="0">
+				<!--The Child Elements have to be filled from Table Animals.-->
+			</xsd:element>
+			<xsd:element name="Reference" type="tReference_Data" minOccurs="0">
+				<!--The Child Elements have to be filled from Table Methods.-->
+			</xsd:element>
+			<xsd:element name="Injection" type="tInjection" minOccurs="0" maxOccurs="unbounded">
+				<!--The Child Elements have to be filled from Table Injections.-->
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tTracerSubstance">
+		<xsd:sequence>
+			<xsd:element name="ID_Tracer" type="tString20"/>
+			<xsd:element name="FullName" type="tString255"/>
+			<xsd:element name="Anterograde" type="xsd:boolean"/>
+			<xsd:element name="Retrograde" type="xsd:boolean"/>
+			<xsd:element name="RadioactiveTracer" type="tRadioactiveTracer" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tRadioactiveTracer">
+		<xsd:sequence>
+			<xsd:element name="TracerSubstance" type="tString50"/>
+			<xsd:element name="Activity" type="tString10"/>
+			<xsd:element name="SpecificActivity" type="tString10"/>
+			<xsd:element name="Ratio" type="tString10"/>
+			<!--The Child Elements have to be filled from Table Methods_RadioactiveTracers....-->
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tInjectionMethod">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="?"/>
+			<xsd:enumeration value="P"/>
+			<xsd:enumeration value="I"/>
+			<xsd:enumeration value="D"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tMethods_Animals">
+		<xsd:sequence>
+			<xsd:element name="Nbr_AllAnimals" type="tString10" sql:relation="Methods_Animals" sql:field="Nbr_AllAnimals"/>
+			<xsd:element name="Nbr_AllFemaleAnimals" type="tString10" sql:relation="Methods_Animals" sql:field="Nbr_AllFemaleAnimals"/>
+			<xsd:element name="AgeRange" type="tString20" sql:relation="Methods_Animals" sql:field="AgeRange"/>
+			<xsd:element name="WeightRange" type="tString20" sql:relation="Methods_Animals" sql:field="WeightRange"/>
+			<xsd:element name="Comments" type="tMemoString" minOccurs="0" sql:relation="Methods_Animals" sql:field="Comments"/>
+			<xsd:element name="Details" type="tMethods_Animals_Details" minOccurs="0" maxOccurs="unbounded">
+				<!--The Child Elements have to be filled from Table Methods_Animals_Details.-->
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tMethods_Animals_Details">
+		<xsd:sequence>
+			<xsd:element name="MacaqueSpecies" type="tString50" sql:relation="Methods_Animals_Details" sql:field="MacaqueSpecies"/>
+			<xsd:element name="Sex" type="tSex_Animals" sql:relation="Methods_Animals_Details" sql:field="Gender"/>
+			<xsd:element name="Number" type="tString10" sql:relation="Methods_Animals_Details" sql:field="Nbr"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tSex_Animals">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="?"/>
+			<xsd:enumeration value="M"/>
+			<xsd:enumeration value="F"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tInjection">
+		<xsd:sequence>
+			<xsd:element name="InjectedBrainsite" type="tInvestigatedBrainSite" sql:relation="Injections" sql:field="">
+				<!--The Child Elements have to be filled from Table Injections-->
+			</xsd:element>
+			<xsd:element name="AffectedSites" type="tInvestigatedBrainSite" minOccurs="0" maxOccurs="unbounded" sql:relation="Injections_AffectedSites" sql:field="">
+				<!--The Child Elements have to be filled from Table Injections_AffectedSites-->
+			</xsd:element>
+			<xsd:element name="Volume" type="tString20" sql:relation="Injections" sql:field="Volume"/>
+			<xsd:element name="Concentration" type="tString50" sql:relation="Injections" sql:field="Concentration"/>
+			<xsd:element name="MethodicalProblems" type="xsd:boolean" minOccurs="0" sql:relation="Injections" sql:field="MethodicalProblems"/>
+			<xsd:element name="Reference" type="tReference_Data" minOccurs="0" sql:relation="Thickness_Sections" sql:field="BilateralUse_Tracer"/>
+			<xsd:element name="LabelledBrainSite" type="tLabelledBrainSite" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tLabelledBrainSite">
+		<xsd:sequence>
+			<xsd:element name="BrainSite" type="tInvestigatedBrainSite">
+				<!--The Child Elements have to be filled from Table Labeled Sites Data and Labeled Sites Description-->
+			</xsd:element>
+			<xsd:element name="Course" type="tCourse" sql:relation="LabeledSites_Descriptions" sql:field="Henisphere"/>
+			<xsd:element name="Location" type="tLabel_Location" sql:relation="LabeledSites_Descriptions" sql:field="Terminal_vs_Soma"/>
+			<xsd:element name="Density" type="tLabelDensity"/>
+			<xsd:element name="QuantitativeData" type="tQuantitativeData" minOccurs="0">
+				<!--The Child Elements have to be filled from Table Labeled Sites Data-->
+			</xsd:element>
+			<xsd:element name="Reference" type="tReference_Data" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tLabel_Location">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="?"/>
+			<xsd:enumeration value="T"/>
+			<xsd:enumeration value="S"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tQuantitativeData">
+		<xsd:sequence>
+			<xsd:element name="TotalNbr_Neurons_Site" type="tString10" minOccurs="0" sql:relation="LabelledSites_Data_QD_Site_Nbr" sql:field="TotalNbr_Neurons"/>
+			<xsd:element name="Percentage_Site" type="tString10" minOccurs="0"/>
+			<xsd:element name="Percentage_Lamina" minOccurs="0" maxOccurs="6">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Lamina" type="tString10"/>
+						<xsd:element name="Percentage" type="tString10" sql:relation="LabelledSites_Data_QD_Lamina_Percent" sql:field="Percentage"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ================= connectivity data ================== -->
+	<xsd:complexType name="tProcessedConnectivityData">
+		<xsd:sequence>
+			<xsd:element name="PrimaryProjection" type="tPrimaryProjection" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="IntegratedPrimaryProjection" type="tIntegratedPrimaryProjection" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ResultingProjection" type="tResultingProjection" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="IntegratedResultingProjection" type="tIntegratedResultingProjection" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tPrimaryProjection">
+		<xsd:complexContent>
+			<xsd:extension base="tProjection">
+				<xsd:sequence>
+					<xsd:element name="History" type="tHistory_PrimaryProj" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tIntegratedPrimaryProjection">
+		<xsd:complexContent>
+			<xsd:extension base="tProjection">
+				<xsd:sequence>
+					<xsd:element name="History" type="tHistory_IntegrPrimaryProj" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tResultingProjection">
+		<xsd:complexContent>
+			<xsd:extension base="tProjection">
+				<xsd:sequence>
+					<xsd:element name="History" type="tHistory_ResultingProj" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tIntegratedResultingProjection">
+		<xsd:complexContent>
+			<xsd:extension base="tProjection">
+				<xsd:sequence>
+					<xsd:element name="History" type="tHistory_IntegrResultingProj" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="tProjection">
+		<xsd:sequence>
+			<xsd:element name="SourceSite" type="tInvestigatedBrainSite"/>
+			<xsd:element name="TargetSite" type="tInvestigatedBrainSite"/>
+			<xsd:element name="Density" type="tLabelDensity"/>
+			<xsd:element name="Course" type="tCourse"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tHistory_PrimaryProj">
+		<xsd:sequence>
+			<xsd:element name="RawProjection" type="tExpData" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tHistory_IntegrPrimaryProj">
+		<xsd:sequence>
+			<xsd:element name="PrimaryProjection" type="tPrimaryProjection" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tHistory_ResultingProj">
+		<xsd:sequence>
+			<xsd:element name="IntegratedPrimaryProjection" type="tIntegratedPrimaryProjection" maxOccurs="unbounded"/>
+			<xsd:element name="TransformationPath_Source" type="tResultingRelation" minOccurs="0"/>
+			<xsd:element name="TransformationPath_Target" type="tResultingRelation" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="tHistory_IntegrResultingProj">
+		<xsd:sequence>
+			<xsd:element name="ResultingProjection" type="tResultingProjection" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ================= general CoCoMac types ================== -->
+	<xsd:complexType name="tGeneralBrainSite">
+		<xsd:sequence>
+			<xsd:element name="ID_BrainSite" type="tID_BrainSite" sql:relation="BrainMaps_BrainSites" sql:field="ID">
+				<!--BrainSiteInformation from BrainMaps_BrainSites with link to the Table this barinsite was used.-->
+			</xsd:element>
+			<xsd:element name="SiteClass" type="tSiteClass" minOccurs="0" sql:relation="BrainMaps_BrainSites" sql:field="SiteClass"/>
+			<xsd:element name="Acronym" type="tAcronym" minOccurs="0" sql:relation="BrainMaps_BrainSiteAcronyms" sql:field="Acronym"/>
+			<xsd:element name="FullName" type="tString255" minOccurs="0" sql:relation="BrainMaps_BrainSiteAcronyms" sql:field="FullName"/>
+			<xsd:element name="DefType" type="tDefType" minOccurs="0" sql:relation="BrainMaps_BrainSites" sql:field="SiteDef_Type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tDefType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[DAda]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tInvestigatedBrainSite">
+		<xsd:sequence>
+			<xsd:element name="ID_BrainSite" type="tID_BrainSite"/>
+			<xsd:element name="SiteType" type="tSiteType" minOccurs="0"/>
+			<xsd:element name="Hemisphere" type="tHemisphere"/>
+			<xsd:element name="PDC_Site" type="tPDC_Site" minOccurs="0"/>
+			<xsd:element name="Extent" type="tExtent"/>
+			<xsd:element name="Laminae" type="tLaminarPattern_IsoCtx" minOccurs="0"/>
+			<xsd:element name="Sublamina" type="tString50" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tID_BrainSite">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tAcronym">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tSiteClass">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Area_AlloCtx"/>
+			<xsd:enumeration value="Area_IsoCtx"/>
+			<xsd:enumeration value="Band_Ctx"/>
+			<xsd:enumeration value="Column_Ctx"/>
+			<xsd:enumeration value="Lamina_Ctx"/>
+			<xsd:enumeration value="Lamina_SubCtx"/>
+			<xsd:enumeration value="Neuron_Ensemble"/>
+			<xsd:enumeration value="Neuron_Soma"/>
+			<xsd:enumeration value="Nucl_SubCtx"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tSiteType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Area_AlloCtx_2D"/>
+			<xsd:enumeration value="Area_AlloCtx_3D"/>
+			<xsd:enumeration value="Area_IsoCtx_2D"/>
+			<xsd:enumeration value="Area_IsoCtx_3D"/>
+			<xsd:enumeration value="Band_Ctx_3D"/>
+			<xsd:enumeration value="Column_Ctx_3D"/>
+			<xsd:enumeration value="Lamina_Ctx_2D"/>
+			<xsd:enumeration value="Lamina_Ctx_3D"/>
+			<xsd:enumeration value="Lamina_SubCtx_3D"/>
+			<xsd:enumeration value="Neuron_Ensemble_3D"/>
+			<xsd:enumeration value="Neuron_Soma_3D"/>
+			<xsd:enumeration value="Nucl_SubCtx_3D"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tPDC_Site">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([A-Q]|[a-q]){1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tExtent">
+		<xsd:sequence>
+			<xsd:element name="EC" type="tEC"/>
+			<xsd:element name="PDC_EC" type="tPDC_EC" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tEC">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[NnPpXxCc§$%]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tPDC_EC">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([A-O]|[a-o]|\-){1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tLaminarPattern_IsoCtx">
+		<xsd:sequence>
+			<xsd:element name="Pattern" type="tIsoCtx_Laminae"/>
+			<xsd:element name="PDC_Laminae" type="tPDC_Laminae" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tIsoCtx_Laminae">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0123Xx?]{6}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tPDC_Laminae">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([A-J]|[a-j]|\-){1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tLabelDensity">
+		<xsd:sequence>
+			<xsd:element name="Degree">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:pattern value="[0123Xx]{1}"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PDC_Density" type="tPDC_Density" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="tPDC_Density">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([A-J]|[a-j]|\-){1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tHemisphere">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[LRlr?]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tCourse">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[ICic?]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="tReference_Data">
+		<xsd:sequence>
+			<xsd:element name="ID_Literature" type="tString10"/>
+			<xsd:element name="TextPageNumber" type="tString50" minOccurs="0"/>
+			<xsd:element name="FigureNumber" type="tString50" minOccurs="0"/>
+			<xsd:element name="Quotation" type="tMemoString" minOccurs="0"/>
+			<xsd:element name="Comments" type="tMemoString" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ================= misc. general types ================== -->
+	<xsd:simpleType name="tString10">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tString20">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tString50">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tString255">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="255"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tMemoString">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="65536"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="tYear">
+		<xsd:restriction base="xsd:integer">
+			<xsd:minInclusive value="1800"/>
+			<xsd:maxInclusive value="2100"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>
+
