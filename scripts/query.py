@@ -7,6 +7,7 @@
 
 # Stdlib
 import urllib, urllib2
+import os
 
 from xml.etree.ElementTree import ElementTree
 
@@ -24,13 +25,23 @@ url_base = "http://cocomac.org/URLSearch.asp?"
 
 schema_base = '{http://www.cocomac.org}'
 
-site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
-             {'Extent': ['EC', 'PDC_EC'],
-              'Laminae': ['Pattern', 'PDC_Laminae'] }
-             ]
+# For Connectivity:
+#site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
+#             {'Extent': ['EC', 'PDC_EC'],
+#              'Laminae': ['Pattern', 'PDC_Laminae'] }
+#             ]
+#
+#edge_spec = ['Course',
+#             {'Density' : ['Degree', 'PDC_Density'] } ]
+#
+#source_name, target_name = 'SourceSite', 'TargetSite'
 
-edge_spec = ['Course',
-             {'Density' : ['Degree', 'PDC_Density'] } ]
+# For Mapping:
+site_spec = ['ID_BrainSite']
+
+edge_spec = ['RC']
+
+source_name, target_name = 'SourceBrainSite', 'TargetBrainSite'
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -46,7 +57,21 @@ def fetch_cocomac_tree(url):
     """
     coco = urllib2.urlopen(url)
     tree = ElementTree()
-    tree.parse(coco)
+    if source_name == 'SourceSite':
+        tree.parse(coco)
+    # Initially the Mapping XML has a long string of garbage characters
+    # in front of the proper beginning code. Hence we remove this chaff.
+    else:
+        long_line = coco.readline()
+        chaff, wheat = long_line.split('))',1)
+        rest = coco.readlines()
+        xml_file = '/home/despo/dbliss/cocomac/xml.txt'
+        with open(xml_file,'w') as f:
+            f.write(wheat)
+            for line in rest:
+                f.write(line)
+        tree.parse(xml_file)
+        os.remove(xml_file)
     return tree
 
 
@@ -195,7 +220,6 @@ def parse_site(site):
     node_id = parse_element(site, site_spec)
     return node_id['ID_BrainSite'], node_id
 
-
 def tree2graph(node, edge='IntegratedPrimaryProjection'):
     """Convert a Cocomac XML connectivity tree to a Networkx DiGraph.
 
@@ -216,8 +240,8 @@ def tree2graph(node, edge='IntegratedPrimaryProjection'):
     g = nx.DiGraph()
 
     def add_edge(xnode):
-        src = parse_site(nfind(xnode, 'SourceSite'))
-        tgt = parse_site(nfind(xnode, 'TargetSite'))
+        src = parse_site(nfind(xnode, source_name))
+        tgt = parse_site(nfind(xnode, target_name))
         edge_data = parse_element(xnode, edge_spec)
         
         g.add_nodes_from([src, tgt])
@@ -225,5 +249,8 @@ def tree2graph(node, edge='IntegratedPrimaryProjection'):
     
     if isinstance(node, ElementTree):
         node = node.getroot()
-    walk_tree(node, full_tag(edge), add_edge)
+    # Connectivity:
+#    walk_tree(node, full_tag(edge), add_edge)
+    # Mapping:
+    walk_tree(node, full_tag('PrimaryRelation'), add_edge)
     return g
