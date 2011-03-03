@@ -62,12 +62,12 @@ def fetch_cocomac_tree(url):
     # Initially the Mapping XML has a long string of garbage characters
     # in front of the proper beginning code. Hence we remove this chaff.
     else:
-        long_line = coco.readline()
-        chaff, wheat = long_line.split('))',1)
+        coco.readline()
+        first_line = '<?xml version="1.0" encoding="UTF-8"?><CoCoMacExport xmlns="http://www.cocomac.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cocomac.org http://www.cocomac.org/cocomac.xsd">\n'
         rest = coco.readlines()
         xml_file = '/home/despo/dbliss/cocomac/xml.txt'
         with open(xml_file,'w') as f:
-            f.write(wheat)
+            f.write(first_line)
             for line in rest:
                 f.write(line)
         tree.parse(xml_file)
