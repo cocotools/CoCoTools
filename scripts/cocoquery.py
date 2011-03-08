@@ -30,7 +30,7 @@ search_category, data_set = 'Mapping', 'PrimRel'
 output_type = 'XML_Browser'
 
 # Set string.
-map_of_interest = 'PP02'
+map_of_interest = 'PP94'
 search_string = ("(('%s')[SourceMap]OR('%s')[TargetMap])" % (
     map_of_interest, map_of_interest))
 
