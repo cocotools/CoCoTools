@@ -9,6 +9,7 @@ from __future__ import print_function
 # Stdlib
 import urllib2
 import pickle
+import sys
 
 from xml.etree.ElementTree import ElementTree
 
@@ -23,14 +24,15 @@ from query import query_cocomac, tree2graph
 user = 'teamcoco'
 password = 'teamcoco'
 
-# Set Mapping or Connectivity
-#search_category, data_set = 'Connectivity', 'IntPrimProj'
-search_category, data_set = 'Mapping', 'PrimRel'
+if sys.argv[1][0].lower() == 'm':
+    search_category, data_set = 'Mapping', 'PrimRel'
+else:
+    search_category, data_set = 'Connectivity', 'IntPrimProj'
 
 output_type = 'XML_Browser'
 
 # Set string.
-map_of_interest = 'PP94'
+map_of_interest = 'PP99'
 search_string = ("(('%s')[SourceMap]OR('%s')[TargetMap])" % (
     map_of_interest, map_of_interest))
 
@@ -62,6 +64,6 @@ print(g.node[g.nodes()[0]])
 
 # Save the graph
 homedir = '/home/despo/dbliss/cocomac/graphs/mapping/'
-file_name = str('%s_mapping_graph.pck' % map_of_interest)
+file_name = str('%s_%s_graph.pck' % (map_of_interest, sys.argv[0]))
 with open(homedir+file_name, 'w') as f:
     pickle.dump(g,f)

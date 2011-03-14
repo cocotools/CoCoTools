@@ -25,23 +25,19 @@ url_base = "http://cocomac.org/URLSearch.asp?"
 
 schema_base = '{http://www.cocomac.org}'
 
-# For Connectivity:
-#site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
-#             {'Extent': ['EC', 'PDC_EC'],
-#              'Laminae': ['Pattern', 'PDC_Laminae'] }
-#             ]
-#
-#edge_spec = ['Course',
-#             {'Density' : ['Degree', 'PDC_Density'] } ]
-#
-#source_name, target_name = 'SourceSite', 'TargetSite'
+if sys.argv[1][0].lower() == 'c':
+    site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
+             {'Extent': ['EC', 'PDC_EC'],
+              'Laminae': ['Pattern', 'PDC_Laminae'] }
+             ]
+    edge_spec = ['Course',
+             {'Density' : ['Degree', 'PDC_Density'] } ]
+    source_name, target_name = 'SourceSite', 'TargetSite'
 
-# For Mapping:
-site_spec = ['ID_BrainSite']
-
-edge_spec = ['RC']
-
-source_name, target_name = 'SourceBrainSite', 'TargetBrainSite'
+else:
+    site_spec = ['ID_BrainSite']
+    edge_spec = ['RC']
+    source_name, target_name = 'SourceBrainSite', 'TargetBrainSite'
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -249,8 +245,8 @@ def tree2graph(node, edge='IntegratedPrimaryProjection'):
     
     if isinstance(node, ElementTree):
         node = node.getroot()
-    # Connectivity:
-#    walk_tree(node, full_tag(edge), add_edge)
-    # Mapping:
-    walk_tree(node, full_tag('PrimaryRelation'), add_edge)
+    if sys.argv[1][0].lower() == 'c':
+        walk_tree(node, full_tag(edge), add_edge)
+    else:
+        walk_tree(node, full_tag('PrimaryRelation'), add_edge)
     return g

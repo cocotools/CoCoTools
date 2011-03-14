@@ -14,3 +14,5 @@ PP94
 PP02
 PP99
 W40
+
+and there are no contradictions in merged_mapping_graph
