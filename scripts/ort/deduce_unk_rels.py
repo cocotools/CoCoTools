@@ -73,19 +73,21 @@ for index in range(len(nodes)):
     i = nodes[index]
     for v in g.predecessors(i):
         for w in g.successors(i):
-            # RC_final is the RC for an edge as stated in the literature (entered
-            # into CoCoMac, and downloaded by us) or as applied in this script
-            # (see below).
-            new_path_code = g.edge[v][i]['RC_final'] + g.edge[i][w]['RC_final']
-            v_i_w = FA(new_path_code)
-            if v_i_w.q > 0:
-                if not g.has_edge(v, w):
-                    g.add_edge(v, w, RC_final=new_path_code, cat=v_i_w.q)
-                else:
-                    v_w = FA(g.edge[v][w]['RC_final'])
-                    if v_i_w.q < v_w.q:
-                        g.edge[v][w]['RC_final'] = v_i_w.word
-                        g.edge[v][w]['category'] = v_i_w.q
+            # Only consider regions from different maps.
+            if v.split('-')[0] != w.split('-')[0]:
+                # RC_final is the RC for an edge as stated in the literature (entered
+                # into CoCoMac, and downloaded by us) or as applied in this script
+                # (see below).
+                new_path_code = g.edge[v][i]['RC_final'] + g.edge[i][w]['RC_final']
+                v_i_w = FA(new_path_code)
+                if v_i_w.q > 0:
+                    if not g.has_edge(v, w):
+                        g.add_edge(v, w, RC_final=new_path_code, cat=v_i_w.q)
+                    else:
+                        v_w = FA(g.edge[v][w]['RC_final'])
+                        if v_i_w.q < v_w.q:
+                            g.edge[v][w]['RC_final'] = v_i_w.word
+                            g.edge[v][w]['category'] = v_i_w.q
 
 with open(output_file,'w') as f:
     pickle.dump(g, f)

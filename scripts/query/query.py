@@ -8,6 +8,7 @@
 # Stdlib
 import urllib, urllib2
 import os
+import sys
 
 from xml.etree.ElementTree import ElementTree
 
@@ -53,21 +54,7 @@ def fetch_cocomac_tree(url):
     """
     coco = urllib2.urlopen(url)
     tree = ElementTree()
-    if source_name == 'SourceSite':
-        tree.parse(coco)
-    # Initially the Mapping XML has a long string of garbage characters
-    # in front of the proper beginning code. Hence we remove this chaff.
-    else:
-        coco.readline()
-        first_line = '<?xml version="1.0" encoding="UTF-8"?><CoCoMacExport xmlns="http://www.cocomac.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cocomac.org http://www.cocomac.org/cocomac.xsd">\n'
-        rest = coco.readlines()
-        xml_file = '/home/despo/dbliss/cocomac/xml.txt'
-        with open(xml_file,'w') as f:
-            f.write(first_line)
-            for line in rest:
-                f.write(line)
-        tree.parse(xml_file)
-        os.remove(xml_file)
+    tree.parse(coco)
     return tree
 
 
