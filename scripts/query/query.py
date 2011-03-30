@@ -10,12 +10,14 @@ import urllib, urllib2
 import os
 import sys
 
+from cStringIO import StringIO
 from xml.etree.ElementTree import ElementTree
 
 # Third-party
 import networkx as nx
 
 # Local
+import utils
 from decotools import memoize
 
 #-----------------------------------------------------------------------------
@@ -26,19 +28,25 @@ url_base = "http://cocomac.org/URLSearch.asp?"
 
 schema_base = '{http://www.cocomac.org}'
 
-if sys.argv[1][0].lower() == 'c':
-    site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
-             {'Extent': ['EC', 'PDC_EC'],
-              'Laminae': ['Pattern', 'PDC_Laminae'] }
-             ]
-    edge_spec = ['Course',
-             {'Density' : ['Degree', 'PDC_Density'] } ]
-    source_name, target_name = 'SourceSite', 'TargetSite'
-
-else:
-    site_spec = ['ID_BrainSite']
-    edge_spec = ['RC']
-    source_name, target_name = 'SourceBrainSite', 'TargetBrainSite'
+specs = dict(
+    # For connectivity searches
+    connectivity=dict(
+        site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
+                     {'Extent': ['EC', 'PDC_EC'],
+                      'Laminae': ['Pattern', 'PDC_Laminae'] }
+                     ],
+        edge_spec = ['Course',
+                     {'Density' : ['Degree', 'PDC_Density'] } ],
+        source_name, 'SourceSite',
+        target_name = 'TargetSite'),
+    
+    # For mapping searches
+    mapping = dict(
+        site_spec = ['ID_BrainSite'],
+        edge_spec = ['RC'],
+        source_name = 'SourceBrainSite',
+        target_name =  'TargetBrainSite')
+    )
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -52,9 +60,19 @@ def fetch_cocomac_tree(url):
     ----
     This function caches previous executions during the same session.
     """
-    coco = urllib2.urlopen(url)
+    # We need to read the output to a string for scrubbing, because cocomac is
+    # returning invalid xml sometimes.  But ElementTree expects a file-like
+    # object for parsing, so we wrap our scrubbed string in a StringIO object.
+    coco = urllib2.urlopen(url).read()
+    s = StringIO()
+    s.write(utils.scrub_xml(coco))
+    # Reset the file pointer to the start so ElementTree can read it
+    s.seek(0)
     tree = ElementTree()
-    tree.parse(coco)
+    try:
+        tree.parse(s)
+    finally:
+        s.close()
     return tree
 
 
@@ -72,6 +90,7 @@ def query_cocomac(dquery):
     dquery : dict
       A dict with all the fields to construct a full Cocomac query.
     """
+    #q = mk_query_url(dquery); print 'Query\n', q  # dbg
     return fetch_cocomac_tree(mk_query_url(dquery))
 
 
@@ -189,7 +208,7 @@ def parse_element(node, spec):
     return data
 
 
-def parse_site(site):
+def parse_site(site, site_spec):
     """Parse a node of brain site type.
 
     The return is a pair of (string, dict) suitable for creating a node with
@@ -203,7 +222,8 @@ def parse_site(site):
     node_id = parse_element(site, site_spec)
     return node_id['ID_BrainSite'], node_id
 
-def tree2graph(node, edge='IntegratedPrimaryProjection'):
+
+def tree2graph(node, search_type):
     """Convert a Cocomac XML connectivity tree to a Networkx DiGraph.
 
     Parameters
@@ -220,20 +240,23 @@ def tree2graph(node, edge='IntegratedPrimaryProjection'):
       A directed graph is constructed with attributes on all nodes and edges as
       extracted from the matching nodes.
     """
+    # FIXME: edge should be selected based on search type
+    # edge='IntegratedPrimaryProjection'
+    
+    spec = specs[search_type]
+    
     g = nx.DiGraph()
-
+    
     def add_edge(xnode):
-        src = parse_site(nfind(xnode, source_name))
-        tgt = parse_site(nfind(xnode, target_name))
-        edge_data = parse_element(xnode, edge_spec)
+        src = parse_site(nfind(xnode, spec['source_name'])
+        tgt = parse_site(nfind(xnode, spec['target_name'], spec['site_spec']))
+        edge_data = parse_element(xnode, spec['edge_spec'])
         
         g.add_nodes_from([src, tgt])
         g.add_edge(src[0], tgt[0], edge_data)
     
     if isinstance(node, ElementTree):
         node = node.getroot()
-    if sys.argv[1][0].lower() == 'c':
-        walk_tree(node, full_tag(edge), add_edge)
-    else:
-        walk_tree(node, full_tag('PrimaryRelation'), add_edge)
+
+    walk_tree(node, full_tag(edge), add_edge)
     return g

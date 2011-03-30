@@ -81,7 +81,7 @@ def execute_query(type='m', map=None, region=None):
 #-----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    home_dir = '/home/despo/dbliss/cocomac/graphs/'
+    home_dir = '../../graphs/'
 
     with open('%spfc_graph_named.pck' % home_dir) as f:
         g = pickle.load(f)
