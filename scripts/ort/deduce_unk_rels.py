@@ -78,16 +78,8 @@ def determine_RC_res(category):
     RC_res : string
       RC to which the path code reduces unambiguously.
     """
-    if category == 1:
-        return 'I'
-    elif category == 2:
-        return 'S'
-    elif category == 3:
-        return 'L'
-    elif category == 5:
-        return 'O'
-    else:
-        return 'SLO?'
+    rules = {1: 'I', 2: 'S', 3: 'L', 4: 'SLO?', 5: 'O'}
+    return rules[category]
 
 #-----------------------------------------------------------------------------
 # Main script
