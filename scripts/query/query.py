@@ -28,25 +28,28 @@ url_base = "http://cocomac.org/URLSearch.asp?"
 
 schema_base = '{http://www.cocomac.org}'
 
-specs = dict(
-    # For connectivity searches
-    connectivity=dict(
-        site_spec = ['ID_BrainSite', 'SiteType', 'Hemisphere', 'PDC_Site',
-                     {'Extent': ['EC', 'PDC_EC'],
-                      'Laminae': ['Pattern', 'PDC_Laminae'] }
-                     ],
-        edge_spec = ['Course',
-                     {'Density' : ['Degree', 'PDC_Density'] } ],
-        source_name, 'SourceSite',
-        target_name = 'TargetSite'),
-    
-    # For mapping searches
-    mapping = dict(
-        site_spec = ['ID_BrainSite'],
-        edge_spec = ['RC'],
-        source_name = 'SourceBrainSite',
-        target_name =  'TargetBrainSite')
-    )
+specs = {'Connectivity': {'source_name': 'SourceSite',
+                          'target_name': 'TargetSite',
+                          'site_spec': ['ID_BrainSite',
+                                        'SiteType',
+                                        'Hemisphere',
+                                        'PDC_Site',
+                                        {'Extent': ['EC', 'PDC_EC'],
+                                         'Laminae': ['Pattern', 'PDC_Laminae']
+                                         }
+                                        ],
+                          'edge_spec': ['Course',
+                                        {'Density': ['Degree', 'PDC_Density']}
+                                        ]
+                          'edge_label': ########
+                          },
+         'Mapping': {'source_name': 'SourceBrainSite',
+                     'target_name': 'TargetBrainSite',
+                     'site_spec': ['ID_BrainSite'],
+                     'edge_spec': ['RC']
+                     'edge_label': ############
+                     }
+         }
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -228,11 +231,11 @@ def tree2graph(node, search_type):
 
     Parameters
     ----------
-    tree : ElementTree or Element instance
+    node : ElementTree or Element instance
 
-    edge : string
-      The label of the nodes that have to match to be processed into the final
-      tree.  Nodes that don't match this label will be silently ignored.
+    search_type : string
+      'Mapping' or 'Connectivity'. Determines which specs are searched for
+      in the ElementTree.
 
     Returns
     -------
@@ -240,10 +243,9 @@ def tree2graph(node, search_type):
       A directed graph is constructed with attributes on all nodes and edges as
       extracted from the matching nodes.
     """
-    # FIXME: edge should be selected based on search type
-    # edge='IntegratedPrimaryProjection'
-    
     spec = specs[search_type]
+
+    edge = spec[
     
     g = nx.DiGraph()
     
@@ -258,5 +260,5 @@ def tree2graph(node, search_type):
     if isinstance(node, ElementTree):
         node = node.getroot()
 
-    walk_tree(node, full_tag(edge), add_edge)
+    walk_tree(node, full_tag(XXXXXXXXXXXXXXXXXx), add_edge)
     return g
