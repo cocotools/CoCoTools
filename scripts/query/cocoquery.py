@@ -116,7 +116,8 @@ if __name__ == '__main__':
         # compose operation will overwrite the RC in g with that in merged_g.
         # Contradictory RCs (which should be rare) will not be flagged.
         merged_g = nx.compose(merged_g, g)
+        print("Done with region %s's query." % region)
 
-    with open('%smapping/m&s_merged_mapping_graph.pck','w') as f:
+    with open('%smapping/modha_merged_mapping_graph.pck' % home_dir,'w') as f:
         pickle.dump(merged_g,f)
     

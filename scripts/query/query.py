@@ -40,14 +40,14 @@ specs = {'Connectivity': {'source_name': 'SourceSite',
                                         ],
                           'edge_spec': ['Course',
                                         {'Density': ['Degree', 'PDC_Density']}
-                                        ]
-                          'edge_label': ########
+                                        ],
+                          'edge_label': 'IntegratedPrimaryProjection'
                           },
          'Mapping': {'source_name': 'SourceBrainSite',
                      'target_name': 'TargetBrainSite',
                      'site_spec': ['ID_BrainSite'],
-                     'edge_spec': ['RC']
-                     'edge_label': ############
+                     'edge_spec': ['RC'],
+                     'edge_label': 'PrimaryRelation'
                      }
          }
 
@@ -245,13 +245,13 @@ def tree2graph(node, search_type):
     """
     spec = specs[search_type]
 
-    edge = spec[
+    edge_label = spec['edge_label']
     
     g = nx.DiGraph()
     
     def add_edge(xnode):
-        src = parse_site(nfind(xnode, spec['source_name'])
-        tgt = parse_site(nfind(xnode, spec['target_name'], spec['site_spec']))
+        src = parse_site(nfind(xnode, spec['source_name']), spec['site_spec'])
+        tgt = parse_site(nfind(xnode, spec['target_name']), spec['site_spec'])
         edge_data = parse_element(xnode, spec['edge_spec'])
         
         g.add_nodes_from([src, tgt])
@@ -260,5 +260,5 @@ def tree2graph(node, search_type):
     if isinstance(node, ElementTree):
         node = node.getroot()
 
-    walk_tree(node, full_tag(XXXXXXXXXXXXXXXXXx), add_edge)
+    walk_tree(node, full_tag(edge_label), add_edge)
     return g
