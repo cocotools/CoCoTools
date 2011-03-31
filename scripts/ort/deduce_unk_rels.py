@@ -59,6 +59,37 @@ class FA(object):
             self.q = self.move_rules[RC][self.q]
 
 #-----------------------------------------------------------------------------
+# Functions
+#-----------------------------------------------------------------------------
+
+def determine_RC_res(category):
+    """Takes a path category and returns the corresponding RC_res.
+
+    See Appendix E.
+
+    Parameters
+    ----------
+    category : int
+      Integer between 1 and 5 indicating the path category of the path code
+      for the associated edge.
+
+    Returns
+    -------
+    RC_res : string
+      RC to which the path code reduces unambiguously.
+    """
+    if category == 1:
+        return 'I'
+    elif category == 2:
+        return 'S'
+    elif category == 3:
+        return 'L'
+    elif category == 5:
+        return 'O'
+    else:
+        return 'SLO?'
+
+#-----------------------------------------------------------------------------
 # Main script
 #-----------------------------------------------------------------------------
 
@@ -74,7 +105,7 @@ for index in range(len(nodes)):
     for v in g.predecessors(i):
         for w in g.successors(i):
             # Only consider regions from different maps.
-            if v.split('-')[0] != w.split('-')[0]:
+            if v.split('-')[0] != w.split('-')[0] != i.split('-')[0]:
                 # RC_final is the RC for an edge as stated in the literature (entered
                 # into CoCoMac, and downloaded by us) or as applied in this script
                 # (see below).
@@ -88,6 +119,17 @@ for index in range(len(nodes)):
                         if v_i_w.q < v_w.q:
                             g.edge[v][w]['RC_final'] = v_i_w.word
                             g.edge[v][w]['category'] = v_i_w.q
+
+edges = g.edges()
+edges_copy = copy.deepcopy(edges)
+for edge in edges_copy:
+    edge_attributes = g.edge[edge[0]][edge[1]]
+    if edge_attributes.has_key('category'):
+        edge_attributes['RC_final'] = determine_RC_res(edge_attributes['category'])
+        #For now we are not going to deal with the complications associated with
+        #interpreting category 4 (see Appendix E). Edges in this category are deleted.
+        if edge_attributes['category'] == 4:
+            g.remove_edge(edge)
 
 with open(output_file,'w') as f:
     pickle.dump(g, f)
