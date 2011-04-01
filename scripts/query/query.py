@@ -5,6 +5,8 @@
 # Library imports
 #-----------------------------------------------------------------------------
 
+from __future__ import print_function
+
 # Stdlib
 import urllib, urllib2
 import os
@@ -74,6 +76,9 @@ def fetch_cocomac_tree(url):
     tree = ElementTree()
     try:
         tree.parse(s)
+    except Exception:
+        print(url)
+        1/0
     finally:
         s.close()
     return tree

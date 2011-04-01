@@ -111,13 +111,15 @@ if __name__ == '__main__':
     
     merged_g = nx.DiGraph()
     for region in regions:
-        g = execute_query('Mapping', region=region)
-        # NB: If the same edge exists in g and merged_g before the merge, the
-        # compose operation will overwrite the RC in g with that in merged_g.
-        # Contradictory RCs (which should be rare) will not be flagged.
+        g = execute_query('Connectivity', region=region)
+        # NB for Mapping searches: If the same edge exists in g and merged_g
+        # before the merge, the compose operation will overwrite the RC in g
+        # with that in merged_g. Contradictory RCs (which should be rare) will
+        # not be flagged.
         merged_g = nx.compose(merged_g, g)
         print("Done with region %s's query." % region)
 
-    with open('%smapping/modha_merged_mapping_graph.pck' % home_dir,'w') as f:
+    with open('%smapping/modha_merged_connectivity_graph.pck' % home_dir,
+              'w') as f:
         pickle.dump(merged_g,f)
     
