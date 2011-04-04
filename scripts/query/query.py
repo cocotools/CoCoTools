@@ -33,15 +33,10 @@ schema_base = '{http://www.cocomac.org}'
 specs = {'Connectivity': {'source_name': 'SourceSite',
                           'target_name': 'TargetSite',
                           'site_spec': ['ID_BrainSite',
-                                        'SiteType',
-                                        'Hemisphere',
                                         'PDC_Site',
-                                        {'Extent': ['EC', 'PDC_EC'],
-                                         'Laminae': ['Pattern', 'PDC_Laminae']
-                                         }
+                                        {'Extent': ['EC', 'PDC_EC']}
                                         ],
-                          'edge_spec': ['Course',
-                                        {'Density': ['Degree', 'PDC_Density']}
+                          'edge_spec': [{'Density': ['Degree', 'PDC_Density']}
                                         ],
                           'edge_label': 'IntegratedPrimaryProjection'
                           },
@@ -258,6 +253,9 @@ def tree2graph(node, search_type):
         src = parse_site(nfind(xnode, spec['source_name']), spec['site_spec'])
         tgt = parse_site(nfind(xnode, spec['target_name']), spec['site_spec'])
         edge_data = parse_element(xnode, spec['edge_spec'])
+
+        edge_data['EC_s'] = src[1]['EC']
+        edge_data['EC_t'] = tgt[1]['EC']
         
         g.add_nodes_from([src, tgt])
         g.add_edge(src[0], tgt[0], edge_data)
