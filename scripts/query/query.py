@@ -9,8 +9,8 @@ from __future__ import print_function
 
 # Stdlib
 import urllib, urllib2
-import os
-import sys
+import pdb
+import xml.parsers.expat
 
 from cStringIO import StringIO
 from xml.etree.ElementTree import ElementTree
@@ -20,33 +20,8 @@ import networkx as nx
 
 # Local
 import utils
+reload(utils)
 from decotools import memoize
-
-#-----------------------------------------------------------------------------
-# Globals
-#-----------------------------------------------------------------------------
-
-url_base = "http://cocomac.org/URLSearch.asp?"
-
-schema_base = '{http://www.cocomac.org}'
-
-specs = {'Connectivity': {'source_name': 'SourceSite',
-                          'target_name': 'TargetSite',
-                          'site_spec': ['ID_BrainSite',
-                                        'PDC_Site',
-                                        {'Extent': ['EC', 'PDC_EC']}
-                                        ],
-                          'edge_spec': [{'Density': ['Degree', 'PDC_Density']}
-                                        ],
-                          'edge_label': 'IntegratedPrimaryProjection'
-                          },
-         'Mapping': {'source_name': 'SourceBrainSite',
-                     'target_name': 'TargetBrainSite',
-                     'site_spec': ['ID_BrainSite'],
-                     'edge_spec': ['RC'],
-                     'edge_label': 'PrimaryRelation'
-                     }
-         }
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -56,6 +31,16 @@ specs = {'Connectivity': {'source_name': 'SourceSite',
 def fetch_cocomac_tree(url):
     """Get a url from the Cocomac database and return an ElementTree.
 
+    Parameters
+    ----------
+    url : string
+      A URL.
+
+    Returns
+    -------
+    tree : ElementTree
+      XML tree made from CoCoMac query output.
+
     Note
     ----
     This function caches previous executions during the same session.
@@ -63,25 +48,40 @@ def fetch_cocomac_tree(url):
     # We need to read the output to a string for scrubbing, because cocomac is
     # returning invalid xml sometimes.  But ElementTree expects a file-like
     # object for parsing, so we wrap our scrubbed string in a StringIO object.
-    coco = urllib2.urlopen(url).read()
-    s = StringIO()
-    s.write(utils.scrub_xml(coco))
+    try:
+        coco = urllib2.urlopen(url).read()
+    except urllib2.URLError, e:
+        print(e)
+        print('Check variable url.')
+        pdb.set_trace()
+    s_io = StringIO()
+    s_io.write(utils.scrub_xml(coco))
     # Reset the file pointer to the start so ElementTree can read it
-    s.seek(0)
+    s_io.seek(0)
     tree = ElementTree()
     try:
-        tree.parse(s)
-    except Exception:
-        print(url)
-        1/0
-    finally:
-        s.close()
+        tree.parse(s_io)
+    except xml.parsers.expat.ExpatError, e:
+        print(e)
+        print('Remember to close s_io!')
+        pdb.set_trace()
     return tree
 
 
 def mk_query_url(dquery):
     """Make a fully encoded query URL from a dict with the query data.
+
+    Parameters
+    ----------
+    dquery : dict
+      Dict with CoCoMac search terms.
+
+    Returns
+    -------
+    string
+      Fully encoded query URL.
     """
+    url_base = "http://cocomac.org/URLSearch.asp?"
     return url_base + urllib.urlencode(dquery)
 
 
@@ -92,48 +92,13 @@ def query_cocomac(dquery):
     ----------
     dquery : dict
       A dict with all the fields to construct a full Cocomac query.
+
+    Returns
+    -------
+    ElementTree
+      XML tree made from CoCoMac query output.
     """
-    #q = mk_query_url(dquery); print 'Query\n', q  # dbg
     return fetch_cocomac_tree(mk_query_url(dquery))
-
-
-def save_query(dquery, fname):
-    """Query the Cocomac database and save the output to a file.
-
-    Similar to query_cocomac, but instead of parsing the output into an
-    ElementTree, it is simply saved to disk without further post-processing.
-
-    Parameters
-    ----------
-    dquery : dict
-      A dict with all the fields to construct a full Cocomac query.
-
-    fname : string
-      Path of the file where the output should be saved.  This file is
-      overwritten without asking.
-    """
-    
-    url = mk_query_url(dquery)
-    with open(fname, 'w') as f:
-        f.write(urllib2.urlopen(url).read())
-    
-
-def print_tree(node, level=0):
-    """Recursively print all text and attributes of an ElementTree.
-    """
-    if isinstance(node, ElementTree):
-        node = node.getroot()
-        
-    fill = '    ' * level
-    print('%sElement: %s' % (fill, node.tag, ))
-    for (name, value) in node.attrib.items():
-        print('%s    Attr -- Name: %s  Value: %s' % (fill, name, value,))
-    if node.attrib.get('ID') is not None:
-        print('%s    ID: %s' % (fill, node.attrib.get('ID').value, ))
-    children = node.getchildren()
-    for child in children:
-        print_tree(child, level + 1)
-
 
 def walk_tree(node, match, callback):
     """Walk an ElementTree, calling a function for all matching nodes.
@@ -161,8 +126,8 @@ def walk_tree(node, match, callback):
 
 def full_tag(tag):
     """Return a fully qualified tag that includes the common prefix.
-
-    The prefix is stored in the module global schema_base."""
+    """
+    schema_base = '{http://www.cocomac.org}'
     return schema_base + tag
 
 
@@ -243,6 +208,26 @@ def tree2graph(node, search_type):
       A directed graph is constructed with attributes on all nodes and edges as
       extracted from the matching nodes.
     """
+    specs = {'Connectivity': {'source_name': 'SourceSite',
+                              'target_name': 'TargetSite',
+                              'site_spec': ['ID_BrainSite',
+                                            'PDC_Site',
+                                            {'Extent': ['EC', 'PDC_EC']}
+                                            ],
+                              'edge_spec': [{'Density': ['Degree',
+                                                         'PDC_Density']
+                                             }
+                                            ],
+                              'edge_label': 'IntegratedPrimaryProjection'
+                              },
+             'Mapping': {'source_name': 'SourceBrainSite',
+                         'target_name': 'TargetBrainSite',
+                         'site_spec': ['ID_BrainSite'],
+                         'edge_spec': ['RC'],
+                         'edge_label': 'PrimaryRelation'
+                         }
+             }
+    
     spec = specs[search_type]
 
     edge_label = spec['edge_label']
@@ -254,8 +239,9 @@ def tree2graph(node, search_type):
         tgt = parse_site(nfind(xnode, spec['target_name']), spec['site_spec'])
         edge_data = parse_element(xnode, spec['edge_spec'])
 
-        edge_data['EC_s'] = src[1]['EC']
-        edge_data['EC_t'] = tgt[1]['EC']
+        if search_type == 'Connectivity':
+            edge_data['EC_s'] = src[1]['Extent']['EC']
+            edge_data['EC_t'] = tgt[1]['Extent']['EC']
         
         g.add_nodes_from([src, tgt])
         g.add_edge(src[0], tgt[0], edge_data)
@@ -265,3 +251,47 @@ def tree2graph(node, search_type):
 
     walk_tree(node, full_tag(edge_label), add_edge)
     return g
+
+def execute_query(search_type, search_string):
+    """Queries CoCoMac.
+
+    Performs mapping or connectivity queries for a single map or a single
+    site.
+
+    Parameters
+    ----------
+    search_type : string
+      'Mapping' or 'Connectivity'
+
+    search_string : string
+      Paraphrased from CoCoMac URL Search Documentation: The search_string
+      consists of one or more criteria to be matched against CoCoMac's
+      contents. Criteria are concatenated by the Boolean operators AND, OR,
+      and NOT. The criteria are specific to the search_type. They are preceded
+      by the search term in the format ('Search Term')[Criterion]. All
+      criteria available via the GUI at www.cocomac.org can be used. The same
+      criterion can be used repeatedly in the search_string and priorities in
+      the Boolean concatenation can be expressed by parentheses.
+
+    Returns
+    -------
+    g : DiGraph
+      Graph with regions as nodes and mapping relationships (if mapping query)
+      or anatomical connections (if connectivity query) as edges.
+    """
+    # Shared login we use for querying the site.
+    user = 'teamcoco'
+    password = 'teamcoco'
+
+    data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
+    data_set = data_sets[type]
+    output_type = 'XML_Browser'
+    cquery = dict(user=user,
+                  password=password,
+                  Search=search_type,
+                  SearchString=search_string,
+                  DataSet=data_set,
+                  OutputType=output_type)
+
+    tree = query_cocomac(cquery)
+    return tree2graph(tree, type)
