@@ -8,45 +8,14 @@ Soc. Lond. B, 2000.
 # Library imports
 #-----------------------------------------------------------------------------
 
-#Std Lib
-import pickle
-import copy
-
 #Third Party
 import networkx as nx
-
-#-----------------------------------------------------------------------------
-# Globals
-#-----------------------------------------------------------------------------
-
-dir = '/home/despo/dbliss/cocomac/'
-
-with open('%sgraphs/mapping/deduced_additional_edges_modha_mapping_graph.pck' %
-          dir) as f:
-    MAPPING_GRAPH = pickle.load(f)
-
-AREAS = copy.deepcopy(MAPPING_GRAPH.nodes())
-
-with open('%smaps.pck' % dir) as f:
-    MAPS = pickle.load(f)
-
-with open('%smodha_merged_connectivity_graph.pck' % dir) as f:
-    CONNECTIVITY_GRAPH = pickle.load(f)
-
-EDGES = CONNECTIVITY_GRAPH.edges()
-
-TARGET_MAP = 'PHT00'
-
-#-----------------------------------------------------------------------------
-# Class Definitions
-#-----------------------------------------------------------------------------
-
 
 #-----------------------------------------------------------------------------
 # Functions
 #-----------------------------------------------------------------------------
 
-def find_coextensive_areas(input_area, target_map):
+def find_coextensive_areas(input_area, target_map, mapping_graph):
     """Find which regions in target_map are coextensive with input_area.
 
     input_area is from a map different from target_map. Function assumes
@@ -67,8 +36,8 @@ def find_coextensive_areas(input_area, target_map):
       input_area. (An RC defines the type of coextensivity between two
       regions.)
     """
-    neighbors = set(MAPPING_GRAPH.predecessors(input_area) +
-                    MAPPING_GRAPH.successors(input_area))
+    neighbors = set(mapping_graph.predecessors(input_area) +
+                    mapping_graph.successors(input_area))
     neighbors_copy = neighbors.copy()
     for neighbor in neighbors_copy:
         if target_map not in neighbor:
@@ -223,7 +192,7 @@ def get_EC(source, target, which):
     else:
         return 'U'
 
-def ort(area, target_map, pred=None, succ=None):
+def ort(area, target_map, mapping_graph, pred=None, succ=None):
     """Get sets phi_B and phi_A.
 
     Parameters
@@ -241,12 +210,12 @@ def ort(area, target_map, pred=None, succ=None):
       corresponding to regions in the input area's map that are coextensive
       with these B regions.
     """
-    phi_B = find_coextensive_areas(area, target_map)
+    phi_B = find_coextensive_areas(area, target_map, mapping_graph)
     for B_k in phi_B:
-        phi_A = find_coextensive_areas(B_k, area.split('-')[0])
+        phi_A = find_coextensive_areas(B_k, area.split('-')[0], mapping_graph)
         EC_B_k = 'B'
         for A_i in phi_A:
-            RC_A_i_B_k = MAPPING_GRAPH.edge[A_i][B_k]['RC_final']
+            RC_A_i_B_k = mapping_graph.edge[A_i][B_k]['RC_final']
             if succ:
                 EC_A_i = get_EC(A_i, succ, 'pred')
             elif pred:
@@ -257,37 +226,43 @@ def ort(area, target_map, pred=None, succ=None):
         EC_res[B_k] = EC_B_k
     return EC_res
     
-#-----------------------------------------------------------------------------
-# Main script
-#-----------------------------------------------------------------------------
+def conn_ort(g, target_map, mapping_graph):
+    """Performs ORT on a graph of anatomical connections.
 
-transformed_g = nx.DiGraph()
+    Graph is transformed from the terms of one or more input maps to a single
+    output map.
 
-for edge in EDGES:
-    pred = edge[0]
-    succ = edge[1]
-    ec_pred = ort(pred, TARGET_MAP, succ=succ)
-    ec_succ = ort(succ, TARGET_MAP, pred=pred)
-    for new_pred, EC_s in ec_pred.iteritems():
-        for new_succ, EC_t in ec_succ.iteritems():
-            transformed_g.add_edge(new_pred, new_succ, EC_s=EC_s, EC_t=EC_t)
+    Parameters
+    ----------
+    g : DiGraph
+      Graph with brain regions as nodes and anatomical connections as edges.
 
-#for A_prime_label in MAPS - set(['PHT00']):
-#    A_prime = set()
-#    for area in AREAS:
-#        if A_prime_label in area:
-#            A_prime.add(area)
-#    for A_alpha in A_prime:
-#        AREAS.remove(A)
-#        phi_B = find_coextensive_areas(A_alpha, 'PHT00')
-#        for B_k in phi_B:
-#            phi_A = find_coextensive_areas(B_k, A_prime_label)
-#            EC_B_k = 'B'
-#            for A_i in phi_A:
-#                RC_A_i_B_k = MAPPING_GRAPH.edge[A_i][B_k]['RC_final']
-#                #Big question is where to get EC_A_i. Probably from
-#                #connectivity data.
-#                EC_B_k = transformation_step(EC_B_k, RC_A_i_B_k, EC_A_i)
+    target_map : string
+      Output map of the ORT process in CoCoMac nomenclature (e.g., PHT00).
+
+    Returns
+    -------
+    transformed_g : DiGraph
+      Representation of g in terms of target_map.
+    """
+    transformed_g = nx.DiGraph()
+
+    for edge in g.edges():
+        pred = edge[0]
+        succ = edge[1]
+        ec_pred = ort(pred, target_map, mapping_graph, succ=succ)
+        ec_succ = ort(succ, target_map, mapping_graph, pred=pred)
+        for new_pred, EC_s in ec_pred.iteritems():
+            for new_succ, EC_t in ec_succ.iteritems():
+                if not transformed_g.has_edge(new_pred, new_succ):
+                    transformed_g.add_edge(new_pred, new_succ, EC_s=[EC_s],
+                                           EC_t=[EC_t])
+                else:
+                    #Change to use PDC hierarchy?
+                    transformed_g.edge[new_pred][new_succ]['EC_s'].append(EC_s)
+                    transformed_g.edge[new_pred][new_succ]['EC_t'].append(EC_t)
+
+    return transformed_g
 
 ##############################################################################
 # Test section - eventually will be moved to another file
