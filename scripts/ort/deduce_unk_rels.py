@@ -27,8 +27,8 @@ import networkx as nx
 
 directory = '/home/despo/dbliss/cocomac/graphs/mapping/'
 
-input_file = '%smerged_mapping_graph.pck' % directory
-output_file = '%sdeduced_additional_edges_mapping_graph.pck' % directory
+input_file = '%smodha_merged_mapping_graph.pck' % directory
+output_file = '%sdeduced_additional_edges_modha_mapping_graph.pck' % directory
 
 #-----------------------------------------------------------------------------
 # Class Definitions
@@ -81,47 +81,43 @@ def determine_RC_res(category):
     rules = {1: 'I', 2: 'S', 3: 'L', 4: 'SLO?', 5: 'O'}
     return rules[category]
 
-#-----------------------------------------------------------------------------
-# Main script
-#-----------------------------------------------------------------------------
+def deduce(g):
+    """
+    """
+    nodes = g.nodes()
 
-with open(input_file) as f:
-    g = pickle.load(f)
+    for index in range(len(nodes)):
+        # Node labels i, v, & w are in keeping with Stephan et al.'s terminology.
+        # See Sec. 2(g).
+        i = nodes[index]
+        for v in g.predecessors(i):
+            for w in g.successors(i):
+                # Only consider regions from different maps.
+                if v.split('-')[0] != w.split('-')[0] != i.split('-')[0]:
+                    # RC_final is the RC for an edge as stated in the literature
+                    #(entered into CoCoMac, and downloaded by us) or as applied in this
+                    #script (see below).
+                    new_path_code = g.edge[v][i]['RC_final'] + g.edge[i][w]['RC_final']
+                    v_i_w = FA(new_path_code)
+                    if v_i_w.q > 0:
+                        if not g.has_edge(v, w):
+                            g.add_edge(v, w, RC_final=new_path_code, cat=v_i_w.q)
+                        else:
+                            v_w = FA(g.edge[v][w]['RC_final'])
+                            if v_i_w.q < v_w.q:
+                                g.edge[v][w]['RC_final'] = v_i_w.word
+                                g.edge[v][w]['category'] = v_i_w.q
 
-nodes = g.nodes()
+    edges = g.edges()
+    edges_copy = copy.deepcopy(edges)
+    for edge in edges_copy:
+        edge_attributes = g.edge[edge[0]][edge[1]]
+        if edge_attributes.has_key('category'):
+            edge_attributes['RC_final'] = determine_RC_res(edge_attributes['category'])
+            #For now we are not going to deal with the complications associated with
+            #interpreting category 4 (see Appendix E). Edges in this category are
+            #deleted.
+            if edge_attributes['category'] == 4:
+                g.remove_edge(edge)
 
-for index in range(len(nodes)):
-    # Node labels i, v, & w are in keeping with Stephan et al.'s terminology.
-    # See Sec. 2(g).
-    i = nodes[index]
-    for v in g.predecessors(i):
-        for w in g.successors(i):
-            # Only consider regions from different maps.
-            if v.split('-')[0] != w.split('-')[0] != i.split('-')[0]:
-                # RC_final is the RC for an edge as stated in the literature (entered
-                # into CoCoMac, and downloaded by us) or as applied in this script
-                # (see below).
-                new_path_code = g.edge[v][i]['RC_final'] + g.edge[i][w]['RC_final']
-                v_i_w = FA(new_path_code)
-                if v_i_w.q > 0:
-                    if not g.has_edge(v, w):
-                        g.add_edge(v, w, RC_final=new_path_code, cat=v_i_w.q)
-                    else:
-                        v_w = FA(g.edge[v][w]['RC_final'])
-                        if v_i_w.q < v_w.q:
-                            g.edge[v][w]['RC_final'] = v_i_w.word
-                            g.edge[v][w]['category'] = v_i_w.q
-
-edges = g.edges()
-edges_copy = copy.deepcopy(edges)
-for edge in edges_copy:
-    edge_attributes = g.edge[edge[0]][edge[1]]
-    if edge_attributes.has_key('category'):
-        edge_attributes['RC_final'] = determine_RC_res(edge_attributes['category'])
-        #For now we are not going to deal with the complications associated with
-        #interpreting category 4 (see Appendix E). Edges in this category are deleted.
-        if edge_attributes['category'] == 4:
-            g.remove_edge(edge)
-
-with open(output_file,'w') as f:
-    pickle.dump(g, f)
+    return g
