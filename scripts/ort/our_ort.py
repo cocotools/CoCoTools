@@ -1,125 +1,76 @@
-"""Query the cocomac database.
+"""Our execution of ORT.
+
+Query CoCoMac for mapping and connectivity data, deduce unknown mapping
+relations, and perform ORT on the connectivity data.
 """
 
 #-----------------------------------------------------------------------------
 # Library imports
 #-----------------------------------------------------------------------------
+
 from __future__ import print_function
-
-# Stdlib
-import urllib2
-import pickle
-import sys
-
-from xml.etree.ElementTree import ElementTree
 
 #Third Party
 import networkx as nx
 
-# local imports
-from query import query_cocomac, tree2graph
-
-#-----------------------------------------------------------------------------
-# Functions
-#-----------------------------------------------------------------------------
-
-def execute_query(type, map=None, region=None):
-    """Queries CoCoMac.
-
-    Setup to perform queries of a single map or a single site.
-
-    Parameters
-    ----------
-    type : string
-      'Mapping' or 'Connectivity' are taken as values. Used to specify
-      whether a mapping or connectivity search is desired.
-
-    map : string
-      Optional map specification in CoCoMac format (e.g., PHT00).
-
-    region : string
-      Optional BrainSite specification (without specification of a particular
-      map) in CoCoMac format (e.g., 10).
-
-    Returns
-    -------
-    g : NetworkX DiGraph object
-      graph of mapping relationships (if mapping query) or connections
-      between BrainSites (if connectivity query)
-    """
-    # Shared login we use for querying the site. Sends email to Rob.
-    user = 'teamcoco'
-    password = 'teamcoco'
-
-    data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
-    search_category = type
-    data_set = data_sets[type]
-    output_type = 'XML_Browser'
-
-    if map:
-        search_string = ("(('%s')[SourceMap]OR('%s')[TargetMap])" % (map, map))
-    elif region:
-        search_string = ("(('%s')[SourceSite]OR('%s')[TargetSite])" % (region,
-                                                                       region))
-    else:
-        raise TypeError, 'Must provide map or region as parameter'
-
-    cquery = dict(user=user,
-                  password=password,
-                  Search=search_category,
-                  SearchString=search_string,
-                  # Parameters
-                  DataSet=data_set,
-                  OutputType=output_type)
-
-    # Run a real query or fall back to local static copy for offline testing
-    try:
-        tree = query_cocomac(cquery)
-    except urllib2.URLError:
-        # Use locally cached file
-        tree = ElementTree()
-        tree.parse('coco_query_example_int.xml')
-
-    g = tree2graph(tree, type)
-
-    # Some summary info
-    #print('Graph nodes:')
-    #print(g.nodes())
-    #print('Graph edges:')
-    #print(g.edges())
-    #print('Attributes of first node:')
-    #print(g.node[g.nodes()[0]])
-
-    # Save the graph
-    #homedir = '/home/despo/dbliss/cocomac/graphs/mapping/'
-    #file_name = str('%s_%s_graph.pck' % (map_of_interest, sys.argv[0]))
-    #with open(homedir+file_name, 'w') as f:
-    #    pickle.dump(g,f)
-
-    return g
+#Local
+from query import execute_query
+from deduce_unk_rels import deduce
+from at import conn_ort
 
 #-----------------------------------------------------------------------------
 # Main Script
 #-----------------------------------------------------------------------------
 
-if __name__ == '__main__':
-    home_dir = '../../graphs/'
+#--------------------------------------------------
+#STEP 1: Conduct mapping queries and merge results.
+#--------------------------------------------------
 
-    with open('%spfc_graph_named.pck' % home_dir) as f:
-        g = pickle.load(f)
-    regions = g.nodes()
-    
-    merged_g = nx.DiGraph()
-    for region in regions:
-        g = execute_query('Connectivity', region=region)
-        # NB for Mapping searches: If the same edge exists in g and merged_g
-        # before the merge, the compose operation will overwrite the RC in g
-        # with that in merged_g. Contradictory RCs (which should be rare) will
-        # not be flagged.
-        merged_g = nx.compose(merged_g, g)
-        print("Done with region %s's query." % region)
+map_g = nx.DiGraph()
+#We need to decide on a final list of maps to query.
+for map in ('W40', 'PP94', 'PP99', 'PP02', 'PHT00', 'B05', 'VV19', 'BB47',
+            'MLR85', 'BP89', 'PG91a'):
+    g = execute_query('Mapping', "('%s')[SourceMap]OR('%s')[TargetMap]" %
+                      (map, map))
+    #Compose method overwrites RC contradictions (which are rare) with
+    #the last RC encountered in the data.
+    map_g = nx.compose(map_g, g)
+    print("Done with %s." % map)
 
-    with open('%smapping/modha_merged_connectivity_graph.pck' % home_dir,
-              'w') as f:
-        pickle.dump(merged_g,f)
-    
+print('Done with mapping queries.')
+
+#---------------------------------
+#STEP 2: Deduce unknown relations.
+#---------------------------------
+
+map_g = deduce(map_g)
+
+#-------------------------------------
+#STEP 3: Conduct connectivity queries.
+#-------------------------------------
+
+region_list = []
+
+for node in map_g:
+    region_list.append(node.split('-', 1)[1])
+
+region_set = set(region_list)
+conn_g = nx.DiGraph()
+
+for region in region_set:
+    g = execute_query('Connectivity',
+                      "('%s')[SourceSite]OR('%s')[TargetSite]" %
+                      (region, region))
+    conn_g = nx.compose(conn_g, g)
+    print('Done with %s.' % region)
+
+print('Done with connectivity queries.')
+
+#--------------------
+#STEP 4: Perform ORT.
+#--------------------
+
+final_g = conn_ort(conn_g, 'PHT00', map_g)
+
+print("""\nTransformed connectivity graph available as final_g.
+Remember to pickle it before closing ipython.""")
