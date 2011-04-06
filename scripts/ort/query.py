@@ -11,6 +11,8 @@ from __future__ import print_function
 import urllib, urllib2
 import pdb
 import xml.parsers.expat
+import random
+import time
 
 from cStringIO import StringIO
 from xml.etree.ElementTree import ElementTree
@@ -45,15 +47,20 @@ def fetch_cocomac_tree(url):
     ----
     This function caches previous executions during the same session.
     """
-    # We need to read the output to a string for scrubbing, because cocomac is
-    # returning invalid xml sometimes.  But ElementTree expects a file-like
-    # object for parsing, so we wrap our scrubbed string in a StringIO object.
+    #Wait between 0.1 and 1.1 s to avoid multiple threads trying to access
+    #the site at once.
+    time.sleep(0.1 + random.random())
     try:
         coco = urllib2.urlopen(url).read()
     except urllib2.URLError, e:
         print(e)
-        print('Check variable url.')
+        print('Check variable url.\n')
+        print('If url is good, set coco = urllib2.urlopen(url).read()')
+        print(', and continue.')
         pdb.set_trace()
+    # We need to read the output to a string for scrubbing, because cocomac is
+    # returning invalid xml sometimes.  But ElementTree expects a file-like
+    # object for parsing, so we wrap our scrubbed string in a StringIO object.
     s_io = StringIO()
     s_io.write(utils.scrub_xml(coco))
     # Reset the file pointer to the start so ElementTree can read it
@@ -188,7 +195,10 @@ def parse_site(site, site_spec):
     node_attributes : dict
     """
     node_id = parse_element(site, site_spec)
-    return node_id['ID_BrainSite'], node_id
+    #Make all nodes named with uppercase letters, as naming scheme
+    #CoCoMac uses is case-insensitive, and entered data uses case
+    #inconsistently.
+    return node_id['ID_BrainSite'].upper(), node_id
 
 
 def tree2graph(node, search_type):
@@ -244,12 +254,23 @@ def tree2graph(node, search_type):
             edge_data['EC_t'] = tgt[1]['Extent']['EC']
         
         g.add_nodes_from([src, tgt])
+
+        #Mapping queries may return RCs of E (for expanded laminae) or C (for
+        #collapsed laminae). We don't want to deal with these, and for our
+        #purposes they are equivalent to RC = I (as regions with E or C cover
+        #the same area on standardized 2D brain space), so we'll change them
+        #to I.
+        if edge_data.has_key('RC'):
+            if edge_data['RC'] == 'E' or edge_data['RC'] == 'C':
+                edge_data['RC'] = 'I'
+        
         g.add_edge(src[0], tgt[0], edge_data)
     
     if isinstance(node, ElementTree):
         node = node.getroot()
 
-    walk_tree(node, full_tag(edge_label), add_edge)
+    walk_tree(node, full_tag(edge_label), add_edge) 
+    
     return g
 
 def execute_query(search_type, search_string):
@@ -284,7 +305,7 @@ def execute_query(search_type, search_string):
     password = 'teamcoco'
 
     data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
-    data_set = data_sets[type]
+    data_set = data_sets[search_type]
     output_type = 'XML_Browser'
     cquery = dict(user=user,
                   password=password,
@@ -294,4 +315,4 @@ def execute_query(search_type, search_string):
                   OutputType=output_type)
 
     tree = query_cocomac(cquery)
-    return tree2graph(tree, type)
+    return tree2graph(tree, search_type)

@@ -43,7 +43,7 @@ def scrub_xml(raw):
         out =  match.group(2)
         # We've seen invalid characters in cocomac's xml, so we scrub them out
         # by hand for now.  Add to this list any other such ones you see
-        invalids = '[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2]'
+        invalids = '[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2\x92\x96\xed\x84\x94]'
         return re.sub(invalids, '', out)
     else:
         raise ValueError('input does not contain valid xml header')

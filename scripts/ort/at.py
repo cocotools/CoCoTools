@@ -146,14 +146,14 @@ def transformation_step(EC_prev_B_k, RC_A_i_B_k, EC_A_i):
                                         'C': 'X'
                                         }
                                   },
-                            'C': {'S': {'N': 'P'
-                                        'P': 'P'
-                                        'X': 'X'
+                            'C': {'S': {'N': 'P',
+                                        'P': 'P',
+                                        'X': 'X',
                                         'C': 'C'
                                         },
-                                  'O': {'N': 'P'
-                                        'P': 'X'
-                                        'X': 'X'
+                                  'O': {'N': 'P',
+                                        'P': 'X',
+                                        'X': 'X',
                                         'C': 'C'
                                         }
                                   }
@@ -215,7 +215,7 @@ def ort(area, target_map, mapping_graph, pred=None, succ=None):
         phi_A = find_coextensive_areas(B_k, area.split('-')[0], mapping_graph)
         EC_B_k = 'B'
         for A_i in phi_A:
-            RC_A_i_B_k = mapping_graph.edge[A_i][B_k]['RC_final']
+            RC_A_i_B_k = mapping_graph.edge[A_i][B_k]['RC']
             if succ:
                 EC_A_i = get_EC(A_i, succ, 'pred')
             elif pred:
