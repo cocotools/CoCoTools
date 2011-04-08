@@ -11,11 +11,10 @@ from __future__ import print_function
 import urllib, urllib2
 import pdb
 import xml.parsers.expat
-import random
-import time
 
 from cStringIO import StringIO
 from xml.etree.ElementTree import ElementTree
+from time import sleep
 
 # Third-party
 import networkx as nx
@@ -47,17 +46,23 @@ def fetch_cocomac_tree(url):
     ----
     This function caches previous executions during the same session.
     """
-    #Wait between 0.1 and 1.1 s to avoid multiple threads trying to access
-    #the site at once.
-    time.sleep(0.1 + random.random())
-    try:
-        coco = urllib2.urlopen(url).read()
-    except urllib2.URLError, e:
-        print(e)
-        print('Check variable url.\n')
-        print('If url is good, set coco = urllib2.urlopen(url).read()')
-        print(', and continue.')
-        pdb.set_trace()
+    #Sometimes CoCoMac is unresponsive, so if a first attempt to access
+    #the site fails, try two more times before entering debugging mode.
+    for attempt in range(3):
+        while True:
+            try:
+                coco = urllib2.urlopen(url).read()
+            except urllib2.URLError, e:
+                if attempt == 2:
+                    print(e)
+                    print('Check variable url.\n')
+                    print('If url is good, set coco =')
+                    print('urllib2.urlopen(url).read(), and continue.')
+                    pdb.set_trace()
+                else:
+                    sleep(5)
+                    continue
+            break        
     # We need to read the output to a string for scrubbing, because cocomac is
     # returning invalid xml sometimes.  But ElementTree expects a file-like
     # object for parsing, so we wrap our scrubbed string in a StringIO object.
@@ -72,6 +77,7 @@ def fetch_cocomac_tree(url):
         print(e)
         print('Remember to close s_io!')
         pdb.set_trace()
+    s_io.close()
     return tree
 
 
@@ -198,7 +204,11 @@ def parse_site(site, site_spec):
     #Make all nodes named with uppercase letters, as naming scheme
     #CoCoMac uses is case-insensitive, and entered data uses case
     #inconsistently.
-    return node_id['ID_BrainSite'].upper(), node_id
+    map, region = node_id['ID_BrainSite'].split('-', 1)
+    map = map.upper()
+    node_id['ID_BrainSite'] = '-'.join([map, region])
+    
+    return node_id['ID_BrainSite'], node_id
 
 
 def tree2graph(node, search_type):

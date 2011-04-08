@@ -89,7 +89,7 @@ def deduce(g):
                     v_i_w = FA(new_path_code)
                     if v_i_w.q > 0:
                         if not g.has_edge(v, w):
-                            g.add_edge(v, w, RC=new_path_code, cat=v_i_w.q)
+                            g.add_edge(v, w, RC=new_path_code, category=v_i_w.q)
                         else:
                             v_w = FA(g.edge[v][w]['RC'])
                             if v_i_w.q < v_w.q:
@@ -99,13 +99,12 @@ def deduce(g):
     edges = g.edges()
     edges_copy = copy.deepcopy(edges)
     for edge in edges_copy:
-        edge_attributes = g.edge[edge[0]][edge[1]]
-        if edge_attributes.has_key('category'):
-            edge_attributes['RC'] = determine_RC_res(edge_attributes['category'])
+        if g.edge[edge[0]][edge[1]].has_key('category'):
+            g.edge[edge[0]][edge[1]]['RC'] = determine_RC_res(g.edge[edge[0]][edge[1]]['category'])
             #For now we are not going to deal with the complications associated with
             #interpreting category 4 (see Appendix E). Edges in this category are
             #deleted.
-            if edge_attributes['category'] == 4:
+            if g.edge[edge[0]][edge[1]]['category'] == 4:
                 g.remove_edge(edge[0], edge[1])
 
     return g
