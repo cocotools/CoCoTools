@@ -22,37 +22,111 @@ import copy
 import networkx as nx
 
 #-----------------------------------------------------------------------------
-# Class Definitions
-#-----------------------------------------------------------------------------
-
-class FA(object):
-    """Finite automaton that determines path category of given word.
-
-    Reads words composed of RCs (I, S, L, O) to determine their validity.
-    Possible states other than start -- 1, 2, 3, 4, 5, 0 -- correspond to
-    indices of path categories. 'The indices express a hierarchical order: the
-    lower the index of a path category [excluding 0, which represents
-    invalidity], the lower the probability that a path from this class may evoke
-    ambiguous constellations for the AT [algebra of transformation]' (p. 51).
-
-    q is the FA's state, which is updated according to move_rules as each letter
-    of a word is processed.
-    """
-    def __init__(self, word):
-        self.q = 'start'
-        self.word = word
-        self.move_rules = {'I': {'start': 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 0: 0},
-                           'S': {'start': 2, 1: 2, 2: 2, 3: 4, 4: 4, 5: 0, 0: 0},
-                           'L': {'start': 3, 1: 3, 2: 0, 3: 3, 4: 0, 5: 0, 0: 0},
-                           'O': {'start': 5, 1: 5, 2: 0, 3: 4, 4: 0, 5: 0, 0: 0}
-                           }
-        for RC in self.word:
-            self.q = self.move_rules[RC][self.q]
-
-#-----------------------------------------------------------------------------
 # Functions
 #-----------------------------------------------------------------------------
 
+def relabel_slo(a_1, a_n, g_n):
+    """Disambiguates RC_res for a given transformation path of code 4.
+
+    Uses rules in Appendix E.
+
+    Parameters
+    ----------
+    a_1 : string
+      First node in the transformation path.
+
+    a_n : string
+      Last node in the transformation path.
+
+    g_n : DiGraph instance
+      See Returns section of docstring for floyd.
+
+    Returns
+    -------
+    'L', 'S', or 'O' : string
+      RC_res.
+    """    
+    #Return 'L' if the following is true:
+    #a) edge from a_1 to node != a_n but from same map as a_n
+    #b) edge's code is 3 or 5
+
+    #and the following is false:
+    #e) edge from a_n to u
+    #f) u != a_1
+    #g) u same map as a_1.
+    
+    if ([t for t in g_n.successors(a_1) if 
+        lambda_(eta(g_n.edge[a_1][t])) in (3, 5) and 
+        t != a_n and 
+        t.split('-')[0] == a_n.split('-')[0]] 
+        and not 
+        [u for u in g_n.successors(a_n) if 
+         u != a_1 and 
+         u.split('-')[0] == a_1.split('-')[0]]):
+
+        return 'L'
+
+    #Return 'S' if the following is true:
+    #a) edge from t to a_n
+    #b) edge's code is 2 or 5
+    #c) t != a_1
+    #d) t same map as a_1
+    vs = [t for t in g_n.predecessors(a_n) if 
+          lambda_(eta(g_n.edge[t][a_n])) in (2, 5) and
+          t != a_1 and
+          t.split('-')[0] == a_1.split('-')[0]]
+
+    #and the following is false:
+    #e) edge from u to a_1
+    #f) u != a_n
+    #g) u same map as a_n
+    if vs and not [u for u in g_n.predecessors(a_1) if
+                   u != a_n and
+                   u.split('-')[0] == a_n.split('-')[0]]:
+        return 'S'
+
+    #Return 'O' if the following is true:
+    #a) a-g for 'S'
+    #b) code for edge from u to a_1 is 2 or 5 
+
+    #and the following is false:
+    #h) edge from a_1 to r
+    #i) edge's code is 1 or 2
+    #j) r != a_n
+    #k) r same map as a_n
+    if vs and ([u for u in g_n.predecessors(a_1) if
+                u != a_n and
+               u.split('-')[0] == a_n.split('-')[0] and
+               lambda_(eta(g_n.edge[u][a_1])) in (2, 5)]
+               and not
+               [r for r in g_n.successors(a_1) if
+                lambda_(eta(g_n.edge[a_1][r])) in (1, 2) and
+                r != a_n and
+                r.split('-')[0] == a_n.split('-')[0]]):
+        return 'O'
+
+def process_category4(g_n):
+    """Determines RC_res for an edge of category 4 based on its context. See
+    Appendix E.
+
+    Parameters
+    ----------
+    g_n : DiGraph instance
+      See Returns section of docstring for floyd
+
+    Returns
+    -------
+    g_n : DiGraph instance
+      Same as input g_n but with disambiguated RCs for those in category 4.
+    """
+    g_n_copy = copy.deepcopy(g_n)
+
+    for a_1, a_n in g_n_copy.edges():
+        if g_n_copy.edge[a_1][a_n]['RC'] == 'SLO?':
+            g_n.edge[a_1][a_n]['RC'] = relabel_slo(a_1, a_n, g_n)
+
+    return g_n
+                                
 def determine_RC_res(category):
     """Takes a path category and returns the corresponding RC_res.
 
@@ -66,45 +140,411 @@ def determine_RC_res(category):
 
     Returns
     -------
-    RC_res : string
+    rules[category] : string
       RC to which the path code reduces unambiguously.
     """
     rules = {1: 'I', 2: 'S', 3: 'L', 4: 'SLO?', 5: 'O'}
     return rules[category]
 
-def deduce(g):
+def generate_t_path(v_j, i, w_k, g_i_1):
+    """Get the transformation path for a new edge between v_j and w_k.
+
+    Parameters
+    ----------
+    v_j : string
+      Predecessor of node i in graph g_i_1.
+
+    i : string
+      See docstring for floyd_step.
+
+    w_k : string
+      Successor of node i in graph g_i_1.
+
+    g_i_1 : DiGraph instance
+      See docstring for floyd_step.
+
+    Returns
+    -------
+    first_minus_i + g_i_1.edge[i][w_k]['t_path'] : list
+      The sequence of areas that form a connected chain allowing the creation
+      of the edge between v_j and w_k.
     """
+    first_minus_i = g_i_1.edge[v_j][i]['t_path'][:-1]
+
+    return first_minus_i + g_i_1.edge[i][w_k]['t_path']
+
+def lambda_(w):
+    """Determines the path category of a given word w lying on L.
+
+    Uses a finite automaton: If w lying on L_i (i lying on {0, . . . , 5})
+    then lambda_(w) = i.
+
+    Parameters
+    ----------
+    w : string
+      Any combination of non-disjoint RCs with a minimum length of 1.
+
+    Returns
+    -------
+    state : int
+      Path category. 0 is the set of invalid transformation path codes.
+      Indices 1-5 express a hierarchical order: the lower the index, the lower
+      the probability that a path from this class may evoke ambiguous
+      constellations for the AT.
     """
-    nodes = g.nodes()
+    delta = {'I': {'start': 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 0: 0},
+             'S': {'start': 2, 1: 2, 2: 2, 3: 4, 4: 4, 5: 0, 0: 0},
+             'L': {'start': 3, 1: 3, 2: 0, 3: 3, 4: 0, 5: 0, 0: 0},
+             'O': {'start': 5, 1: 5, 2: 0, 3: 4, 4: 0, 5: 0, 0: 0}
+             }
+    #Set initial state (q_0).
+    state = 'START'
+    for letter in w:
+        state = delta[letter][state]
+    return state
 
-    for index in range(len(nodes)):
-        # Node labels i, v, & w are in keeping with Stephan et al.'s terminology.
-        # See Sec. 2(g).
-        i = nodes[index]
-        for v in g.predecessors(i):
-            for w in g.successors(i):
-                # Only consider regions from different maps.
-                if v.split('-')[0] != w.split('-')[0] != i.split('-')[0]:
-                    new_path_code = g.edge[v][i]['RC'] + g.edge[i][w]['RC']
-                    v_i_w = FA(new_path_code)
-                    if v_i_w.q > 0:
-                        if not g.has_edge(v, w):
-                            g.add_edge(v, w, RC=new_path_code, category=v_i_w.q)
-                        else:
-                            v_w = FA(g.edge[v][w]['RC'])
-                            if v_i_w.q < v_w.q:
-                                g.edge[v][w]['RC'] = v_i_w.word
-                                g.edge[v][w]['category'] = v_i_w.q
+def eta(edge):
+    """Labels edges with words lying on l_plus.
 
-    edges = g.edges()
-    edges_copy = copy.deepcopy(edges)
-    for edge in edges_copy:
-        if g.edge[edge[0]][edge[1]].has_key('category'):
-            g.edge[edge[0]][edge[1]]['RC'] = determine_RC_res(g.edge[edge[0]][edge[1]]['category'])
-            #For now we are not going to deal with the complications associated with
-            #interpreting category 4 (see Appendix E). Edges in this category are
-            #deleted.
-            if g.edge[edge[0]][edge[1]]['category'] == 4:
-                g.remove_edge(edge[0], edge[1])
+    L_plus defines valid transformation path codes.
 
-    return g
+    Parameters
+    ----------
+    edge : dict
+      Edge attribute dict (i.e., g.edge[source][target]).
+
+    Returns
+    -------
+    edge['w'] : string
+      Word in L_plus corresponding to the edge.
+    """
+    return edge['w']
+
+def floyd_step(i, g_i_1):
+    """Computes g_i out of g_i_1.
+
+    See Appendix H and comments in code.
+
+    Parameters
+    ----------
+    i : string
+      node in g_i_1 upon which algorithm is currently operating.
+    
+    g_i_1 : DiGraph instance
+      Transformation graph created in previous step.
+
+    Returns
+    -------
+    g_i : DiGraph instance
+      g_i has the same set of nodes as g_0 (and g_i_1). g_i has an
+      edge (v, w) with eta(v, w) = a if and only if there is a transformation
+      path p from node v to node w in g_0 (and g_i_1) that includes only
+      nodes of {1, . . . , i} and is represented by the transformation path
+      code alpha lying on L_plus.
+    """
+    g_i = copy.deepcopy(g_i_1)
+    
+    #Let v_1, . . . , v_r be all predecessors and w_1, . . . , w_s be all
+    #successors of node i in g_i_1 (r, s >= 0). All pairs (v_j, w_k) are
+    #evaluated (0 <= j <= r, 0 <= k <= s) to see whether the intermediate
+    #node i may be used either to establish a hitherto non-existing edge
+    #(v_j, w_k) or to relabel an already existing edge (v_j, w_k).
+    for v_j in g_i_1.predecessors(i):
+        for w_k in g_i_1.successors(i):
+
+            #If the sequence v_j, i, w_k is a valid path (i.e.,
+            #lambda_(eta(v_j, i) + eta(i, w_k)) != 0 and v_j and w_k are from
+            #different maps) . . . 
+            if (lambda_(eta(g_i_1.edge[v_j][i])+eta(g_i_1.edge[i][w_k])) != 0
+                and v_j.split('-')[0] != w_k.split('-')[0]):
+                #. . . then the following criteria of optimality can be
+                #applied.
+
+                #(i) If there is no edge (v_j, w_k) yet, then insert an edge
+                #(v_j, w_k) with eta(v_j, w_k) = eta(v_j, i) + eta(i, w_k).
+                if not g_i_1.has_edge(v_j, w_k):
+                    g_i.add_edge(v_j, w_k, w=eta(v_j, i)+eta(i, w_k))
+
+                #(ii) If there already is an edge (v_j, w_k) and if
+                #lambda_(eta(v_j, i) + eta(i, w_k)) < lambda_(eta(v_j, w_k)),
+                #then eta(v_j, w_k) = eta(v_j, i) + eta(i, w_k).
+                elif (lambda_(eta(g_i_1.edge[v_j][i])+eta(g_i_1.edge[i][w_k]))
+                      < lambda_(eta(g_i_1.edge[v_j][w_k]))):
+                    g_i.edge[v_j][w_k]['w'] = (eta(g_i_1.edge[v_j][i])+
+                                               eta(g_i_1.edge[i][w_k]))
+                else:
+                    continue
+
+                #If (i) or (ii) is met, our algorithm not only stores the new
+                #transformation path code eta(v_j, i) + eta(i, w_k) by
+                #labeling the edge (v_j, w_k), but also stores the
+                #transformation path v_j, . . . , i, . . . , w_k as such, that
+                #is the sequence of areas that is represented by eta(v_j, i) +
+                #eta(i, w_k).
+                g_i.edge[v_j][w_k]['t_path'] = generate_t_path(v_j, i, w_k,
+                                                               g_i_1)
+
+    return g_i
+
+def update_rcs(g_n):
+    """Updates the RCs for g_n's edges using the RC_res list in Appendix E.
+
+    Parameters
+    ----------
+    g_n : DiGraph instance
+      See Returns section of docstring for floyd.
+
+    Returns
+    -------
+    process_category4(g_n) : DiGraph instance
+      Same as input g_n, but with updated RC values.
+    """
+    g_n_copy = copy.deepcopy(g_n)
+
+    for source, target in g_n_copy.edges():
+        g_n.edge[source][target]['RC'] = determine_RC_res(lambda_(eta(
+            g_n_copy.edge[source][target])))
+
+    return process_category4(g_n)
+
+def floyd(g_0):
+    """Performs Floyd's algorithm for deduction of new relations.
+
+    Starting with an initial transformation graph g_0 consisting of n nodes
+    which are connected by an edge whenever a relation is known for the
+    respective two areas, the algorithm computes a sequence of graphs g_0,
+    g_1, . . . , g_n using transformation path codes for the insertion of new
+    edges and the substitution of existing ones by more favorable paths.
+    After n steps, the optimized transformation graph g_n is produced, which
+    contains all valid transformation paths with a minimal potential of
+    ambiguity. [From Sec. 2 (g).]
+
+    Paramters
+    ---------
+    g_0 : DiGraph instance
+      For n areas of all known maps, the initial transformation graph g_0
+      consists of n nodes (n >= 1) which are connected by an edge whenever a
+      relation is known for the respective two areas. Each edge must have an
+      RC attribute.
+
+    Returns
+    -------
+    update_rcs(transformation_gs[len(g_0.nodes())-1]) : DiGraph instance
+      The optimized transformation graph, which contains all valid
+      transformation paths with a minimal potential of ambiguity.
+    """
+    transformation_gs = {-1: g_0}
+
+    #The algorithm computes a sequence of graphs g_0, g_1, . . . , g_n.
+    for i, node_i in enumerate(g_0):
+        transformation_gs[i] = floyd_step(node_i, transformation_gs[i-1])
+
+    return update_rcs(transformation_gs[len(g_0)-1])
+
+def sort_by_map(node, other_type, g_n):
+    """Sort node's afferents or efferents by which map they're from.
+
+    Parameters
+    ----------
+    node : string
+      A node in graph g_n.
+
+    other_type : string
+      'targets' or 'sources' to indicate whether node's efferents or afferents
+      should be sought.
+
+    g_n : DiGraph instance
+      See Returns section of floyd.
+
+    Returns
+    -------
+    sorted : dict
+      Keys are maps and values are regions from corresponding maps to which
+      a is connected.
+    """
+    regions = {'sources': g_n.predecessors, 'targets': g_n.successors}
+
+    sorted = {}
+
+    for region in apply(regions[other_type], node):
+        if not sorted.has_key(region.split('-')[0]):
+            sorted[region.split('-')[0]] = [region]
+        else:
+            sorted[region.split('-')[0]].append(region)
+
+    return sorted
+
+def check_contradiction(node, others, other_type, g_n):
+    """Checks node's RCs to the bs for a contradiction.
+
+    With regard to A's targets, contradiction occurs if area A is identical
+    with, or a subarea of an area B_i and has a further relation with another
+    area B_j of B'.
+
+    With regard to A's sources, contradiction occurs if A is identical with
+    or larger than an area B_i and has a further relation with another area
+    B_j of B'.
+
+    Parameters
+    ----------
+    node : string
+      See docstring for sort_by_map.
+
+    others : list
+      List of nodes from the same map to which a connects.
+
+    other_type : string
+      'targets' or 'sources' to indicate whether node's efferents or afferents
+      are being considered.
+
+    g_n : DiGraph instance
+      See Returns section of floyd.
+
+    Returns
+    -------
+    True or False : Boolean
+      Indicates whether a contradiction is present.
+    """
+    if len(others) > 1:
+        for other in others:
+            if other_type == 'sources':
+                if (g_n.edge[other][node]['RC'] == 'I' or
+                    g_n.edge[other][node]['RC'] == 'L'):
+                    return True
+            else:
+                if (g_n.edge[node][other]['RC'] == 'I' or
+                    g_n.edge[node][other]['RC'] == 'S'):
+                    return True
+        return False
+    else:
+        return False
+
+def remove_contradiction(node, others, other_type, g_n):
+    """Remove edge with least certain RC from contradictory set.
+
+    The one with the least certain RC is the one with the greatest path
+    category.
+
+    Parameters
+    ----------
+    node : string
+      See docstring for sort_by_map.
+
+    others : list
+      See docstring for check_contradiction.
+
+    other_type : string
+      See docstring for check_contradiction.
+
+    g_n : DiGraph instance
+      See Returns section of floyd's docstring.
+
+    Returns
+    -------
+    g_n : DiGraph instance
+      Same as input graph but with one edge removed.
+    """
+    max = (None, 0)
+
+    for other in others:
+        if other_type == 'sources':
+            category = lambda_(eta(g_n.edge[other][node]))
+        else:
+            category = lambda_(eta(g_n.edge[node][other]))
+        if category > max[1]:
+            max = (other, category)
+
+    if other_type == 'targets':
+        g_n.remove_edge(node, max[0])
+    else:
+        g_n.remove_edge(max[0], node)
+
+    return g_n
+
+def eliminate_contradiction_sets(node, other_type, g_n):
+    """Eliminate contradictions among a node's afferents or efferents.
+
+    Implements one step of the two-step procedure described in Appendix J and
+    in the comments within eliminate_all_contradictions.
+
+    Parameters
+    ----------
+    node : string
+      See docstring for sort_by_map.
+
+    other_type : string
+      See docstring for check_contradiction.
+
+    g_n : DiGraph instance
+      See Returns section of floyd's docstring
+
+    Returns
+    -------
+    g_n : DiGraph instance
+      Same as input graph but with some contradictory edges (if they exist)
+      removed.
+    """
+    maps = sort_by_map(node, other_type, g_n)
+    for map, others in maps.iteritems():
+        while check_contradiction(node, others, other_type, g_n):
+            g_n = remove_contradiction(node, others, other_type, g_n)
+    return g_n
+
+def eliminate_all_contradictions(g_n):
+    """Resolves contradictions in final graph.
+
+    Executes procedure described in Appendix J.
+
+    Parameters
+    ----------
+    g_n : DiGraph instance
+      See Returns section of floyd.
+
+    Returns
+    -------
+    g_n : DiGraph instance
+      Same as input graph but with logically contradictory paths resolved.
+    """
+    g_n_copy = copy.deepcopy(g_n)
+    
+    for node in g_n_copy:
+        #First we investigate all paths originating from the same area of any
+        #given source map and leading to the same target map. That is, for each
+        #area A being a node of the transformation graph and for each target
+        #map B', we look for all paths that originate in A and lead to
+        #different areas B_1, . . . , B_p within B' (p >= 1).
+        g_n = eliminate_contradiction_sets(node, 'targets', g_n)
+        
+        #Second, we investigate all paths originating in the same source map
+        #and leading to the same area of any given target map. That is, for
+        #each area B being a node of the transformation graph and for each map
+        #A', we look for all paths that originate in areas A_1, . . . , A_q of
+        #A' (q >= 1) and lead to area B.
+        g_n = eliminate_contradiction_sets(node, 'sources', g_n)
+
+    return g_n
+      
+def prepare_g_0(g_0):
+    """Adds attributes t_path and w to edges of g_0, then perform algorithm.
+
+    In Floyd's algorithm, we'll need to assume that each edge has these
+    attributes. 
+
+    Parameters
+    ----------
+    g_0 : DiGraph instance
+      See docstring for floyd.
+
+    Returns
+    -------
+    eliminate_contradictions(floyd(g_0)) : DiGraph instance
+      Floyd is given input graph with t_path and w attributes added to edges.
+      See floyd's docstring for info about what it does.
+    """
+    g_0_copy = copy.deepcopy(g_0)
+    
+    for source, target in g_0_copy.edges():
+        g_0.edge[source][target]['t_path'] = [source, target]
+        g_0.edge[source][target]['w'] = g_0_copy.edge[source][target]['RC']
+
+    return eliminate_contradictions(floyd(g_0))
