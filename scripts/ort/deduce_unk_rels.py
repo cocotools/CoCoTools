@@ -419,7 +419,7 @@ def check_contradiction(node, others, other_type, g_n):
     else:
         return False
 
-def remove_contradiction(node, others, other_type, g_n):
+def eliminate_one_contradiction(node, others, other_type, g_n):
     """Remove edge with least certain RC from contradictory set.
 
     The one with the least certain RC is the one with the greatest path
@@ -487,7 +487,7 @@ def eliminate_contradiction_sets(node, other_type, g_n):
     maps = sort_by_map(node, other_type, g_n)
     for map, others in maps.iteritems():
         while check_contradiction(node, others, other_type, g_n):
-            g_n = remove_contradiction(node, others, other_type, g_n)
+            g_n = eliminate_one_contradiction(node, others, other_type, g_n)
     return g_n
 
 def eliminate_all_contradictions(g_n):
@@ -547,4 +547,4 @@ def prepare_g_0(g_0):
         g_0.edge[source][target]['t_path'] = [source, target]
         g_0.edge[source][target]['w'] = g_0_copy.edge[source][target]['RC']
 
-    return eliminate_contradictions(floyd(g_0))
+    return eliminate_all_contradictions(floyd(g_0))
