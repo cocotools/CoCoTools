@@ -19,7 +19,7 @@ import networkx as nx
 
 #Local
 from query import execute_query
-from deduce_unk_rels import deduce
+from deduce_unk_rels import prepare_g_0
 from ort import transform_connectivity_data
 
 #-----------------------------------------------------------------------------
@@ -36,7 +36,9 @@ def perform_query(search_type, search_sequence):
         g = execute_query(search_type, search_string[search_type] %
                           (item, item))
         #For mapping searches, compose method overwrites RC contradictions
-        #(which are rare) with the last RC encountered.
+        #(which are rare) with the last RC encountered. We should change this
+        #at some point so that we're checking for contradictions and handling
+        #them sensibly.
         merged_g = nx.compose(merged_g, g)
         count += 1
         print('Done with %s: %d of %d.' % (item, count, len(search_sequence)))
@@ -45,6 +47,12 @@ def perform_query(search_type, search_sequence):
 
 def step1():
     """Conduct mapping queries and merge results.
+
+    Returns
+    -------
+    perform_query('Mapping', map_tuple) : DiGraph instance
+      Mapping graph representing nodes and edges for queries of all maps in
+      map_tuple.
     """
     map_tuple = ('SR88', 'SP78', 'DBDU93', 'W38', 'SUD90', 'MLWJR05', 'HSK99b',
                  'CCHR95', 'FV91', 'CP99', 'HSK98A', 'G82', 'SG85', 'SG88',
@@ -94,22 +102,68 @@ def step1():
 
 def step2(map_g):
     """Deduce unknown relations.
+
+    See deduce_unk_rels.py for more info.
+
+    Parameters
+    ----------
+    map_g : DiGraph instance
+      Mapping graph representing nodes and edges for queries of all maps in
+      map_tuple defined within step1.
+
+    Returns
+    -------
+    prepare_g_0(map_g) : DiGraph instance
+      Processed version of map_g with additional edges corresponding to those
+      able to be deduced from the original ones.
     """
     print('Deducing . . .\n')
-    return deduce(map_g)
+    return prepare_g_0(map_g)
 
 def step3(map_g):
     """Conduct connectivity queries.
+
+    Parameters
+    ----------
+    map_g : DiGraph instance
+      See docstring for step4.
+
+    Returns
+    -------
+    perform_query('Connectivity', region_set) : DiGraph instance
+      Connectivity graph representing nodes and edges for queries of all
+      regions (without map specification) in map_g.
+
+    region_set : set
+      All regions for which connectivity queries are performed.
     """
     region_list = []
     for node in map_g:
         region_list.append(node.split('-', 1)[1])
 
     region_set = set(region_list)
-    return perform_query('Connectivity', region_set)
+    return perform_query('Connectivity', region_set), region_set
 
 def step4(conn_g, map_g):
-    """Perform ORT.
+    """Perform ORT using PHT00 as the target map.
+
+    Parameters
+    ----------
+    conn_g : DiGraph instance
+      Graph resulting from step3, connectivity queries.
+
+    map_g : DiGraph instance
+      Graph resulting from step2, deduction of unknown relations.
+
+    Returns
+    -------
+    conn_g : DiGraph instance
+      Same as input conn_g but with nodes for which there is no mapping info
+      removed.
+
+    transform_connectivity_data(conn_g, 'PHT00', map_g) : DiGraph instance
+      Final connectivity graph with nodes in PHT00 space and edges anatomical
+      connections.
     """
     conn_nodes = conn_g.nodes()
 
@@ -125,19 +179,60 @@ def step4(conn_g, map_g):
 #-----------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    
+    def pickle_it(f_name, obj):
+        """Pickles obj with filename f_name.
+        """
+        with open(f_name, 'w'):
+            pickle.dump(obj, f)
+    
     os.chdir('our_ort_results')
-    
-    with open('map_g2.pck') as f:
-        map_g = pickle.load(f)
 
-    with open('conn_g1.pck') as f:
-        conn_g = pickle.load(f)
-    
-    conn_g, final_g = step4(conn_g, map_g)
+    #Perform step 4 of the full procedure only if it has not yet been
+    #performed (i.e., if results have not already been pickled). For steps 1-3,
+    #only perform the step if the subsequent step has not been performed.
+    #Pickle all new results.
+    try:
+        with open('final_g.pck') as f:
+            final_g = pickle.load(f)
 
-    with open('final_g.pck', 'w') as f:
-        pickle.dump(final_g, f)
+    except IOError:
+        try:
+            with open('map_g2.pck') as f:
+                map_g = pickle.load(f)
 
-    with open('conn_g2.pck', 'w') as f:
-        pickle.dump(conn_g, f)
+        except IOError:
+            try:
+                with open('map_g1.pck') as f:
+                    map_g = pickle.load(f)
 
+            except IOError:
+                map_g = step1()
+                pickle_it('map_g1.pck', map_g)
+
+            finally:
+                map_g = step2(map_g)
+                pickle_it('map_g2.pck', map_g)
+                conn_g, conn_queries = step3(map_g)
+                pickle_it('conn_g1.pck', conn_g)
+                pickle_it('conn_queries.pck', conn_queries)
+
+        else:
+            try:
+                with open('conn_g2.pck') as f:
+                    conn_g = pickle.load(f)
+
+            except IOError:
+                try:
+                    with open('conn_g1.pck') as f:
+                        conn_g = pickle.load(f)
+
+                except IOError:
+                    conn_g, conn_queries = step3(map_g)
+                    pickle_it('conn_g1.pck', conn_g)
+                    pickle_it('conn_queries.pck', conn_queries)
+
+        finally:
+            conn_g, final_g = step4(conn_g, map_g)
+            pickle_it('conn_g2.pck', conn_g)
+            pickle_it('final_g.pck', final_g)
