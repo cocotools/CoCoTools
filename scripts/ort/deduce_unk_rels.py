@@ -332,18 +332,17 @@ def floyd(g_0):
 
     Returns
     -------
-    update_rcs(transformation_gs[len(g_0.nodes())-1]) : DiGraph instance
+    update_rcs(transformation_g) : DiGraph instance
       The optimized transformation graph, which contains all valid
       transformation paths with a minimal potential of ambiguity.
     """
-    transformation_gs = {-1: g_0}
-
     #The algorithm computes a sequence of graphs g_0, g_1, . . . , g_n.
+    transformation_g = copy.deepcopy(g_0)
     for i, node_i in enumerate(g_0):
-        transformation_gs[i] = floyd_step(node_i, transformation_gs[i-1])
+        transformation_g = floyd_step(node_i, transformation_g)
         print('step %d of %d done' % (i, len(g_0)))
 
-    return update_rcs(transformation_gs[len(g_0)-1])
+    return update_rcs(transformation_g)
 
 def prepare_g_0(g_0):
     """Adds attributes t_path and w to edges of g_0, then perform algorithm.
