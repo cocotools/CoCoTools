@@ -11,6 +11,7 @@ from __future__ import print_function
 
 #Std Lib
 import copy
+import pdb
 
 #Third Party
 import networkx as nx
@@ -43,11 +44,14 @@ def sort_by_map(node, other_type, g_n):
       Keys are maps and values are regions from corresponding maps to which
       a is connected.
     """
-    regions = {'sources': g_n.predecessors, 'targets': g_n.successors}
+    if other_type == 'sources':
+        regions = g_n.predecessors(node)
+    else:
+        regions = g_n.successors(node)
 
     sorted = {}
 
-    for region in apply(regions[other_type], node):
+    for region in regions:
         if not sorted.has_key(region.split('-')[0]):
             sorted[region.split('-')[0]] = [region]
         else:
@@ -93,9 +97,12 @@ def check_contradiction(node, others, other_type, g_n):
                     g_n.edge[other][node]['RC'] == 'L'):
                     return True
             else:
-                if (g_n.edge[node][other]['RC'] == 'I' or
-                    g_n.edge[node][other]['RC'] == 'S'):
-                    return True
+                try:
+                    if (g_n.edge[node][other]['RC'] == 'I' or
+                        g_n.edge[node][other]['RC'] == 'S'):
+                        return True
+                except KeyError:
+                    pdb.set_trace()
         return False
     else:
         return False
@@ -165,11 +172,19 @@ def eliminate_contradiction_sets(node, other_type, g_n):
       Same as input graph but with some contradictory edges (if they exist)
       removed.
     """
-    maps = sort_by_map(node, other_type, g_n)
-    for map, others in maps.iteritems():
-        while check_contradiction(node, others, other_type, g_n):
-            g_n = eliminate_one_contradiction(node, others, other_type, g_n)
-    return g_n
+    while True:
+        maps = sort_by_map(node, other_type, g_n)
+        for map, others in maps.iteritems():
+            if check_contradiction(node, others, other_type, g_n):
+                g_n = eliminate_one_contradiction(node, others,
+                                                  other_type, g_n)
+                #Because an edge has been eliminated, we need to recalculate
+                #the maps and regions in others.
+                break
+        else:
+            #We've made it through all the maps and others without a
+            #contradiction, so we're ready to return.
+            return g_n
 
 def eliminate_all_contradictions(g_n):
     """Resolves contradictions in final graph.
@@ -188,7 +203,7 @@ def eliminate_all_contradictions(g_n):
     """
     g_n_copy = copy.deepcopy(g_n)
 
-    count = 0
+    count = 1
     
     for node in g_n_copy:
         print('node %d of %d' % (count, len(g_n_copy)))
