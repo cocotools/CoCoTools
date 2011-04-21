@@ -89,7 +89,7 @@ def conn_query(map_g):
 def pickle_it(f_name, obj):
     """Pickles obj with filename f_name.
     """
-    with open(f_name, 'w'):
+    with open(f_name, 'w') as f:
         pickle.dump(obj, f)
 
 #-----------------------------------------------------------------------------
