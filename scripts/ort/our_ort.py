@@ -100,7 +100,7 @@ if __name__ == '__main__':
         
     os.chdir('results_ort')
 
-    #Perform step 6 of the full procedure only if it has not yet been
+    #Perform Step 6 of the full procedure only if it has not yet been
     #performed (i.e., if results have not already been pickled). For steps 1-5,
     #only perform the step if the subsequent step has not been performed.
     #Pickle all new results.    
@@ -198,27 +198,34 @@ if __name__ == '__main__':
 
             #Step 3 done. Perform Step 4.
             conn_g = conn_query(map_g)
-            
+
+            #Step 4 done. Perform Step 5.
+            conn_nodes = conn_g.nodes()
+            for node in conn_nodes:
+                if node not in map_g:
+                    conn_g.remove_node(node)
+            pickle_it('conn_g2.pck', conn_g)
+
+            #NEED TO PERFORM STEP 6
+
         else:
             try:
                 with open('conn_g2.pck') as f:
                     conn_g = pickle.load(f)
-
             except IOError:
                 try:
                     with open('conn_g1.pck') as f:
                         conn_g = pickle.load(f)
-
                 except IOError:
                     #Step 3 done. Perform Step 4.
                     conn_g = conn_query(map_g)
-        
-        #Step 4 done. Perform Step 5.
-        conn_nodes = conn_g.nodes()
-        for node in conn_nodes:
-            if node not in map_g:
-                conn_g.remove_node(node)
-        pickle_it('conn_g2.pck', conn_g)
+
+                #Step 4 done. Perform Step 5.
+                conn_nodes = conn_g.nodes()
+                for node in conn_nodes:
+                    if node not in map_g:
+                        conn_g.remove_node(node)
+                pickle_it('conn_g2.pck', conn_g)
 
         #Step 5 done. Perform Step 6.
         final_g = transform_connectivity_data(conn_g, 'PHT00', map_g)
