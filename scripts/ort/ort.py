@@ -41,13 +41,8 @@ def find_coextensive_areas(input_area, target_map, mapping_relations):
       input_area. (An RC defines the type of coextensivity between two
       regions.)
     """
-    neighbors = set(mapping_relations.predecessors(input_area) +
-                    mapping_relations.successors(input_area))
-    neighbors_copy = neighbors.copy()
-    for neighbor in neighbors_copy:
-        if target_map not in neighbor:
-            neighbors.remove(neighbor)
-    return neighbors
+    return [region for region in mapping_relations.successors(input_area) if
+            region.split('-')[0] == target_map]
 
 def m_s(ec_a_alpha):
     """Single-step operation of the AT.
@@ -203,14 +198,7 @@ def get_ecs(phi_a_k, neighbor_a, node_of_interest, connectivity_data):
         elif node_of_interest == 'a_q':
             source, target, ec = neighbor_a, a_i_x, 'EC_t'
 
-        if connectivity_data.has_edge(source, target):
-            if connectivity_data.edge[source][target]['Density']['Degree'] != '0':
-                #If the graph has the edge, and it's a found connection, give the
-                #reported EC.
-                ecs[a_i_x] = connectivity_data.edge[source][target][ec]
-            else:
-                #If the density of the connection is 0, the EC is N.
-                ecs[a_i_x] = 'N'
+        ecs[a_i_x] = connectivity_data.edge[source][target][ec]
     return ecs
 
 def algebra_of_transformation(a_alpha, b_prime, a_prime, mapping_relations,
@@ -370,44 +358,36 @@ def transform_connectivity_data(connectivity_data, b_prime, mapping_relations):
     """
     new_g = nx.DiGraph()
     for a_p, a_q in connectivity_data.edges():
-        #The AT for connectivity data assumes we're operating on connections
-        #within a single map. Make sure this is the case. (But does this need
-        #to be the case?)
-        if a_p.split('-')[0] == a_q.split('-')[0]:
-            #We also need to make sure we aren't working with regions of
-            #b_prime already. If we are, we can skip ahead.
-            if a_p.split('-')[0] == b_prime:
-                new_g = add_edge(new_g, a_p, a_q, ec_s, ec_t)
-            #ORT assumes beginning EC != U.
-            elif (connectivity_data.edge[a_p][a_q]['EC_s'] == 'U' or
-                  connectivity_data.edge[a_p][a_q]['EC_t'] == 'U'):
-                continue
-            else:
-                a_prime = a_p.split('-')[0]
-                #Get ECs for this projection so all info in eq. 9, p. 43 is on
-                #hand.
-                ec_a_p = connectivity_data.edge[a_p][a_q]['EC_s']
-                ec_a_q = connectivity_data.edge[a_p][a_q]['EC_t']
+        #If this connection is already in terms of b_prime, skip ahead.
+        if a_p.split('-')[0] == b_prime and a_q.split('-')[0] == b_prime:
+            new_g = add_edge(new_g, a_p, a_q, ec_s, ec_t)
+        else:
+            a_prime1 = a_p.split('-')[0]
+            a_prime2 = a_q.split('-')[0]
+            #Get ECs for this projection so all info in eq. 9, p. 43 is on
+            #hand.
+            ec_a_p = connectivity_data.edge[a_p][a_q]['EC_s']
+            ec_a_q = connectivity_data.edge[a_p][a_q]['EC_t']
 
-                #Perform AT on the source and target.
-                ec_sigma_b = algebra_of_transformation(a_p, b_prime, a_prime,
-                                                       mapping_relations,
-                                                       ec_a_p,
-                                                       a_q, 'a_p',
-                                                       connectivity_data)
-                ec_tau_b = algebra_of_transformation(a_q, b_prime, a_prime,
-                                                     mapping_relations, ec_a_q,
-                                                     a_p, 'a_q',
-                                                     connectivity_data)
+            #Perform AT on the source and target.
+            ec_sigma_b = algebra_of_transformation(a_p, b_prime, a_prime,
+                                                   mapping_relations,
+                                                   ec_a_p,
+                                                   a_q, 'a_p',
+                                                   connectivity_data)
+            ec_tau_b = algebra_of_transformation(a_q, b_prime, a_prime,
+                                                 mapping_relations, ec_a_q,
+                                                 a_p, 'a_q',
+                                                 connectivity_data)
 
-                #Finally, using sigma_b, tau_b, and their ECs, determine all
-                #the
-                #projections in map b_prime which result from the
-                #transformation of
-                #projection p_alpha in map a_prime. Add them to new_g.
-                for b_s, ec_b_s in ec_sigma_b.iteritems():
-                    for b_t, ec_b_t in ec_tau_b.iteritems():
-                        new_g = add_edge(new_g, b_s, b_t, ec_b_s, ec_b_t)
+            #Finally, using sigma_b, tau_b, and their ECs, determine all
+            #the
+            #projections in map b_prime which result from the
+            #transformation of
+            #projection p_alpha in map a_prime. Add them to new_g.
+            for b_s, ec_b_s in ec_sigma_b.iteritems():
+                for b_t, ec_b_t in ec_tau_b.iteritems():
+                    new_g = add_edge(new_g, b_s, b_t, ec_b_s, ec_b_t)
     return new_g
 
 ##############################################################################
