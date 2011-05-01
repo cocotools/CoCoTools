@@ -200,6 +200,14 @@ if __name__ == '__main__':
         pickle_it('map_g1.pck', map_g)
 
     try:
+        with open('map_g1a.pck') as f:
+            map_g = pickle.load(f)
+
+    except IOError:
+        map_g = make_symmetrical(map_g)
+        pickle_it('map_g1a.pck', map_g)
+
+    try:
         with open('map_g2.pck') as f:
             map_g = pickle.load(f)
 
