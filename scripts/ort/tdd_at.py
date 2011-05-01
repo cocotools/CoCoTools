@@ -3,8 +3,17 @@ from __future__ import print_function
 import networkx as nx
 import nose.tools as nt
 
-class Ort(object):
+class At(object):
     def __init__(self, map_g, conn_g, target_map):
+        """The mapping graph (map_g) submitted to Ort must have the following
+        properties:
+
+        i) If A-1 is larger than or identical to B-1, there is no other region
+        in A with a relationship to B-1.
+
+        ii) If A-1 is smaller than or overlaps with B-1, there is another
+        region in A with a relationship to B-1.
+        """
         self.map_g = map_g
         self.conn_g = conn_g
         self.target_map = target_map
@@ -98,24 +107,15 @@ class Ort(object):
         ec_target = 'B'
         for source_region in source_list:
             rc = self.map_g.edge[source_region][target_region]['RC']
-            #Need to fix map_g-creating code so L's and I's end up only in
-            #source_lists of length 1.
-            try:
-                ec_target = rules[ec_target][rc][self.get_ec(source_region)]
-            except KeyError:
-                continue
+            ec_target = rules[ec_target][rc][self.get_ec(source_region)]
         return ec_target
 
     def iterate_trans_dict(self, trans_dict):
         ec_dict = {}
         for target_reg, source_list in trans_dict.iteritems():
             if len(source_list) == 1:
-                #Need to fix remove_contradictions so all source_lists of
-                #length 1 have RC I or L.
-                if (self.map_g.edge[source_list[0]][target_reg]['RC'] == 'I' or
-                    self.map_g.edge[source_list[0]][target_reg]['RC'] == 'L'):
-                    ec_dict[target_reg] = self.single_step(source_list[0],
-                                                           target_reg)
+                ec_dict[target_reg] = self.single_step(source_list[0],
+                                                       target_reg)
             else:
                 ec_dict[target_reg] = self.multi_step(source_list, target_reg)
         return ec_dict
@@ -136,8 +136,10 @@ class Ort(object):
         return self.iterate_trans_dict(end_dict)
 
     def add_edge(self, from_, ec_s, to, ec_t, target_g):
+        """This needs some work!
+        """
         if from_ != to:
-            if ec_s != 'U' and ec_s != 'N' and ec_t != 'U' and ec_t != 'N':
+            if ec_s != 'U' and ec_t != 'U':
                 if not target_g.has_edge(from_, to):
                     target_g.add_edge(from_, to, EC_s=[ec_s], EC_t=[ec_t])
                 else:
@@ -214,20 +216,20 @@ def fake_conn_g():
 
 class Tests(object):
     def __init__(self):
-        self.ort = Ort(fake_map_g(), fake_conn_g(), 'A')
-        self.ort.now = 'from'
-        self.ort.other = 'B-2'
+        self.at = At(fake_map_g(), fake_conn_g(), 'A')
+        self.at.now = 'from'
+        self.at.other = 'B-2'
 
     def update(self):
-        self.ort.now = 'to'
-        self.ort.other = 'B-3'
+        self.at.now = 'to'
+        self.at.other = 'B-3'
 
     def test_add_edge(self):
         g = nx.DiGraph()
-        nt.assert_equal(self.ort.add_edge('A-1', 'P', 'A-1', 'P', g), g)
+        nt.assert_equal(self.at.add_edge('A-1', 'P', 'A-1', 'P', g), g)
         desired_g = nx.DiGraph()
         desired_g.add_edge('A-1', 'A-2', EC_s=['P'], EC_t=['C'])
-        nt.assert_equal(self.ort.add_edge('A-1', 'P', 'A-2', 'C', g).edge,
+        nt.assert_equal(self.at.add_edge('A-1', 'P', 'A-2', 'C', g).edge,
                         desired_g.edge)
 
     def test_iterate_edges(self):
@@ -235,49 +237,49 @@ class Tests(object):
         desired_g.add_edge('A-3', 'A-4', EC_s=['P'], EC_t=['X'])
         desired_g.add_edge('A-3', 'A-1', EC_s=['X'], EC_t=['P'])
         desired_g.add_edge('A-1', 'A-2', EC_s=['P'], EC_t=['P'])
-        nt.assert_equal(self.ort.iterate_edges().edge, desired_g.edge)
+        nt.assert_equal(self.at.iterate_edges().edge, desired_g.edge)
 
     def test_run_one_end(self):
-        nt.assert_equal(self.ort.run_one_end('B-3'), {'A-1': 'P'})
-        self.ort.other = 'B-1'
-        nt.assert_equal(self.ort.run_one_end('B-6'), {'A-3': 'X'})
+        nt.assert_equal(self.at.run_one_end('B-3'), {'A-1': 'P'})
+        self.at.other = 'B-1'
+        nt.assert_equal(self.at.run_one_end('B-6'), {'A-3': 'X'})
         self.update()
-        self.ort.other = 'B-6'
-        nt.assert_equal(self.ort.run_one_end('B-1'), {'A-1': 'P'})
+        self.at.other = 'B-6'
+        nt.assert_equal(self.at.run_one_end('B-1'), {'A-1': 'P'})
 
     def test_get_ec(self):
-        nt.assert_equal(self.ort.get_ec('B-2'), 'C')
-        nt.assert_equal(self.ort.get_ec('B-3'), 'C')
-        nt.assert_equal(self.ort.get_ec('B-4'), 'N')
+        nt.assert_equal(self.at.get_ec('B-2'), 'C')
+        nt.assert_equal(self.at.get_ec('B-3'), 'C')
+        nt.assert_equal(self.at.get_ec('B-4'), 'N')
 
     def test_multi_step(self):
-        nt.assert_equal(self.ort.multi_step(['B-2', 'B-3', 'B-1', 'B-4'],
+        nt.assert_equal(self.at.multi_step(['B-2', 'B-3', 'B-1', 'B-4'],
                                             'A-1'), 'P')
         self.update()
-        nt.assert_equal(self.ort.multi_step(['B-2', 'B-3', 'B-1', 'B-4'],
+        nt.assert_equal(self.at.multi_step(['B-2', 'B-3', 'B-1', 'B-4'],
                                             'A-1'), 'P')
 
     def test_iterate_trans_dict(self):
-        nt.assert_equal(self.ort.iterate_trans_dict({'A-1': ['B-2', 'B-3',
+        nt.assert_equal(self.at.iterate_trans_dict({'A-1': ['B-2', 'B-3',
                                                              'B-1', 'B-4'],
                                                      'A-2': ['B-2', 'B-5']}),
                         {'A-1': 'P', 'A-2': 'P'})
         self.update()
-        nt.assert_equal(self.ort.iterate_trans_dict({'A-1': ['B-2', 'B-3',
+        nt.assert_equal(self.at.iterate_trans_dict({'A-1': ['B-2', 'B-3',
                                                              'B-1', 'B-4'],
                                                      'A-2': ['B-2', 'B-5']}),
                         {'A-1': 'P', 'A-2': 'U'})
-        nt.assert_equal(self.ort.iterate_trans_dict({'B-1': ['C-1']}),
+        nt.assert_equal(self.at.iterate_trans_dict({'B-1': ['C-1']}),
                                                     {'B-1': 'N'})
 
     def test_single_step(self):
-        nt.assert_equal(self.ort.single_step('B-1', 'C-1'), 'C')
+        nt.assert_equal(self.at.single_step('B-1', 'C-1'), 'C')
 
     def test_reverse_find(self):
-        nt.assert_equal(self.ort.reverse_find(['A-1', 'A-2'], 'B'),
+        nt.assert_equal(self.at.reverse_find(['A-1', 'A-2'], 'B'),
                         {'A-1': ['B-2', 'B-3', 'B-1', 'B-4'],
                          'A-2': ['B-2', 'B-5']})
 
     def test_find_areas(self):
-        nt.assert_equal(self.ort.find_areas('B-1', 'A'), ['A-1'])
-        nt.assert_equal(self.ort.find_areas('B-2', 'A'), ['A-1', 'A-2'])
+        nt.assert_equal(self.at.find_areas('B-1', 'A'), ['A-1'])
+        nt.assert_equal(self.at.find_areas('B-2', 'A'), ['A-1', 'A-2'])
