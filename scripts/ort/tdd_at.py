@@ -106,7 +106,7 @@ class At(object):
                   }
         ec_target = 'B'
         for source_region in source_list:
-            rc = self.map_g.edge[source_region][target_region]['RC']
+            rc = self.map_g[source_region][target_region]['RC']
             ec_target = rules[ec_target][rc][self.get_ec(source_region)]
         return ec_target
 
@@ -123,9 +123,9 @@ class At(object):
     def get_ec(self, source_region):
         if self.now == 'from':
             if (source_region, self.other) in self.conn_g.edges():
-                return self.conn_g.edge[source_region][self.other]['EC_s']
+                return self.conn_g[source_region][self.other]['EC_s']
         if (self.other, source_region) in self.conn_g.edges():
-            return self.conn_g.edge[self.other][source_region]['EC_t']
+            return self.conn_g[self.other][source_region]['EC_t']
         if source_region == self.other:
             return 'C'
         return 'N'
@@ -143,8 +143,8 @@ class At(object):
                 if not target_g.has_edge(from_, to):
                     target_g.add_edge(from_, to, EC_s=[ec_s], EC_t=[ec_t])
                 else:
-                    target_g.edge[from_][to]['EC_s'].append(ec_s)
-                    target_g.edge[from_][to]['EC_t'].append(ec_t)
+                    target_g[from_][to]['EC_s'].append(ec_s)
+                    target_g[from_][to]['EC_t'].append(ec_t)
         return target_g
 
     def iterate_edges(self):
@@ -154,14 +154,14 @@ class At(object):
             print('Transforming edge %d of %d' % (count,
                                                   len(self.conn_g.edges())))
             if from_.split('-')[0] == self.target_map:
-                from_ec_dict = {from_: self.conn_g.edge[from_][to]['EC_s']}
+                from_ec_dict = {from_: self.conn_g[from_][to]['EC_s']}
             else:
                 self.now = 'from'
                 self.other = to
                 from_ec_dict = self.run_one_end(from_)
 
             if to.split('-')[0] == self.target_map:
-                to_ec_dict = {to: self.conn_g.edge[from_][to]['EC_t']}
+                to_ec_dict = {to: self.conn_g[from_][to]['EC_t']}
             else:
                 self.now = 'to'
                 self.other = from_
@@ -220,10 +220,6 @@ class Tests(object):
         self.at.now = 'from'
         self.at.other = 'B-2'
 
-    def update(self):
-        self.at.now = 'to'
-        self.at.other = 'B-3'
-
     def test_add_edge(self):
         g = nx.DiGraph()
         nt.assert_equal(self.at.add_edge('A-1', 'P', 'A-1', 'P', g), g)
@@ -243,7 +239,7 @@ class Tests(object):
         nt.assert_equal(self.at.run_one_end('B-3'), {'A-1': 'P'})
         self.at.other = 'B-1'
         nt.assert_equal(self.at.run_one_end('B-6'), {'A-3': 'X'})
-        self.update()
+        self.at.now = 'to'
         self.at.other = 'B-6'
         nt.assert_equal(self.at.run_one_end('B-1'), {'A-1': 'P'})
 
@@ -255,7 +251,8 @@ class Tests(object):
     def test_multi_step(self):
         nt.assert_equal(self.at.multi_step(['B-2', 'B-3', 'B-1', 'B-4'],
                                             'A-1'), 'P')
-        self.update()
+        self.at.now = 'to'
+        self.at.other = 'B-3'
         nt.assert_equal(self.at.multi_step(['B-2', 'B-3', 'B-1', 'B-4'],
                                             'A-1'), 'P')
 
@@ -264,7 +261,8 @@ class Tests(object):
                                                              'B-1', 'B-4'],
                                                      'A-2': ['B-2', 'B-5']}),
                         {'A-1': 'P', 'A-2': 'P'})
-        self.update()
+        self.at.now = 'to'
+        self.at.other = 'B-3'
         nt.assert_equal(self.at.iterate_trans_dict({'A-1': ['B-2', 'B-3',
                                                              'B-1', 'B-4'],
                                                      'A-2': ['B-2', 'B-5']}),
