@@ -4,15 +4,6 @@
 
 import networkx as nx
 
-def get_all_children(region, hier):
-    # Return a list of all of a region's children.
-    if hier.has_key(region):
-        children = hier[region][:]
-        for child in hier[region]:
-            children += get_all_children(child, hier)
-        return children
-    return []
-
 def get_circle_coords(modules_with_colors):
     coords = {}
     for index in range(len(modules_with_colors)):

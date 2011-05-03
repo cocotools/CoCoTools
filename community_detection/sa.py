@@ -12,8 +12,6 @@ import nose.tools as nt
 
 from brainx import modularity as m
 
-OUTPUT_FNAME = 'pht00_round2'
-
 def relabel_part(num_part, num2name):
     name_part = {}
     for mod_label, mod_members in num_part.iteritems():
@@ -31,21 +29,24 @@ def make_name_num_dicts(name_g):
     return name2num, num2name
 
 def main(name_g):
-    name2num, num2name = name_num_dicts(name_g)
+    name2num, num2name = make_name_num_dicts(name_g)
     num_g = nx.relabel_nodes(name_g, name2num)
     num_g = num_g.to_undirected()
-    best_part = m.simulated_annealing(num_g)
-    return relabel_part(best_part.index), best_part.modularity()
+    best_part = m.simulated_annealing(num_g, temperature=0.1,
+                                      temp_scaling=0.9995, tmin=1.0e-04)
+    return relabel_part(best_part.index, num2name), best_part.modularity()
 
 if __name__ == '__main__':
-    os.chdir('../ort/results_ort')
-    with open('final_g2.pck') as f:
+    input_fname = raw_input('Input path: ')
+    output_fname = raw_input('Output filename (will be put in results_sa): ')
+    
+    with open(input_fname) as f:
         name_g = pickle.load(f)
 
     part, q = main(name_g)
 
     os.chdir('../../community_detection/results_sa')
-    with open('%s.pck' % OUTPUT_FNAME, 'w') as f:
+    with open('%s.pck' % output_fname, 'w') as f:
         pickle.dump(part, f)
         pickle.dump(q, f)
 
