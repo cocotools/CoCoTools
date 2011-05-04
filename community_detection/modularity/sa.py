@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     part, q = main(name_g)
 
-    os.chdir('../../community_detection/results_sa')
-    with open('%s.pck' % output_fname, 'w') as f:
+    os.chdir('../community_detection/modularity/results_sa')
+    with open('%s' % output_fname, 'w') as f:
         pickle.dump(part, f)
         pickle.dump(q, f)
 

@@ -76,7 +76,7 @@ if __name__ == '__main__':
         with open('modha_full_conn.pck', 'w') as f:
             pickle.dump(conn_g, f)
 
-    if 'frontal_gs.pck' not in os.listdir('.'):
+    if 'full_frontal_g.pck' not in os.listdir('.'):
         with open('modha_full_map.pck') as f:
             map_g = pickle.load(f)
         with open('modha_full_conn.pck') as f:
@@ -92,6 +92,17 @@ if __name__ == '__main__':
             pickle.dump(full_frontal_g, f)
         with open('lowest_frontal_g.pck', 'w') as f:
             pickle.dump(lowest_frontal_g, f)
+
+    if 'lowest_full_g.pck' not in os.listdir('.'):
+        with open('modha_full_map.pck') as f:
+            map_g = pickle.load(f)
+        with open('modha_full_conn.pck') as f:
+            conn_g = pickle.load(f)
+
+        lowest_full = get_lowest(map_g, 'Br')
+        lowest_full_g = remove_rest(conn_g, lowest_full)
+        with open('lowest_full_g.pck', 'w') as f:
+            pickle.dump(lowest_full_g, f)
 
 #------------------------------------------------------------------------------
 #Tests
