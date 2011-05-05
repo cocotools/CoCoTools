@@ -22,12 +22,48 @@ import networkx as nx
 # Local
 import utils
 reload(utils)
-from decotools import memoize
+from decotools import memoize, memoize_strfunc
 
 #-----------------------------------------------------------------------------
 # Functions
 #-----------------------------------------------------------------------------
 
+@memoize_strfunc
+def query_cocomac(url):
+    """Query cocomac and return the raw XML output.
+
+    Parameters
+    ----------
+    url : string
+      A URL.
+
+    Returns
+    -------
+    xml : string
+      Raw XML output from the query.
+
+    Note
+    ----
+    This function caches previous executions persistently to disk, using an
+    SQLite database.
+    """
+    #Sometimes CoCoMac is unresponsive, so if a first attempt to access
+    #the site fails, try two more times before entering debugging mode.
+    for attempt in range(1, 10):
+        try:
+            coco = urllib2.urlopen(url).read()
+        except urllib2.URLError:
+            # Exponential backoff
+            sleep(1.25**i)
+        else:
+            break
+    else:
+        # If the loop completes without breaking, re-raise the last exception
+        raise
+        
+    return utils.scrub_xml(coco)
+
+    
 @memoize
 def fetch_cocomac_tree(url):
     """Get a url from the Cocomac database and return an ElementTree.
@@ -46,37 +82,15 @@ def fetch_cocomac_tree(url):
     ----
     This function caches previous executions during the same session.
     """
-    #Sometimes CoCoMac is unresponsive, so if a first attempt to access
-    #the site fails, try two more times before entering debugging mode.
-    for attempt in range(3):
-        while True:
-            try:
-                coco = urllib2.urlopen(url).read()
-            except urllib2.URLError, e:
-                if attempt == 2:
-                    print(e)
-                    print('Check variable url.\n')
-                    print('If url is good, set coco =')
-                    print('urllib2.urlopen(url).read(), and continue.')
-                    pdb.set_trace()
-                else:
-                    sleep(5)
-                    continue
-            break        
     # We need to read the output to a string for scrubbing, because cocomac is
     # returning invalid xml sometimes.  But ElementTree expects a file-like
     # object for parsing, so we wrap our scrubbed string in a StringIO object.
     s_io = StringIO()
-    s_io.write(utils.scrub_xml(coco))
+    s_io.write(query_cocomac(url))
     # Reset the file pointer to the start so ElementTree can read it
     s_io.seek(0)
     tree = ElementTree()
-    try:
-        tree.parse(s_io)
-    except xml.parsers.expat.ExpatError, e:
-        print(e)
-        print('Remember to close s_io!')
-        pdb.set_trace()
+    tree.parse(s_io)
     s_io.close()
     return tree
 
