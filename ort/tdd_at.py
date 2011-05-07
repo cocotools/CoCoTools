@@ -13,6 +13,8 @@ class At(object):
 
         ii) If A-1 is smaller than or overlaps with B-1, there is another
         region in A with a relationship to B-1.
+
+        iii) If map_g[A-1][B-1] exists, then map_g[B-1][A-1] exists.
         """
         self.map_g = map_g
         self.conn_g = conn_g
