@@ -1,10 +1,8 @@
 """Tools for making queries to the Cocomac online database.
 """
-
 #-----------------------------------------------------------------------------
 # Library imports
 #-----------------------------------------------------------------------------
-
 from __future__ import print_function
 
 # Stdlib
@@ -21,7 +19,6 @@ import networkx as nx
 
 # Local
 import utils
-reload(utils)
 from decotools import memoize, memoize_strfunc
 
 #-----------------------------------------------------------------------------
@@ -29,7 +26,7 @@ from decotools import memoize, memoize_strfunc
 #-----------------------------------------------------------------------------
 
 @memoize_strfunc
-def query_cocomac2(url):
+def query_cocomac_raw(url):
     """Query cocomac and return the raw XML output.
 
     Parameters
@@ -47,14 +44,16 @@ def query_cocomac2(url):
     This function caches previous executions persistently to disk, using an
     SQLite database.
     """
-    #Sometimes CoCoMac is unresponsive, so if a first attempt to access
-    #the site fails, try two more times before entering debugging mode.
-    for attempt in range(1, 10):
+    # Sometimes CoCoMac is unresponsive, so if a first attempt to access
+    # the site fails, try a few more times before giving up
+    for attempt in range(2):
         try:
             coco = urllib2.urlopen(url).read()
         except urllib2.URLError:
             # Exponential backoff
-            sleep(1.25**i)
+            delay = 1.5**attempt
+            print("URLError, retrying in %.2g s" % delay)
+            sleep(delay)
         else:
             break
     else:
@@ -63,7 +62,7 @@ def query_cocomac2(url):
         
     return utils.scrub_xml(coco)
 
-    
+
 @memoize
 def fetch_cocomac_tree(url):
     """Get a url from the Cocomac database and return an ElementTree.
@@ -86,7 +85,7 @@ def fetch_cocomac_tree(url):
     # returning invalid xml sometimes.  But ElementTree expects a file-like
     # object for parsing, so we wrap our scrubbed string in a StringIO object.
     s_io = StringIO()
-    s_io.write(query_cocomac2(url))
+    s_io.write(query_cocomac_raw(url))
     # Reset the file pointer to the start so ElementTree can read it
     s_io.seek(0)
     tree = ElementTree()
@@ -109,6 +108,7 @@ def mk_query_url(dquery):
       Fully encoded query URL.
     """
     url_base = "http://cocomac.org/URLSearch.asp?"
+    #print("Query URL:\n", url_base + urllib.urlencode(dquery))  # dbg
     return url_base + urllib.urlencode(dquery)
 
 
