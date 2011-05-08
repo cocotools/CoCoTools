@@ -1,3 +1,15 @@
+"""Algebra of Transformation
+
+See Stephan et al., Trans. Roy. Soc. B, 2000.
+
+Notes:
+
+1) This script should be taking into account, for each anatomical connection
+processed, which site was injected (see p. 43, first full paragraph).
+Unfortunately, this information is not listed in CoCoMac XML output and is
+therefore inaccessible to us.
+"""
+
 from __future__ import print_function
 
 import networkx as nx
@@ -206,14 +218,34 @@ class At(object):
         return ec_dict
 
     def get_ec(self, source_region):
+        """Retrieve EC for the source_region.
+
+        Parameters
+        ----------
+        source_region : string
+          Region from a source map coextensive with region in self.target_map.
+
+        Returns
+        -------
+        source_region's EC for connetion with self.other
+          From source region or to source region according to self.now.
+        """
+        #We'll say that all of a region is always connected to itself.
+        if source_region == self.other:
+            return 'C'
+
+        #If we've gotten this far, source_region and self.other are different
+        #regions.
         if self.now == 'from':
             if (source_region, self.other) in self.conn_g.edges_iter():
                 return self.conn_g[source_region][self.other]['EC_s']
-        if (self.other, source_region) in self.conn_g.edges_iter():
-            return self.conn_g[self.other][source_region]['EC_t']
-        if source_region == self.other:
-            return 'C'
-        return 'N'
+        else:
+            if (self.other, source_region) in self.conn_g.edges_iter():
+                return self.conn_g[self.other][source_region]['EC_t']
+
+        #And if we've gotten this far, the connection of interest is absent
+        #from self.conn_g. We don't know whether it exists in nature.
+        return 'U'
 
     def run_one_end(self, end_reg):
         coext_w_end = self.find_areas(end_reg)        
@@ -231,28 +263,54 @@ class At(object):
                     self.target_g[from_][to]['EC_s'].append(ec_s)
                     self.target_g[from_][to]['EC_t'].append(ec_t)
 
+    def process_one_edge(self, from_, to):
+        """Run both ends of one anatomical connection through the AT.
+
+        Add edges to self.target_g as appropriate.
+
+        Having this as its own function allows one to more easily read along
+        in the Stephan et al. paper (p. 43).
+
+        Parameters
+        ----------
+        from_ : string
+          Source node of the anatomical connection being processed.
+
+        to : string
+          Target node of the anatomical connection being processed.
+
+        Returns
+        -------
+        None
+          Potentially adds and/or changes edges in self.target_g.
+        """
+        #Perform the AT on the source node (from_).
+        if from_.split('-')[0] == self.target_map:
+                from_ec_dict = {from_: self.conn_g[from_][to]['EC_s']}
+        else:
+            self.now = 'from'
+            self.other = to
+            from_ec_dict = self.run_one_end(from_)
+
+        #Now perform the AT on the target node (to).
+        if to.split('-')[0] == self.target_map:
+            to_ec_dict = {to: self.conn_g[from_][to]['EC_t']}
+        else:
+            self.now = 'to'
+            self.other = from_
+            to_ec_dict = self.run_one_end(to)
+
+        #With the ec_dicts, add/adjust edges in self.target_g as appropriate.
+        for from_targ, ec_s in from_ec_dict.iteritems():
+            for to_targ, ec_t in to_ec_dict.iteritems():
+                self.add_edge(from_targ, ec_s, to_targ, ec_t)
+
     def iterate_edges(self):
         count = 0
         for from_, to in self.conn_g.edges():
-            if from_.split('-')[0] == self.target_map:
-                from_ec_dict = {from_: self.conn_g[from_][to]['EC_s']}
-            else:
-                self.now = 'from'
-                self.other = to
-                from_ec_dict = self.run_one_end(from_)
-
-            if to.split('-')[0] == self.target_map:
-                to_ec_dict = {to: self.conn_g[from_][to]['EC_t']}
-            else:
-                self.now = 'to'
-                self.other = from_
-                to_ec_dict = self.run_one_end(to)
-
-            for from_targ, ec_s in from_ec_dict.iteritems():
-                for to_targ, ec_t in to_ec_dict.iteritems():
-                    self.add_edge(from_targ, ec_s, to_targ, ec_t)
+            self.process_one_edge(from_, to)
             count += 1
-            print('AT: %d of %d complete' % (count, len(self.conn_g.edges())))
+            print('AT: %d/%d' % (count, len(self.conn_g.edges())))
 
 #-----------------------------------------------------------------------------
 # Test functions
@@ -262,6 +320,30 @@ def test_add_edge():
     """Write when you fix add_edge.
     """
     pass
+
+def test_get_ec():
+    fake_conn_g = nx.DiGraph()
+    fake_conn_g.add_edge('A-1', 'A-10', EC_s='X', EC_t='P')
+
+    at = At(None, fake_conn_g, None)
+    at.now = 'from'
+    at.other = 'A-10'
+
+    nt.assert_equal(at.get_ec('A-1'), 'X')
+
+    at.now = 'to'
+    at.other = 'A-1'
+
+    nt.assert_equal(at.get_ec('A-1'), 'C')
+
+    at.now = 'from'
+    at.other = 'A-1'
+
+    nt.assert_equal(at.get_ec('A-10'), 'U')
+
+    at.now = 'to'
+
+    nt.assert_equal(at.get_ec('A-10'), 'P')
 
 def test_end_dict_values_contain_end_reg():
     fake_map_g = nx.DiGraph()
