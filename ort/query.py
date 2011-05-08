@@ -29,7 +29,7 @@ from decotools import memoize, memoize_strfunc
 #-----------------------------------------------------------------------------
 
 @memoize_strfunc
-def query_cocomac(url):
+def query_cocomac2(url):
     """Query cocomac and return the raw XML output.
 
     Parameters
@@ -86,7 +86,7 @@ def fetch_cocomac_tree(url):
     # returning invalid xml sometimes.  But ElementTree expects a file-like
     # object for parsing, so we wrap our scrubbed string in a StringIO object.
     s_io = StringIO()
-    s_io.write(query_cocomac(url))
+    s_io.write(query_cocomac2(url))
     # Reset the file pointer to the start so ElementTree can read it
     s_io.seek(0)
     tree = ElementTree()
