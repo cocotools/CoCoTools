@@ -5,9 +5,9 @@ See Stephan et al., Trans. Roy. Soc. B, 2000.
 Notes:
 
 1) This script should be taking into account, for each anatomical connection
-processed, which site was injected (see p. 43, first full paragraph).
-Unfortunately, this information is not listed in CoCoMac XML output and is
-therefore inaccessible to us.
+processed, which site was injected (see p. 43, first full paragraph as well as
+Appendix C). Unfortunately, this information is not listed in CoCoMac XML
+output and is therefore inaccessible to us.
 """
 
 from __future__ import print_function
@@ -248,11 +248,22 @@ class At(object):
         return 'U'
 
     def run_one_end(self, end_reg):
+        """Run one node of an anatomical connection through the AT.
+
+        Parameters
+        ----------
+        end_reg : string
+          Region forming one end of the anatomical connection being processed.
+
+        Returns
+        -------
+        dict mapping regions in self.target_map to ECs for this connection.
+        """
         coext_w_end = self.find_areas(end_reg)        
         end_dict = self.reverse_find(coext_w_end, end_reg.split('-')[0])
         return self.iterate_trans_dict(end_dict)
 
-    def add_edge(self, from_, ec_s, to, ec_t, target_g):
+    def add_edge(self, from_, ec_s, to, ec_t):
         """This needs some work!
         """
         if from_ != to:
@@ -320,6 +331,31 @@ def test_add_edge():
     """Write when you fix add_edge.
     """
     pass
+
+def test_process_one_edge():
+    #See Appendix C. Note, however, that Appendix C incorrectly claims the
+    #resultant ECs would be X and X following the specification of the AT
+    #(which we implement here) that does not take account of explicitly absent
+    #projections. 
+    fake_map_g = nx.DiGraph()
+    fake_map_g.add_edge('A-1', 'B-1', RC='S')
+    fake_map_g.add_edge('B-1', 'A-1', RC='L')
+    fake_map_g.add_edge('A-2', 'B-1', RC='S')
+    fake_map_g.add_edge('B-1', 'A-2', RC='L')
+    fake_map_g.add_edge('A-3', 'B-2', RC='S')
+    fake_map_g.add_edge('B-2', 'A-3', RC='L')
+    fake_map_g.add_edge('A-4', 'B-2', RC='S')
+    fake_map_g.add_edge('B-2', 'A-4', RC='L')
+
+    fake_conn_g = nx.DiGraph()
+    fake_conn_g.add_edge('A-1', 'A-3', EC_s='X', EC_t='N')
+    fake_conn_g.add_edge('A-1', 'A-4', EC_s='N', EC_t='X')
+    fake_conn_g.add_edge('A-2', 'A-3', EC_s='N', EC_t='X')
+
+    at = At(fake_map_g, fake_conn_g, 'B')
+    at.process_one_edge('A-1', 'A-3')
+
+    nt.assert_equal(at.target_g['B-1']['B-2'], {'EC_s': ['P'], 'EC_t': ['P']})
 
 def test_get_ec():
     fake_conn_g = nx.DiGraph()
@@ -472,6 +508,26 @@ def test_multi_step():
 
     nt.assert_equal(at.multi_step(['A-1', 'A-2', 'A-3', 'A-4'], 'B-1'), 'P')
     nt.assert_equal(at.multi_step(['A-4', 'A-1', 'A-2', 'A-3'], 'B-1'), 'X')
+
+    #See Appendix B, end of first paragraph.
+    fake_map_g = nx.DiGraph()
+    fake_map_g.add_edge('A-1', 'B-1', RC='S')
+    fake_map_g.add_edge('B-1', 'A-1', RC='L')
+    fake_map_g.add_edge('A-2', 'B-1', RC='O')
+    fake_map_g.add_edge('B-1', 'A-2', RC='O')
+    fake_map_g.add_edge('A-3', 'B-1', RC='S')
+    fake_map_g.add_edge('B-1', 'A-3', RC='L')
+
+    fake_conn_g = nx.DiGraph()
+    fake_conn_g.add_edge('A-1', 'A-4', EC_s='X')
+    fake_conn_g.add_edge('A-2', 'A-4', EC_s='P')
+    fake_conn_g.add_edge('A-3', 'A-4', EC_s='N')
+
+    at = At(fake_map_g, fake_conn_g, None)
+    at.now, at.other = 'from', 'A-4'
+
+    nt.assert_equal(at.multi_step(['A-1', 'A-2', 'A-3'], 'B-1'), 'P')
+    nt.assert_equal(at.multi_step(['A-3', 'A-2', 'A-1'], 'B-1'), 'X')
 
 def test_find_areas():
     fake_map_g = nx.DiGraph()
