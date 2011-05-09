@@ -111,6 +111,59 @@ class Deducer(object):
         for node in self.map_g:
             self.process_node(node)
 
+    def determine_rc_res(self, tpath):
+        """Given a tpath's category, return its RC_res.
+
+        See Appendix E. My code here assumes that a transformation path from A
+        to B exists if and only if there is an edge in self.map_g from A to B.
+
+        Parameters
+        ----------
+        path_category : int
+          Category to which fin_autom assigned this edge's tpath.
+
+        Returns
+        -------
+        string or None
+          RC_res for the edge if one can be assigned -- None if one can't.
+        """
+        rules = {1: 'I', 2: 'S', 3: 'L', 5: 'O'}
+
+        if fin_autom(self.get_word(tpath)) != 4:
+            return rules[fin_autom(self.get_word(tpath))]
+
+        #I know what follows is *ugly*, but the logic is complicated and I
+        #couldn't think of a clean way to write it.
+        if ([reg for reg in self.map_g.successors(tpath[0]) if
+            fin_autom(self.get_word(self.map_g[tpath[0]][reg]['tpath'])) in
+            (3, 5) and reg != tpath[-1] and reg.split('-')[0] ==
+            tpath[-1].split('-')[0]] and not [reg for reg in
+            self.map_g.successors(tpath[-1]) if reg != tpath[0] and
+            reg.split('-')[0] == tpath[0].split('-')[0]]):
+            return 'L'
+
+        if ([reg for reg in self.map_g.predecessors(tpath[-1]) if
+            fin_autom(self.get_word(self.map_g[reg][tpath[-1]]['tpath'])) in
+            (2, 5) and reg != tpath[0] and reg.split('-')[0] ==
+            tpath[0].split('-')[0]] and not [reg for reg in
+            self.map_g.predecessors(tpath[0]) if reg != tpath[-1] and
+            reg.split('-')[0] == tpath[-1].split('-')[0]]):
+            return 'S'
+
+        if ([reg for reg in self.map_g.predecessors(tpath[-1]) if
+            fin_autom(self.get_word(self.map_g[reg][tpath[-1]]['tpath'])) in
+            (2, 5) and reg != tpath[0] and reg.split('-')[0] ==
+            tpath[0].split('-')[0]] and [reg for reg in
+            self.map_g.predecessors(tpath[0]) if
+            fin_autom(self.get_word(self.map_g[reg][tpath[0]]['tpath'])) in
+            (2, 5) and reg != tpath[-1] and reg.split('-')[0] ==
+            tpath[-1].split('-')[0]] and not [reg for reg in
+            self.map_g.successors(tpath[0]) if
+            fin_autom(self.get_word(self.map_g[tpath[0]][reg]['tpath'])) in
+            (1, 2) and reg != tpath[-1] and reg.split('-')[0] ==
+            tpath[-1].split('-')[0]]):
+            return 'O'
+
 #-----------------------------------------------------------------------------
 # Functions
 #-----------------------------------------------------------------------------
@@ -183,6 +236,48 @@ def fin_autom(word):
 #-----------------------------------------------------------------------------
 # Test functions
 #-----------------------------------------------------------------------------
+
+def test_determine_rc_res():
+    fake_map_g = nx.DiGraph()
+    fake_map_g.add_edge('A-1', 'B-1', RC='I')
+    fake_map_g.add_edge('A-2', 'B-2', RC='S')
+    fake_map_g.add_edge('A-3', 'B-3', RC='L')
+    fake_map_g.add_edge('A-4', 'B-4', RC='O')
+    fake_map_g.add_edge('B-3', 'C-3', RC='O')
+    fake_map_g.add_edge('C-3', 'B-3', RC='O')
+    fake_map_g.add_edge('A-3', 'C-1', RC='L')
+    fake_map_g.add_edge('C-1', 'A-3', RC='S')
+    fake_map_g.add_edge('R-1', 'S-1', RC='L')
+    fake_map_g.add_edge('S-1', 'R-1', RC='S')
+    fake_map_g.add_edge('S-1', 'T-1', RC='S')
+    fake_map_g.add_edge('T-1', 'S-1', RC='L')
+    fake_map_g.add_edge('R-2', 'T-1', RC='S')
+    fake_map_g.add_edge('T-1', 'R-2', RC='L')
+    fake_map_g.add_edge('T-2', 'R-1', RC='S')
+    fake_map_g.add_edge('R-1', 'T-2', RC='L')
+
+    #This block of edges checks whether my edit of Stephan et al.'s FA fits
+    #their RC resolution scheme (see Appendix E). The change passes the test
+    #(see below).
+    fake_map_g.add_edge('X-1', 'Y-1', RC='O')
+    fake_map_g.add_edge('Y-1', 'X-1', RC='O')
+    fake_map_g.add_edge('Y-1', 'Z-1', RC='S')
+    fake_map_g.add_edge('Z-1', 'Y-1', RC='L')
+    fake_map_g.add_edge('X-2', 'Z-1', RC='S')
+    fake_map_g.add_edge('Z-1', 'X-2', RC='L')
+    
+    d = Deducer(fake_map_g)
+    d.iterate_nodes()
+    
+    nt.assert_equal(d.determine_rc_res(['A-1', 'B-1']), 'I')
+    nt.assert_equal(d.determine_rc_res(['A-2', 'B-2']), 'S')
+    nt.assert_equal(d.determine_rc_res(['A-3', 'B-3']), 'L')
+    nt.assert_equal(d.determine_rc_res(['A-4', 'B-4']), 'O')
+    nt.assert_equal(d.determine_rc_res(['A-3', 'B-3', 'C-3']), 'L')
+    nt.assert_equal(d.determine_rc_res(['R-1', 'S-1', 'T-1']), 'O')
+
+    #Test of my change.
+    nt.assert_equal(d.determine_rc_res(['X-1', 'Y-1', 'Z-1']), 'S')
 
 def test_iterate_nodes():
     #See Fig. 5.
@@ -364,14 +459,22 @@ def test_fin_autom():
     nt.assert_equal(fin_autom(''), 0)
     nt.assert_equal(fin_autom('IISS'), 2)
 
+    #See last paragraph of Appendix D.
+    nt.assert_true(fin_autom('LLLLLSSSSS'))
+    nt.assert_false(fin_autom('SSSSLLLL'))
+
 def test_get_word():
     fake_map_g = nx.DiGraph()
     fake_map_g.add_edge('A-1', 'B-1', RC='I')
     fake_map_g.add_edge('B-1', 'A-1', RC='I')
+    fake_map_g.add_edge('B-1', 'C-1', RC='O')
+    fake_map_g.add_edge('C-1', 'B-1', RC='O')
+    fake_map_g.add_edge('C-1', 'D-1', RC='S')
+    fake_map_g.add_edge('D-1', 'C-1', RC='L')
     
     deducer = Deducer(fake_map_g)
 
-    nt.assert_equal(deducer.get_word(['A-1', 'B-1']), 'I')
+    nt.assert_equal(deducer.get_word(['A-1', 'B-1', 'C-1', 'D-1']), 'IOS')
 
 def test_set_initial_tpaths():
     fake_map_g = nx.DiGraph()
