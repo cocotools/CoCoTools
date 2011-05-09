@@ -116,6 +116,9 @@ class Deducer(object):
 
         See Appendix E. My code here assumes that a transformation path from A
         to B exists if and only if there is an edge in self.map_g from A to B.
+        It also assumes that we are working with a sufficiently large base of
+        relational information on all of the involved maps. When the latter
+        assumption totally fails, assume RC='O', per Stephan et al.
 
         Parameters
         ----------
@@ -124,8 +127,8 @@ class Deducer(object):
 
         Returns
         -------
-        string or None
-          RC_res for the edge if one can be assigned -- None if one can't.
+        string
+          RC_res for the edge.
         """
         rules = {1: 'I', 2: 'S', 3: 'L', 5: 'O'}
 
@@ -163,6 +166,11 @@ class Deducer(object):
             (1, 2) and reg != tpath[-1] and reg.split('-')[0] ==
             tpath[-1].split('-')[0]]):
             return 'O'
+
+        #If all of the previous conditionals failed, we don't have enough
+        #information about the maps to resolve this relation. Per Stephan et
+        #al., adopt a worst-case behavior and assume RC='O'.
+        return 'O'
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -255,6 +263,10 @@ def test_determine_rc_res():
     fake_map_g.add_edge('T-1', 'R-2', RC='L')
     fake_map_g.add_edge('T-2', 'R-1', RC='S')
     fake_map_g.add_edge('R-1', 'T-2', RC='L')
+    fake_map_g.add_edge('Q-1', 'M-1', RC='L')
+    fake_map_g.add_edge('M-1', 'Q-1', RC='S')
+    fake_map_g.add_edge('M-1', 'N-1', RC='S')
+    fake_map_g.add_edge('N-1', 'M-1', RC='L')
 
     #This block of edges checks whether my edit of Stephan et al.'s FA fits
     #their RC resolution scheme (see Appendix E). The change passes the test
@@ -275,6 +287,7 @@ def test_determine_rc_res():
     nt.assert_equal(d.determine_rc_res(['A-4', 'B-4']), 'O')
     nt.assert_equal(d.determine_rc_res(['A-3', 'B-3', 'C-3']), 'L')
     nt.assert_equal(d.determine_rc_res(['R-1', 'S-1', 'T-1']), 'O')
+    nt.assert_equal(d.determine_rc_res(['Q-1', 'M-1', 'N-1']), 'O')
 
     #Test of my change.
     nt.assert_equal(d.determine_rc_res(['X-1', 'Y-1', 'Z-1']), 'S')
