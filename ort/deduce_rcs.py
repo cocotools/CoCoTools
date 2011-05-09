@@ -7,7 +7,7 @@ import copy
 #------------------------------------------------------------------------------
 
 class Deducer(object):
-    def __init__(self, map_g):
+    def __init__(self, map_g, done_previously=None):
         """The mapping graph (map_g) submitted to Deducer must have the
         following property:
 
@@ -15,8 +15,9 @@ class Deducer(object):
 
         ii) Edges must be labelled with RCs.
         """
-        for from_, to in map_g.edges_iter():
-            map_g[from_][to]['tpath'] = [from_, to]
+        if not done_previously:
+            for from_, to in map_g.edges_iter():
+                map_g[from_][to]['tpath'] = [from_, to]
         self.map_g = map_g
 
     def get_word(self, tpath):
@@ -49,6 +50,15 @@ class Deducer(object):
         must be from different maps and ii) the tpath's word must fall in a
         valid path category.
 
+        Stephan et al. state that the word for an edge, in addition to its
+        transformation path, should be stored with the edge. However, because
+        a word can be looked up easily given an edge's transformation path (see
+        self.get_word), we store only the transformation path.
+
+        We use the transformation path category hierarchy to optimize edges.
+        Another possibility we don't implement is the use of PD codes (see
+        Appendix I).
+
         Parameters
         ----------
         aff : string
@@ -76,7 +86,8 @@ class Deducer(object):
                     fin_autom(self.get_word(self.map_g[aff][eff]['tpath']))):
                     self.map_g[aff][eff]['tpath'] = new_tpath
             else:
-                self.map_g.add_edge(aff, eff, tpath=new_tpath)
+                self.map_g.add_edge(aff, eff, tpath=new_tpath,
+                                    RC=self.determine_rc_res(new_tpath))
         
     def process_node(self, node):
         """Try to make edges from node's afferents to its efferents.
@@ -308,22 +319,26 @@ def test_iterate_nodes():
     d2 = copy.deepcopy(d1)
     d1.iterate_nodes()
 
-    d2.map_g.add_edge('BP89-V46', 'B09-9', tpath=['BP89-V46','W40-46','B09-9'])
-    d2.map_g.add_edge('B09-9', 'BP89-V46', tpath=['B09-9','W40-46','BP89-V46'])
+    d2.map_g.add_edge('BP89-V46', 'B09-9', tpath=['BP89-V46','W40-46','B09-9'],
+                      RC='S')
+    d2.map_g.add_edge('B09-9', 'BP89-V46', tpath=['B09-9','W40-46','BP89-V46'],
+                      RC='L')
     d2.map_g.add_edge('BB47-FDdelta', 'BP89-V46',
-                      tpath=['BB47-FDdelta','W40-46','BP89-V46'])
+                      tpath=['BB47-FDdelta','W40-46','BP89-V46'], RC='L')
     d2.map_g.add_edge('BP89-V46', 'BB47-FDdelta',
-                      tpath=['BP89-V46','W40-46','BB47-FDdelta'])
+                      tpath=['BP89-V46','W40-46','BB47-FDdelta'], RC='S')
     d2.map_g.add_edge('BB47-FDdelta', 'B09-9',
-                      tpath=['BB47-FDdelta','W40-46','B09-9'])
+                      tpath=['BB47-FDdelta','W40-46','B09-9'], RC='S')
     d2.map_g.add_edge('B09-9', 'BB47-FDdelta',
-                      tpath=['B09-9','W40-46','BB47-FDdelta'])
+                      tpath=['B09-9','W40-46','BB47-FDdelta'], RC='L')
     d2.map_g.add_edge('BB47-FDdelta', 'PG91-46d',
-                      tpath=['BB47-FDdelta','W40-46','PG91-46d'])
+                      tpath=['BB47-FDdelta','W40-46','PG91-46d'], RC='L')
     d2.map_g.add_edge('PG91-46d', 'BB47-FDdelta',
-                      tpath=['PG91-46d','W40-46','BB47-FDdelta'])
-    d2.map_g.add_edge('PG91-46d', 'B09-9', tpath=['PG91-46d','W40-46','B09-9'])
-    d2.map_g.add_edge('B09-9', 'PG91-46d', tpath=['B09-9','W40-46','PG91-46d'])
+                      tpath=['PG91-46d','W40-46','BB47-FDdelta'], RC='S')
+    d2.map_g.add_edge('PG91-46d', 'B09-9', tpath=['PG91-46d','W40-46','B09-9'],
+                      RC='S')
+    d2.map_g.add_edge('B09-9', 'PG91-46d', tpath=['B09-9','W40-46','PG91-46d'],
+                      RC='L')
 
     nt.assert_equal(d1.map_g.edge, d2.map_g.edge)
 
