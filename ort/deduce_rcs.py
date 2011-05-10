@@ -1,3 +1,23 @@
+"""Deduce inter-map relations unstated in the literature.
+
+1) A big question concerns how to deal with nodes within a single map that
+cover the same space on standard cortex. ORT assumes that each map specifies a
+set of regions that are mutually exclusive and collectively exhaustive in their
+coverage of brain space; however, many maps defined supraregions that contain
+sub-regions.
+
+For now we are pretending this issue doesn't exist (as Stephan et al.
+implicitly do).
+
+2) For an unknown reason, the output of this graph is not necessarily
+symmetrical: i.e., the existence of map_g[A-1][B-1] does not imply the
+existence ofmap_g[B-1][A-1], as it should.
+
+My guess is that this error has its source in the definition of the FA, as an
+asymmetry error has already been linked to a bad FA definition (the correction
+of which is documented in the function fin_autom).
+"""
+
 import networkx as nx
 import nose.tools as nt
 import copy
@@ -7,17 +27,14 @@ import copy
 #------------------------------------------------------------------------------
 
 class Deducer(object):
-    def __init__(self, map_g, done_previously=None):
+    def __init__(self, map_g):
         """The mapping graph (map_g) submitted to Deducer must have the
         following property:
 
         i) If map_g[A-1][B-1] exists, then map_g[B-1][A-1] exists.
 
-        ii) Edges must be labelled with RCs.
+        ii) Each edge must have attributes 'RC' and 'tpath'.
         """
-        if not done_previously:
-            for from_, to in map_g.edges_iter():
-                map_g[from_][to]['tpath'] = [from_, to]
         self.map_g = map_g
 
     def get_word(self, tpath):
@@ -258,36 +275,36 @@ def fin_autom(word):
 
 def test_determine_rc_res():
     fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-1', 'B-1', RC='I')
-    fake_map_g.add_edge('A-2', 'B-2', RC='S')
-    fake_map_g.add_edge('A-3', 'B-3', RC='L')
-    fake_map_g.add_edge('A-4', 'B-4', RC='O')
-    fake_map_g.add_edge('B-3', 'C-3', RC='O')
-    fake_map_g.add_edge('C-3', 'B-3', RC='O')
-    fake_map_g.add_edge('A-3', 'C-1', RC='L')
-    fake_map_g.add_edge('C-1', 'A-3', RC='S')
-    fake_map_g.add_edge('R-1', 'S-1', RC='L')
-    fake_map_g.add_edge('S-1', 'R-1', RC='S')
-    fake_map_g.add_edge('S-1', 'T-1', RC='S')
-    fake_map_g.add_edge('T-1', 'S-1', RC='L')
-    fake_map_g.add_edge('R-2', 'T-1', RC='S')
-    fake_map_g.add_edge('T-1', 'R-2', RC='L')
-    fake_map_g.add_edge('T-2', 'R-1', RC='S')
-    fake_map_g.add_edge('R-1', 'T-2', RC='L')
-    fake_map_g.add_edge('Q-1', 'M-1', RC='L')
-    fake_map_g.add_edge('M-1', 'Q-1', RC='S')
-    fake_map_g.add_edge('M-1', 'N-1', RC='S')
-    fake_map_g.add_edge('N-1', 'M-1', RC='L')
+    fake_map_g.add_edge('A-1', 'B-1', RC='I', tpath=['A-1', 'B-1'])
+    fake_map_g.add_edge('A-2', 'B-2', RC='S', tpath=['A-2', 'B-2'])
+    fake_map_g.add_edge('A-3', 'B-3', RC='L', tpath=['A-3', 'B-3'])
+    fake_map_g.add_edge('A-4', 'B-4', RC='O', tpath=['A-4', 'B-4'])
+    fake_map_g.add_edge('B-3', 'C-3', RC='O', tpath=['B-3', 'C-3'])
+    fake_map_g.add_edge('C-3', 'B-3', RC='O', tpath=['C-3', 'B-3'])
+    fake_map_g.add_edge('A-3', 'C-1', RC='L', tpath=['A-3', 'C-1'])
+    fake_map_g.add_edge('C-1', 'A-3', RC='S', tpath=['C-1', 'A-3'])
+    fake_map_g.add_edge('R-1', 'S-1', RC='L', tpath=['R-1', 'S-1'])
+    fake_map_g.add_edge('S-1', 'R-1', RC='S', tpath=['S-1', 'R-1'])
+    fake_map_g.add_edge('S-1', 'T-1', RC='S', tpath=['S-1', 'T-1'])
+    fake_map_g.add_edge('T-1', 'S-1', RC='L', tpath=['T-1', 'S-1'])
+    fake_map_g.add_edge('R-2', 'T-1', RC='S', tpath=['R-2', 'T-1'])
+    fake_map_g.add_edge('T-1', 'R-2', RC='L', tpath=['T-1', 'R-2'])
+    fake_map_g.add_edge('T-2', 'R-1', RC='S', tpath=['T-2', 'R-1'])
+    fake_map_g.add_edge('R-1', 'T-2', RC='L', tpath=['R-1', 'T-2'])
+    fake_map_g.add_edge('Q-1', 'M-1', RC='L', tpath=['Q-1', 'M-1'])
+    fake_map_g.add_edge('M-1', 'Q-1', RC='S', tpath=['M-1', 'Q-1'])
+    fake_map_g.add_edge('M-1', 'N-1', RC='S', tpath=['M-1', 'N-1'])
+    fake_map_g.add_edge('N-1', 'M-1', RC='L', tpath=['N-1', 'M-1'])
 
     #This block of edges checks whether my edit of Stephan et al.'s FA fits
     #their RC resolution scheme (see Appendix E). The change passes the test
     #(see below).
-    fake_map_g.add_edge('X-1', 'Y-1', RC='O')
-    fake_map_g.add_edge('Y-1', 'X-1', RC='O')
-    fake_map_g.add_edge('Y-1', 'Z-1', RC='S')
-    fake_map_g.add_edge('Z-1', 'Y-1', RC='L')
-    fake_map_g.add_edge('X-2', 'Z-1', RC='S')
-    fake_map_g.add_edge('Z-1', 'X-2', RC='L')
+    fake_map_g.add_edge('X-1', 'Y-1', RC='O', tpath=['X-1', 'Y-1'])
+    fake_map_g.add_edge('Y-1', 'X-1', RC='O', tpath=['Y-1', 'X-1'])
+    fake_map_g.add_edge('Y-1', 'Z-1', RC='S', tpath=['Y-1', 'Z-1'])
+    fake_map_g.add_edge('Z-1', 'Y-1', RC='L', tpath=['Z-1', 'Y-1'])
+    fake_map_g.add_edge('X-2', 'Z-1', RC='S', tpath=['X-2', 'Z-1'])
+    fake_map_g.add_edge('Z-1', 'X-2', RC='L', tpath=['Z-1', 'X-2'])
     
     d = Deducer(fake_map_g)
     d.iterate_nodes()
@@ -306,14 +323,20 @@ def test_determine_rc_res():
 def test_iterate_nodes():
     #See Fig. 5.
     fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('B09-9', 'W40-46', RC='L')
-    fake_map_g.add_edge('W40-46', 'B09-9', RC='S')
-    fake_map_g.add_edge('BP89-V46', 'W40-46', RC='S')
-    fake_map_g.add_edge('W40-46', 'BP89-V46', RC='L')
-    fake_map_g.add_edge('BB47-FDdelta', 'W40-46', RC='I')
-    fake_map_g.add_edge('W40-46', 'BB47-FDdelta', RC='I')
-    fake_map_g.add_edge('PG91-46d', 'W40-46', RC='S')
-    fake_map_g.add_edge('W40-46', 'PG91-46d', RC='L')
+    fake_map_g.add_edge('B09-9', 'W40-46', RC='L', tpath=['B09-9', 'W40-46'])
+    fake_map_g.add_edge('W40-46', 'B09-9', RC='S', tpath=['W40-46', 'B09-9'])
+    fake_map_g.add_edge('BP89-V46', 'W40-46', RC='S',
+                        tpath=['BP89-V46', 'W40-46'])
+    fake_map_g.add_edge('W40-46', 'BP89-V46', RC='L',
+                        tpath=['W40-46', 'BP89-V46'])
+    fake_map_g.add_edge('BB47-FDdelta', 'W40-46', RC='I',
+                        tpath=['BB47-FDdelta', 'W40-46'])
+    fake_map_g.add_edge('W40-46', 'BB47-FDdelta', RC='I',
+                        tpath=['W40-46', 'BB47-FDdelta'])
+    fake_map_g.add_edge('PG91-46d', 'W40-46', RC='S',
+                        tpath=['PG91-46d', 'W40-46'])
+    fake_map_g.add_edge('W40-46', 'PG91-46d', RC='L',
+                        tpath=['W40-46', 'PG91-46d'])
 
     d1 = Deducer(fake_map_g)
     d2 = copy.deepcopy(d1)
@@ -344,12 +367,12 @@ def test_iterate_nodes():
 
     #See Fig. 6(d).
     fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-A', 'B-B', RC='L')
-    fake_map_g.add_edge('B-B', 'A-A', RC='S')
-    fake_map_g.add_edge('B-B', 'C-C', RC='O')
-    fake_map_g.add_edge('C-C', 'B-B', RC='O')
-    fake_map_g.add_edge('C-C', 'D-D', RC='S')
-    fake_map_g.add_edge('D-D', 'C-C', RC='L')
+    fake_map_g.add_edge('A-A', 'B-B', RC='L', tpath=['A-A', 'B-B'])
+    fake_map_g.add_edge('B-B', 'A-A', RC='S', tpath=['B-B', 'A-A'])
+    fake_map_g.add_edge('B-B', 'C-C', RC='O', tpath=['B-B', 'C-C'])
+    fake_map_g.add_edge('C-C', 'B-B', RC='O', tpath=['C-C', 'B-B'])
+    fake_map_g.add_edge('C-C', 'D-D', RC='S', tpath=['C-C', 'D-D'])
+    fake_map_g.add_edge('D-D', 'C-C', RC='L', tpath=['D-D', 'C-C'])
 
     d = Deducer(fake_map_g)
     d.iterate_nodes()
@@ -364,10 +387,10 @@ def test_no_tpath_dups():
 def test_handle_new_edge():
     #See first paragraph of Sec. 2(f) and Fig. 7(c).
     fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-A', 'B-B', RC='O')
-    fake_map_g.add_edge('B-B', 'A-A', RC='O')
-    fake_map_g.add_edge('B-B', 'C-C', RC='O')
-    fake_map_g.add_edge('C-C', 'B-B', RC='O')
+    fake_map_g.add_edge('A-A', 'B-B', RC='O', tpath=['A-A', 'B-B'])
+    fake_map_g.add_edge('B-B', 'A-A', RC='O', tpath=['B-B', 'A-A'])
+    fake_map_g.add_edge('B-B', 'C-C', RC='O', tpath=['B-B', 'C-C'])
+    fake_map_g.add_edge('C-C', 'B-B', RC='O', tpath=['C-C', 'B-B'])
     
     deducer = Deducer(fake_map_g)
     deducer.handle_new_edge('A-A', 'B-B', 'C-C')
@@ -470,10 +493,10 @@ def test_handle_new_edge():
 
 def test_process_node():
     fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-1', 'B-1', RC='I')
-    fake_map_g.add_edge('B-1', 'A-1', RC='I')
-    fake_map_g.add_edge('B-1', 'C-1', RC='I')
-    fake_map_g.add_edge('C-1', 'B-1', RC='I')
+    fake_map_g.add_edge('A-1', 'B-1', RC='I', tpath=['A-1', 'B-1'])
+    fake_map_g.add_edge('B-1', 'A-1', RC='I', tpath=['B-1', 'A-1'])
+    fake_map_g.add_edge('B-1', 'C-1', RC='I', tpath=['B-1', 'C-1'])
+    fake_map_g.add_edge('C-1', 'B-1', RC='I', tpath=['C-1', 'B-1'])
     
     deducer = Deducer(fake_map_g)
     deducer.process_node('B-1')
@@ -493,26 +516,13 @@ def test_fin_autom():
 
 def test_get_word():
     fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-1', 'B-1', RC='I')
-    fake_map_g.add_edge('B-1', 'A-1', RC='I')
-    fake_map_g.add_edge('B-1', 'C-1', RC='O')
-    fake_map_g.add_edge('C-1', 'B-1', RC='O')
-    fake_map_g.add_edge('C-1', 'D-1', RC='S')
-    fake_map_g.add_edge('D-1', 'C-1', RC='L')
+    fake_map_g.add_edge('A-1', 'B-1', RC='I', tpath=['A-1', 'B-1'])
+    fake_map_g.add_edge('B-1', 'A-1', RC='I', tpath=['B-1', 'A-1'])
+    fake_map_g.add_edge('B-1', 'C-1', RC='O', tpath=['B-1', 'C-1'])
+    fake_map_g.add_edge('C-1', 'B-1', RC='O', tpath=['C-1', 'B-1'])
+    fake_map_g.add_edge('C-1', 'D-1', RC='S', tpath=['C-1', 'D-1'])
+    fake_map_g.add_edge('D-1', 'C-1', RC='L', tpath=['D-1', 'C-1'])
     
     deducer = Deducer(fake_map_g)
 
     nt.assert_equal(deducer.get_word(['A-1', 'B-1', 'C-1', 'D-1']), 'IOS')
-
-def test_set_initial_tpaths():
-    fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-1', 'B-1', RC='I')
-    fake_map_g.add_edge('B-1', 'A-1', RC='I')
-    
-    deducer = Deducer(fake_map_g)
-
-    desired_g = copy.deepcopy(fake_map_g)
-    desired_g['A-1']['B-1']['tpath'] = ['A-1', 'B-1']
-    desired_g['B-1']['A-1']['tpath'] = ['B-1', 'A-1']
-    
-    nt.assert_equal(deducer.map_g.edge, desired_g.edge)
