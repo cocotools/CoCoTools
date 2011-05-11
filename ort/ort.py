@@ -63,39 +63,11 @@ def add_tpaths(map_g):
 if __name__ == '__main__':
     os.chdir('results_ort')
 
-    #We're done through second mkSymm (third overall step).
-    with open('mkSymm3_2011-05-10T09-45-26.pck') as f:
+    with open('eliminate4_2011-05-11T01-39-39.pck') as f:
         map_g = pickle.load(f)
 
-    #With the symmetrical post-deduce graph, eliminate contradictions and save
-    #the result.
-    e = Eliminator(map_g)
-    e.iterate_nodes()
-
-    map_g = e.map_g
-
-    datetime_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
-    with open('eliminate4_%s.pck' % datetime_stamp, 'w') as f:
-        pickle.dump(map_g, f)
-
-    #If the graph isn't symmetrical, make it symmetrical and save the result.
-    if not is_symmetrical(map_g):
-        make_symmetrical(map_g)
-
-        datetime_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
-        with open('mkSymm5_%s.pck' % datetime_stamp, 'w') as f:
-            pickle.dump(map_g, f)
-
-    #Take out the post-queries conn_g.
-    with open('connQueries_2011-04-22T14-17-58.pck') as f:
+    with open('mkConnMatchMap5_2011-05-11T01-40-01.pck') as f:
         conn_g = pickle.load(f)
-
-    #Remove nodes from conn_g not in map_g and save the result.
-    conn_g = remove_nodes(conn_g, map_g)
-
-    datetime_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
-    with open('makeConnMatchMap6_%s.pck' % datetime_stamp, 'w') as f:
-        pickle.dump(conn_g, f)
 
     #Perform the AT and save the result.
     at = At(map_g, conn_g, 'PHT00')

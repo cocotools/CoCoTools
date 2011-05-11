@@ -12,6 +12,8 @@ output and is therefore inaccessible to us.
 
 from __future__ import print_function
 
+import pdb
+
 import networkx as nx
 import nose.tools as nt
 
@@ -188,8 +190,11 @@ class At(object):
                   }
         ec_target = 'B'
         for source_region in source_list:
-            rc = self.map_g[source_region][target_region]['RC']
-            ec_target = rules[ec_target][rc][self.get_ec(source_region)]
+            try:
+                rc = self.map_g[source_region][target_region]['RC']
+                ec_target = rules[ec_target][rc][self.get_ec(source_region)]
+            except KeyError:
+                pdb.set_trace()
         return ec_target
 
     def iterate_trans_dict(self, trans_dict):
