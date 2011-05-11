@@ -4,6 +4,7 @@ import copy
 
 import nose.tools as nt
 import networkx as nx
+import pickle
 
 from deduce_rcs import Deducer, fin_autom
 
@@ -44,7 +45,16 @@ class Eliminator(object):
         return paths_dict
 
     def contradictory_paths(self):
-        """
+        """Find contradictory paths between self.region and nodes in one map.
+
+        Whether paths are from nodes in a single map or to them is set by
+        self.blank.
+
+        Returns
+        -------
+        tuple or False
+          Tuple is (regions to/from which contradictory paths exist, rcs for
+          those paths).
         """
         for reg_same_map in self.paths_blank_same_map().values():
             rcs = [self.map_g[self.region][targ]['RC'] for targ in
@@ -250,7 +260,12 @@ class Eliminator(object):
                 raise ValueError, 'self.blank must be "from" or "to"'
                 
     def iterate_nodes(self):
-        """
+        """Perform the elimination procedure for all of the nodes.
+
+        Returns
+        -------
+        None
+          Removes contradictory edges from self.map_g in place.
         """
         count = 0
         for region in self.map_g:
@@ -311,6 +326,34 @@ def test_remove_edges():
                                       ('C-1', 'D-1'), ('D-1', 'C-1')]))
 
 def test_iterate_nodes():
+    #After first crash-free run of this script on 5/10/11, the following
+    #contradiction crashed subsequent run of at.py: PHT00-BM <-I-> A86-MB and
+    #PHT00-BM <-I-> A86-AB.
+
+    #A graph with the input to eliminate, reduced to edges between these two
+    #maps and the edges that support those edges, was made using
+    #focus_on_two_maps.py. We will use that graph in this test.
+    with open('preGpht00a86_2011-05-11T14-06-17.pck') as f:
+        fake_map_g = pickle.load(f)
+
+    #The desired graph should have one of the I relations removed.
+    desired_g = copy.deepcopy(fake_map_g)
+    desired_g.remove_edges_from([('PHT00-BM', 'A86-AB'),
+                                 ('A86-AB', 'PHT00-BM')])
+
+    e = Eliminator(fake_map_g)    
+    e.iterate_nodes()
+
+    nt.assert_equal(e.map_g.edge['PHT00-BM'], desired_g.edge['PHT00-BM'])
+
+    #The previous test passes, which means that somehow the simplified input
+    #graph gets Eliminator to do the right thing, whereas with the full graph
+    #doesn't. What's the key difference between the graphs, and how can we get
+    #a test to fail that, once made to pass, will indicate we've solved the
+    #problem?
+    
+
+    #--------------------------------------------------------------------------
     #See third block of text in Appendix J.
     fake_map_g = nx.DiGraph()
     fake_map_g.add_edge('A-1', 'B-1', tpath=['A-1', 'B-1'], RC='L')
