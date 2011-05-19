@@ -1,45 +1,12 @@
-import os
-import pickle
-import copy
-from time import localtime
+"""Script for running ORT and associated processes.
+"""
 
 import nose.tools as nt
 import networkx as nx
 
-from deduce_rcs import Deducer
-from eliminate_contradictions import Eliminator
-from at import At
-
 #-----------------------------------------------------------------------------
 # Functions
 #-----------------------------------------------------------------------------
-
-def make_symmetrical(map_g):
-    """
-    """
-    for source, target in map_g.edges_iter():
-        if not map_g.has_edge(target, source):
-            reversed_tpath = copy.deepcopy(map_g[source][target]['tpath'])
-            reversed_tpath.reverse()
-            if map_g.edge[source][target]['RC'] == 'I':
-                map_g.add_edge(target, source, RC='I', tpath=reversed_tpath)
-            elif map_g.edge[source][target]['RC'] == 'L':
-                map_g.add_edge(target, source, RC='S', tpath=reversed_tpath)
-            elif map_g.edge[source][target]['RC'] == 'S':
-                map_g.add_edge(target, source, RC='L', tpath=reversed_tpath)
-            else:
-                map_g.add_edge(target, source, RC='O', tpath=reversed_tpath)
-
-def is_symmetrical(map_g):
-    """
-    """
-    for source, target in map_g.edges_iter():
-        if not map_g.has_edge(target, source):
-            break
-    else:
-        return True
-
-    return False
 
 def remove_nodes(conn_g, map_g):
     """
@@ -61,21 +28,15 @@ def add_tpaths(map_g):
 #-----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    os.chdir('results_ort')
-
-    with open('eliminate4_2011-05-11T01-39-39.pck') as f:
-        map_g = pickle.load(f)
-
-    with open('mkConnMatchMap5_2011-05-11T01-40-01.pck') as f:
-        conn_g = pickle.load(f)
-
-    #Perform the AT and save the result.
-    at = At(map_g, conn_g, 'PHT00')
-    at.iterate_edges()
-
-    datetime_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
-    with open('at7_%s.pck' % datetime_stamp, 'w') as f:
-        pickle.dump(at.target_g, f)
+    #Our order of operations:
+    #1. Make a graph from all the mapping queries
+    #2. Make a graph from all the connectivity queries sans nodes not in the
+    #   mapping graph.
+    #3. Make the mapping graph symmetrical.
+    #4. Deduce unknown relations.
+    #5. Eliminate contradictions in the mapping graph.
+    #6. Run the alebra of transformation. 
+    pass
 
 #-----------------------------------------------------------------------------
 # Test Functions
@@ -106,33 +67,5 @@ def test_remove_nodes():
 
     nt.assert_equal(remove_nodes(fake_conn_g, fake_map_g).node, desired_g.node)
 
-def test_is_symmetrical():
-    fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-1', 'B-1', RC='S')
 
-    nt.assert_false(is_symmetrical(fake_map_g))
 
-    fake_map_g.add_edge('B-1', 'A-1', RC='L')
-
-    nt.assert_true(is_symmetrical(fake_map_g))
-
-def test_make_symmetrical():
-    fake_map_g = nx.DiGraph()
-    fake_map_g.add_edge('A-1', 'B-1', RC='S', tpath=['A-1', 'B-1'])
-    fake_map_g.add_edge('A-2', 'B-2', RC='I', tpath=['A-2', 'C-1', 'B-2'])
-    fake_map_g.add_edge('A-3', 'B-3', RC='O', tpath=['A-3', 'B-3'])
-    fake_map_g.add_edge('A-4', 'B-4', RC='L', tpath=['A-4', 'B-4'])
-    fake_map_g.add_edge('A-2', 'C-1', RC='I', tpath=['A-2', 'C-1'])
-    fake_map_g.add_edge('C-1', 'B-2', RC='I', tpath=['C-1', 'B-2'])
-
-    desired_g = copy.deepcopy(fake_map_g)
-    desired_g.add_edge('B-1', 'A-1', RC='L', tpath=['B-1', 'A-1'])
-    desired_g.add_edge('B-2', 'A-2', RC='I', tpath=['B-2', 'C-1', 'A-2'])
-    desired_g.add_edge('B-3', 'A-3', RC='O', tpath=['B-3', 'A-3'])
-    desired_g.add_edge('B-4', 'A-4', RC='S', tpath=['B-4', 'A-4'])
-    desired_g.add_edge('C-1', 'A-2', RC='I', tpath=['C-1', 'A-2'])
-    desired_g.add_edge('B-2', 'C-1', RC='I', tpath=['B-2', 'C-1'])
-
-    make_symmetrical(fake_map_g)
-
-    nt.assert_equal(fake_map_g.edge, desired_g.edge)
