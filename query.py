@@ -16,7 +16,7 @@ from time import sleep
 
 # Local
 import utils
-from decotools import memoize, memoize_strfunc
+from decotools import memoize_strfunc
 
 #-----------------------------------------------------------------------------
 # Functions
@@ -101,7 +101,7 @@ def mk_query_url(query_dict):
     string
       Fully encoded query URL.
     """
-    return 'http://cocomac.org/URLSearch.asp?' + urllib.urlencode(dquery)
+    return 'http://cocomac.org/URLSearch.asp?' + urllib.urlencode(query_dict)
 
 def execute_one_query(search_type, search_string):
     """Queries CoCoMac for mapping or connectivity data.
