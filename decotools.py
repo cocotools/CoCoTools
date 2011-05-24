@@ -1,4 +1,4 @@
-"""Decorator tools, using M. Simionato's module.
+"""Decorator tools that use M. Simionato's decorator module.
 """
 #-----------------------------------------------------------------------------
 # Imports
@@ -14,28 +14,8 @@ from decorator import decorator
 # Classes and functions
 #-----------------------------------------------------------------------------
 
-def _memoize(func, *args, **kw):
-    if kw: # frozenset is used to ensure hashability
-        key = args, frozenset(kw.iteritems())
-    else:
-        key = args
-    cache = func.cache # attributed added by memoize
-    if key in cache:
-        return cache[key]
-    else:
-        cache[key] = result = func(*args, **kw)
-        return result
-
-
-def memoize(f):
-    """Simple in-memory memoizing decorator using a dict."""
-    f.cache = {}
-    return decorator(_memoize, f)
-
-
 class MemoizedStrFuncError(Exception):
     pass
-
 
 class MemoizedStrFunc(object):
     """Memoize functions of string arguments with an SQLite database.
@@ -43,7 +23,8 @@ class MemoizedStrFunc(object):
     Note
     ----
     This class isn't really meant to be used by itself, but as a building block
-    for a user-facing decorator.  The class captures state at construction time
+    for a user-facing decorator.  The class captures state at construction
+    time.
     """
     
     def __init__(self, name):
@@ -55,6 +36,7 @@ class MemoizedStrFunc(object):
         """
         pjoin = os.path.join
         cache_dir = pjoin(os.environ['HOME'], '.cache', 'py-string-funcs')
+
         # Ensure the cache directory exists
         try:
             os.makedirs(cache_dir)
@@ -63,18 +45,17 @@ class MemoizedStrFunc(object):
                 raise
 
         self.sqlite_fname = pjoin(cache_dir, name + '.sqlite')        
-        self.db = self.init_db()
+        self.db, self.cursor = self.init_db()
         self._db_open = True
-        # Hold a persistent cursor, we don't need to constantly recreate it
-        self.cursor = self.db.cursor()
 
     def init_db(self):
         """Connect to the database, and create tables if necessary."""
         db = sqlite3.connect(self.sqlite_fname)
-        db.execute("""CREATE TABLE IF NOT EXISTS cache
+        cursor = db.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS cache
                       (input text, output text)""")
         db.commit()
-        return db
+        return db, cursor
 
     def fetch(self, s):
         out = self.cursor.execute('select output from cache where input=?',
@@ -113,7 +94,7 @@ class MemoizedStrFunc(object):
         self.close()
         
 
-def memoize_strfunc(f=None, name=None):
+def memoize_strfunc(f, name=None):
     """SQLite-backed memoizing decorator for string functions.
 
     Parameters
@@ -123,7 +104,7 @@ def memoize_strfunc(f=None, name=None):
       argument and return a single string value.
 
     name : string, optional
-      A name to be used for the cache file, if not given the name of the
+      A name to be used for the cache file; if not given, the name of the
       decorated function is used.
 
     Examples
@@ -140,15 +121,10 @@ def memoize_strfunc(f=None, name=None):
     def mm(func):
         return decorator(MemoizedStrFunc(name), func)
 
-    if f is None:
-        # Decorator was called with keyword arguments, so we must return the
-        # unevaluated wrapper which will *then* be given the function
-        return mm
-    else:
-        # Regular use of the decorator with the function and no keywords.
-        if name is None:
-            name = f.__name__
-        return mm(f)
+    if name is None:
+        name = f.__name__
+
+    return mm(f)
 
 #-----------------------------------------------------------------------------
 # Tests - move later to standalone test files

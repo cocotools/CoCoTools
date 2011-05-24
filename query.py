@@ -23,7 +23,7 @@ from decotools import memoize, memoize_strfunc
 #-----------------------------------------------------------------------------
 
 @memoize_strfunc
-def query_cocomac_raw(url):
+def query_cocomac(url):
     """Query cocomac and return the raw XML output.
 
     Parameters
@@ -59,14 +59,13 @@ def query_cocomac_raw(url):
         
     return utils.scrub_xml(coco)
 
-@memoize
 def fetch_cocomac_tree(url):
-    """Get a url from the Cocomac database and return an ElementTree.
+    """Open an XML query URL at the CoCoMac website and return an ElementTree.
 
     Parameters
     ----------
     url : string
-      A URL.
+      A URL corresponding to CoCoMac query results in XML format.
 
     Returns
     -------
@@ -77,11 +76,11 @@ def fetch_cocomac_tree(url):
     ----
     This function caches previous executions during the same session.
     """
-    # We need to read the output to a string for scrubbing, because cocomac is
-    # returning invalid xml sometimes.  But ElementTree expects a file-like
+    # We need to read the output to a string for scrubbing, because CoCoMac is
+    # returning invalid XML sometimes.  But ElementTree expects a file-like
     # object for parsing, so we wrap our scrubbed string in a StringIO object.
     s_io = StringIO()
-    s_io.write(query_cocomac_raw(url))
+    s_io.write(query_cocomac(url))
     # Reset the file pointer to the start so ElementTree can read it
     s_io.seek(0)
     tree = ElementTree()
@@ -89,12 +88,12 @@ def fetch_cocomac_tree(url):
     s_io.close()
     return tree
 
-def mk_query_url(dquery):
+def mk_query_url(query_dict):
     """Make a fully encoded query URL from a dict with the query data.
 
     Parameters
     ----------
-    dquery : dict
+    query_dict : dict
       Dict with CoCoMac search terms.
 
     Returns
@@ -102,9 +101,7 @@ def mk_query_url(dquery):
     string
       Fully encoded query URL.
     """
-    url_base = "http://cocomac.org/URLSearch.asp?"
-    #print("Query URL:\n", url_base + urllib.urlencode(dquery))  # dbg
-    return url_base + urllib.urlencode(dquery)
+    return 'http://cocomac.org/URLSearch.asp?' + urllib.urlencode(dquery)
 
 def execute_one_query(search_type, search_string):
     """Queries CoCoMac for mapping or connectivity data.
@@ -123,26 +120,24 @@ def execute_one_query(search_type, search_string):
     ElementTree instance
       XML tree made from CoCoMac query output.
     """
-    # Shared login we use for querying the site.
-    user = 'teamcoco'
-    password = 'teamcoco'
-
     data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
-    data_set = data_sets[search_type]
-    output_type = 'XML_Browser'
-    cquery = dict(user=user,
-                  password=password,
-                  Search=search_type,
-                  SearchString=search_string,
-                  DataSet=data_set,
-                  OutputType=output_type)
 
-    return fetch_cocomac_tree(mk_query_url(cquery))
+    #Per CoCoMac specifications, the URL will include the following
+    #information:
+    query_dict = dict(user='teamcoco',
+                      password='teamcoco',
+                      Search=search_type,
+                      SearchString=search_string,
+                      DataSet=data_sets[search_type],
+                      OutputType='XML_Browser')
+
+    return fetch_cocomac_tree(mk_query_url(query_dict))
 
 def populate_database(maps_file):
     """Executes mapping and connectivity queries for all maps in a text file.
 
-    Once executed, these queries are stored in a local SQLite database.
+    The file should have one map, in CoCoMac format, per line. Once executed,
+    these queries are stored as XML trees in a local SQLite database.
 
     Parameters
     ----------
