@@ -4,40 +4,42 @@
 # Imports
 #-----------------------------------------------------------------------------
 
+# Stdlib
 import errno
 import os
 import sqlite3
 
 from decorator import decorator
 
-#-----------------------------------------------------------------------------
+#---------------------------------------------------------------------------
 # Classes and functions
-#-----------------------------------------------------------------------------
+#---------------------------------------------------------------------------
 
 class MemoizedStrFuncError(Exception):
     pass
 
 class MemoizedStrFunc(object):
-    """Memoize functions of string arguments with an SQLite database.
+    """Memoize string functions with an SQLite database.
 
     Note
     ----
-    This class isn't really meant to be used by itself, but as a building block
-    for a user-facing decorator.  The class captures state at construction
-    time.
+    This class isn't really meant to be used by itself, but as a
+    building block for a user-facing decorator.  The class captures
+    state at construction time.
     """
-    
     def __init__(self, name):
         """Create a new memoizer.
 
         Parameters
         ---------
         name : string
+          Name of the function being decorated.
         """
         pjoin = os.path.join
         cache_dir = pjoin(os.environ['HOME'], '.cache', 'py-string-funcs')
 
-        # Ensure the cache directory exists
+        # Make the directories in cache_dir; if they already exist,
+        # suppress the error that would be raised.
         try:
             os.makedirs(cache_dir)
         except OSError, e:
@@ -58,8 +60,10 @@ class MemoizedStrFunc(object):
         return db, cursor
 
     def fetch(self, s):
-        out = self.cursor.execute('select output from cache where input=?',
-                                  (s,)).fetchall()
+        # ? holds the place of s. fethcall() returns a list of
+        # matching rows
+        out = self.cursor.execute('SELECT output FROM cache WHERE input=?',
+                                  s).fetchall()
         if len(out)>1:
             raise MemoizedStrFuncError(
                 'Invalid multiple outputs in database: %s' % out)
@@ -67,7 +71,7 @@ class MemoizedStrFunc(object):
         return out[0][0]
 
     def insert(self, key, value):
-        self.cursor.execute('insert into cache values (?, ?)', (key, value))
+        self.cursor.execute('INSERT INTO cache VALUES (?, ?)', (key, value))
         self.db.commit()
 
     def close(self):
@@ -78,11 +82,13 @@ class MemoizedStrFunc(object):
         self._db_open = False
 
     def destroy(self):
-        """Close the database and remove the backing SQLite file from disk"""
+        """Close the database and remove the backing SQLite file from disk
+        """
         self.close()
         os.remove(self.sqlite_fname)
 
     def __call__(self, func, s):
+        # func is the decorated function; s is func's string arg.
         try:
             output = self.fetch(s)
         except IndexError:
@@ -92,9 +98,8 @@ class MemoizedStrFunc(object):
 
     def __del__(self):
         self.close()
-        
 
-def memoize_strfunc(f, name=None):
+def memoize_strfunc(f):
     """SQLite-backed memoizing decorator for string functions.
 
     Parameters
@@ -103,68 +108,10 @@ def memoize_strfunc(f, name=None):
       The function to be decorated.  It can ONLY take a single string
       argument and return a single string value.
 
-    name : string, optional
-      A name to be used for the cache file; if not given, the name of the
-      decorated function is used.
-
-    Examples
+    Example
     --------
     @memoize_strfunc
     def f1(s):
         return 'input: %s' % s
-
-    @memoize_strfunc(name='func_v2')
-    def f2(s):
-        return 'input: %s' % s
     """
-
-    def mm(func):
-        return decorator(MemoizedStrFunc(name), func)
-
-    if name is None:
-        name = f.__name__
-
-    return mm(f)
-
-#-----------------------------------------------------------------------------
-# Tests - move later to standalone test files
-#-----------------------------------------------------------------------------
-import nose.tools as nt
-from unittest import TestCase
-
-
-class MemoizedStrFuncTestCase(TestCase):
-
-    def test_corrupted_db(self):
-        """Manually poison the caching db"""
-        memo = MemoizedStrFunc('test')
-        memo.insert('x', 'one')
-        memo.insert('x', 'two')
-        self.assertRaises(MemoizedStrFuncError, memo.fetch, 'x')
-        memo.close()
-
-    def test_db_file(self):
-        memo = MemoizedStrFunc('test')
-        self.assertTrue(os.path.isfile(memo.sqlite_fname))
-        memo.destroy()
-        self.assertFalse(os.path.isfile(memo.sqlite_fname))
-        
-    def test_insert_retrieval(self):
-        memo = MemoizedStrFunc('test')
-        memo.insert('x', 'one')
-        self.assertEqual(memo.fetch('x'), 'one')
-
-
-def test_memoize_strfunc():
-    """Test the decorator version, in both syntaxes"""
-    @memoize_strfunc
-    def f1(s):
-        return 'input: %s' % s
-
-    @memoize_strfunc(name='func_v2')
-    def f2(s):
-        return 'input: %s' % s
-
-    for f in [f1, f2]:
-        x = 'hi'
-        nt.assert_equals(f(x), f.undecorated(x))
+    return decorator(MemoizedStrFunc(f.__name__), f)

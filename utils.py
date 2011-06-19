@@ -38,51 +38,17 @@ def scrub_xml(raw):
     The output is NOT validated as real xml, only the part prior to the headers
     is cleaned up.
     """
+    # The re.DOTALL flag causes '.' to match any character including a
+    # newline; without the flag, '.' matches any character but a newline.
     match = re.match('(.*)(<\?xml.*\?>.*)', raw, re.DOTALL)
     if match:
+        # out is a string containing the xml with the garbage at the
+        # beginning removed.
         out =  match.group(2)
         # We've seen invalid characters in cocomac's xml, so we scrub them out
-        # by hand for now.  Add to this list any other such ones you see
-        invalids = '[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2\x92\x96\xed\x84\x94]'
+        # by hand for now.  Add to this list any other such ones you see.
+        invalids = '[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2\x92\x96' + \
+                    '\xed\x84\x94]'
         return re.sub(invalids, '', out)
     else:
         raise ValueError('input does not contain valid xml header')
-    
-
-##############################################################################
-# Test section - eventually will be moved to another file
-##############################################################################
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-import nose.tools as nt
-
-#-----------------------------------------------------------------------------
-# Test functions
-#-----------------------------------------------------------------------------
-
-def test_scrub_xml():
-    """Basic tests for scrub_xml"""
-    header = "SELECT  Top 32767  "
-    xmls  = ['<?xml version="1.0" encoding="UTF-8"?>',
-             '<?xml version="1.0" encoding="UTF-8"?>\n<Header>']
-    for xml in xmls:
-        raw = header+xml
-        clean = scrub_xml(raw)
-        nt.assert_equal(scrub_xml(raw), xml)
-        nt.assert_equal(scrub_xml(xml), xml)
-        nt.assert_raises(ValueError, scrub_xml, header)
-
-
-def test_scrub_xml_junk():
-    """test removal of invalid characters in input"""
-    texts = ['<?xml?>With \xb4junk',
-             '<?xml?>With <TextPageNumber>\xfc.200</TextPageNumber>'
-             ]
-    valids = ['<?xml?>With junk',
-              '<?xml?>With <TextPageNumber>.200</TextPageNumber>'
-              ]
-    for text, valid in zip(texts, valids):
-        nt.assert_equal(scrub_xml(text), valid)

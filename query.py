@@ -1,4 +1,4 @@
-"""Tools for making queries to the Cocomac online database.
+"""Tools for making queries to www.cocomac.org.
 """
 #-----------------------------------------------------------------------------
 # Library imports
@@ -18,23 +18,24 @@ from time import sleep
 import utils
 from decotools import memoize_strfunc
 
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Functions
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 @memoize_strfunc
 def query_cocomac(url):
-    """Query cocomac and return the raw XML output.
+    """Query cocomac and return clean XML output.
 
     Parameters
     ----------
     url : string
-      A URL.
+      A URL corresponding to CoCoMac query results in XML format.
 
     Returns
     -------
     xml : string
-      Raw XML output from the query.
+      Scrubbed XML output from the query.  Scrubbing is necessary, because 
+      CoCoMac is returning invalid XML sometimes.
 
     Note
     ----
@@ -43,7 +44,7 @@ def query_cocomac(url):
     """
     # Sometimes CoCoMac is unresponsive, so if a first attempt to access
     # the site fails, try a few more times before giving up
-    for attempt in range(2):
+    for attempt in range(4):
         try:
             coco = urllib2.urlopen(url).read()
         except urllib2.URLError:
@@ -71,14 +72,7 @@ def fetch_cocomac_tree(url):
     -------
     tree : ElementTree
       XML tree made from CoCoMac query output.
-
-    Note
-    ----
-    This function caches previous executions during the same session.
     """
-    # We need to read the output to a string for scrubbing, because CoCoMac is
-    # returning invalid XML sometimes.  But ElementTree expects a file-like
-    # object for parsing, so we wrap our scrubbed string in a StringIO object.
     s_io = StringIO()
     s_io.write(query_cocomac(url))
     # Reset the file pointer to the start so ElementTree can read it
@@ -103,7 +97,7 @@ def mk_query_url(query_dict):
     """
     return 'http://cocomac.org/URLSearch.asp?' + urllib.urlencode(query_dict)
 
-def execute_one_query(search_type, search_string):
+def search_terms2results(search_type, search_string):
     """Queries CoCoMac for mapping or connectivity data.
 
     Parameters
@@ -117,13 +111,11 @@ def execute_one_query(search_type, search_string):
 
     Returns
     -------
-    ElementTree instance
+    result : ElementTree instance
       XML tree made from CoCoMac query output.
     """
     data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
 
-    #Per CoCoMac specifications, the URL will include the following
-    #information:
     query_dict = dict(user='teamcoco',
                       password='teamcoco',
                       Search=search_type,
@@ -132,28 +124,3 @@ def execute_one_query(search_type, search_string):
                       OutputType='XML_Browser')
 
     return fetch_cocomac_tree(mk_query_url(query_dict))
-
-def populate_database(maps_file):
-    """Executes mapping and connectivity queries for all maps in a text file.
-
-    The file should have one map, in CoCoMac format, per line. Once executed,
-    these queries are stored as XML trees in a local SQLite database.
-
-    Parameters
-    ----------
-    maps_file : string
-      Path to a text file containing one map in CoCoMac format per line.
-
-    Returns
-    -------
-    None
-    """
-    maps = open(maps_file).readlines()
-    count = 0
-    for map in maps:
-        map = map.strip()
-        search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (map, map)
-        execute_one_query('Mapping', search_string)
-        execute_one_query('Connectivity', search_string)
-        count += 1
-        print('Queried: %d/%d' % (count, len(maps)))
