@@ -3,6 +3,7 @@
 #-----------------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------------
+from __future__ import print_function
 
 # Stdlib
 import errno
@@ -27,13 +28,8 @@ class MemoizedStrFunc(object):
     building block for a user-facing decorator.  The class captures
     state at construction time.
     """
-    def __init__(self, name):
+    def __init__(self):
         """Create a new memoizer.
-
-        Parameters
-        ---------
-        name : string
-          Name of the function being decorated.
         """
         pjoin = os.path.join
         cache_dir = pjoin(os.environ['HOME'], '.cache', 'py-string-funcs')
@@ -46,7 +42,7 @@ class MemoizedStrFunc(object):
             if e.errno != errno.EEXIST:
                 raise
 
-        self.sqlite_fname = pjoin(cache_dir, name + '.sqlite')        
+        self.sqlite_fname = pjoin(cache_dir, 'cocomac.sqlite')        
         self.db, self.cursor = self.init_db()
         self._db_open = True
 
@@ -63,7 +59,7 @@ class MemoizedStrFunc(object):
         # ? holds the place of s. fethcall() returns a list of
         # matching rows
         out = self.cursor.execute('SELECT output FROM cache WHERE input=?',
-                                  s).fetchall()
+                                  (s,)).fetchall()
         if len(out)>1:
             raise MemoizedStrFuncError(
                 'Invalid multiple outputs in database: %s' % out)
@@ -71,7 +67,11 @@ class MemoizedStrFunc(object):
         return out[0][0]
 
     def insert(self, key, value):
-        self.cursor.execute('INSERT INTO cache VALUES (?, ?)', (key, value))
+        try:
+            self.cursor.execute('INSERT INTO cache VALUES (?, ?)', (key, value))
+        except ProgrammingError:
+            print('Unsupported character in the CoCoMac XML.')
+            raise
         self.db.commit()
 
     def close(self):
@@ -114,4 +114,4 @@ def memoize_strfunc(f):
     def f1(s):
         return 'input: %s' % s
     """
-    return decorator(MemoizedStrFunc(f.__name__), f)
+    return decorator(MemoizedStrFunc(), f)
