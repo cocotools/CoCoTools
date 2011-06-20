@@ -28,26 +28,28 @@ def populate_database(maps):
 
     Returns
     -------
-    unable : list
-      List of CoCoMac maps for which queries failed due to URLError.
+    unable : dict
+      Dict with lists for each query type of CoCoMac maps for which URLErrors
+      occurred, preventing data acquisition.
     """
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
 
-    count, unable = 0, []
+    count = {'Mapping': 0, 'Connectivity': 0}
+    unable = {'Mapping': [], 'Connectivity': []}
     for bmap in maps:
-        try:
-            search_terms2results('Mapping', bmap)
-            search_terms2results('Connectivity', bmap)
-        except urllib2.URLError:
-            unable.append(bmap)
-            continue
-        else:
-            count += 1
-            print('Queried: %d/%d' % (count, len(maps)))
+        for search_type in ('Mapping', 'Connectivity'):
+            try:
+                search_terms2results(search_type, bmap)
+            except urllib2.URLError:
+                unable[search_type].append(bmap)
+                continue
+            else:
+                count[search_type] += 1
+                print('Acquired %d map, %d conn (%d total maps)' %
+                      (count['Mapping'], count['Connectivity'], len(maps)))
 
-    print('Queries failed for %s' % str(unable))
-    if raw_input('Retry failures (y/n)?') == 'y':
-        populate_database(unable)
-    else:
-        return unable
+    print('Mapping queries failed for %s' % str(unable['Mapping']))
+    print('Connectivity queries failed for %s' % str(unable['Connectivity']))
+
+    return unable
