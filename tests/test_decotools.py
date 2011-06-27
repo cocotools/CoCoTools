@@ -1,6 +1,7 @@
 import nose.tools as nt
 from unittest import TestCase
 
+from decotools import memoize_strfunc, MemoizedStrFunc, MemoizedStrFuncError
 
 class MemoizedStrFuncTestCase(TestCase):
 
@@ -20,20 +21,13 @@ class MemoizedStrFuncTestCase(TestCase):
         
     def test_insert_retrieval(self):
         memo = MemoizedStrFunc('test')
-        memo.insert('x', 'one')
-        self.assertEqual(memo.fetch('x'), 'one')
-
+        memo.insert('y', 'three')
+        self.assertEqual(memo.fetch('y'), 'three')
 
 def test_memoize_strfunc():
-    """Test the decorator version, in both syntaxes"""
     @memoize_strfunc
     def f1(s):
         return 'input: %s' % s
 
-    @memoize_strfunc(name='func_v2')
-    def f2(s):
-        return 'input: %s' % s
-
-    for f in [f1, f2]:
-        x = 'hi'
-        nt.assert_equals(f(x), f.undecorated(x))
+    x = 'hi'
+    nt.assert_equals(f1(x), f1.undecorated(x))
