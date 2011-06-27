@@ -28,7 +28,7 @@ class MemoizedStrFunc(object):
     building block for a user-facing decorator.  The class captures
     state at construction time.
     """
-    def __init__(self):
+    def __init__(self, name):
         """Create a new memoizer.
         """
         pjoin = os.path.join
@@ -42,7 +42,7 @@ class MemoizedStrFunc(object):
             if e.errno != errno.EEXIST:
                 raise
 
-        self.sqlite_fname = pjoin(cache_dir, 'cocomac.sqlite')        
+        self.sqlite_fname = pjoin(cache_dir, '%s.sqlite' % name)        
         self.db, self.cursor = self.init_db()
         self._db_open = True
 
@@ -56,7 +56,7 @@ class MemoizedStrFunc(object):
         return db, cursor
 
     def fetch(self, s):
-        # ? holds the place of s. fethcall() returns a list of
+        # ? indicates s's value. fethcall() returns a list of
         # matching rows
         out = self.cursor.execute('SELECT output FROM cache WHERE input=?',
                                   (s,)).fetchall()
@@ -114,4 +114,4 @@ def memoize_strfunc(f):
     def f1(s):
         return 'input: %s' % s
     """
-    return decorator(MemoizedStrFunc(), f)
+    return decorator(MemoizedStrFunc(f.__name__), f)
