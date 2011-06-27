@@ -48,7 +48,7 @@ class MemoizedStrFunc(object):
 
     def init_db(self):
         """Connect to the database, and create tables if necessary."""
-        db = sqlite3.connect(self.sqlite_fname)
+        db = sqlite3.connect(self.sqlite_fname, check_same_thread = False)
         cursor = db.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS cache
                       (input text, output text)""")
