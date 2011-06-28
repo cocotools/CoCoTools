@@ -46,7 +46,7 @@ def populate_database(maps):
                 continue
             else:
                 count[search_type] += 1
-                print('Acquired %d map, %d conn (%d total maps)' %
+                print('Completed %d map, %d conn (%d maps requested)' %
                       (count['Mapping'], count['Connectivity'], len(maps)))
 
     print('Mapping queries failed for %s' % str(unable['Mapping']))
