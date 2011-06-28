@@ -1,0 +1,24 @@
+CoCoTools is a package that facilitates interaction with the CoCoMac
+database and analysis of downloaded data.  Because the server at
+www.cocomac.org is slow and unreliable, it is recommended that users
+of CoCoTools begin by populating a local sqlite database with query
+results for all BrainMaps of interest.
+
+>>> from cocotools.query import populate_database
+
+When called with an iterable container of BrainMaps, populate_database
+queries CoCoMac for Mapping and Connectivity data referring to these
+BrainMaps and returns a dictionary detailing which queries failed.
+(Failures are most often due to the CoCoMac server hanging.)  When no
+argument is supplied, queries are performed for all BrainMaps in
+CoCoMac.
+
+>>> failed = populate_database(['PP99', 'PP02'])
+Completed 1 map, 0 conn (2 maps requested)
+Completed 1 map, 1 conn (2 maps requested)
+Completed 2 map, 1 conn (2 maps requested)
+Completed 2 map, 2 conn (2 maps requested)
+Mapping queries failed for []
+Connectivity queries failed for []
+>>> failed
+{'Connectivity': [], 'Mapping': []}
