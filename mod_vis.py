@@ -1,6 +1,4 @@
-"""This module contains functions used to setup modules for visualization.
-
-"""
+"""This module contains functions used to setup modules for visualization."""
 
 import pickle
 
@@ -18,17 +16,18 @@ modules_with_colors = 'sa_lateral_modules_with_colors.pck'
 
 HOME_DIR = '/home/despo/dbliss/cocomac/'
 
-f = open('%smodularity/results/within_pfc/%s' % (HOME_DIR, modules_with_colors)
-         , 'r')
-modules_with_colors = pickle.load(f)
-f.close()
+def function():
+    f = open('%smodularity/results/within_pfc/%s' % (HOME_DIR, modules_with_colors)
+             , 'r')
+    modules_with_colors = pickle.load(f)
+    f.close()
 
-nodes_with_coords = get_circle_coords(modules_with_colors)
+    nodes_with_coords = get_circle_coords(modules_with_colors)
 
-f = open('%sgraphs/%s' % (HOME_DIR, graph), 'r')
-g = pickle.load(f)
-f.close()
-edges = g.edges()
+    f = open('%sgraphs/%s' % (HOME_DIR, graph), 'r')
+    g = pickle.load(f)
+    f.close()
+    edges = g.edges()
 
-make_gexf('%sgephi/gexf/%s' % (HOME_DIR, output_file), nodes_with_coords,
+    make_gexf('%sgephi/gexf/%s' % (HOME_DIR, output_file), nodes_with_coords,
           edges, modules_with_colors)

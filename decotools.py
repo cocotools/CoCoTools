@@ -19,7 +19,7 @@ from decorator import decorator
 class MemoizedStrFuncError(Exception):
     pass
 
-class MemoizedStrFunc(object):
+class _MemoizedStrFunc(object):
     """Memoize string functions with an SQLite database.
 
     Note
@@ -114,4 +114,4 @@ def memoize_strfunc(f):
     def f1(s):
         return 'input: %s' % s
     """
-    return decorator(MemoizedStrFunc(f.__name__), f)
+    return decorator(_MemoizedStrFunc(f.__name__), f)
