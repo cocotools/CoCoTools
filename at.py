@@ -10,14 +10,21 @@ Appendix C). Unfortunately, this information is not listed in CoCoMac XML
 output and is therefore inaccessible to us.
 """
 
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
 from __future__ import print_function
 
-import pdb
-
+# Third party
 import networkx as nx
 import nose.tools as nt
 
-class At(object):
+#------------------------------------------------------------------------------
+# Classes
+#------------------------------------------------------------------------------
+
+class AT(object):
     def __init__(self, map_g, conn_g, target_map):
         """map_g must have the following properties:
 
@@ -190,11 +197,8 @@ class At(object):
                   }
         ec_target = 'B'
         for source_region in source_list:
-            try:
-                rc = self.map_g[source_region][target_region]['RC']
-                ec_target = rules[ec_target][rc][self.get_ec(source_region)]
-            except KeyError:
-                pdb.set_trace()
+            rc = self.map_g[source_region][target_region]['RC']
+            ec_target = rules[ec_target][rc][self.get_ec(source_region)]
         return ec_target
 
     def iterate_trans_dict(self, trans_dict):
