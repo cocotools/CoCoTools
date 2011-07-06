@@ -42,7 +42,7 @@ def query_cocomac(url):
     This function caches previous executions persistently to disk, using an
     SQLite database.
     """
-    return utils.scrub_xml(urllib2.urlopen(url, timeout=60).read())
+    return utils.scrub_xml(urllib2.urlopen(url, timeout=120).read())
 
 def fetch_cocomac_tree(url):
     """Open an XML query URL at the CoCoMac website and return an ElementTree.
