@@ -10,7 +10,7 @@ import networkx as nx
 import nose.tools as nt
 
 # Local
-from deduce_rcs import Deducer, fin_autom, no_tpath_dups
+from cocotools.deduce_rcs import Deducer, fin_autom, no_tpath_dups
 
 #------------------------------------------------------------------------------
 # Test Functions

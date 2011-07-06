@@ -7,7 +7,7 @@ import networkx as nx
 import nose.tools as nt
 
 # Local
-from at import AT
+from cocotools.at import AT
 
 #------------------------------------------------------------------------------
 # Test Functions

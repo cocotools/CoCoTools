@@ -6,7 +6,7 @@
 import nose.tools as nt
 
 # Local
-from utils import scrub_xml
+from cocotools.utils import scrub_xml
 
 #-----------------------------------------------------------------------------
 # Test functions

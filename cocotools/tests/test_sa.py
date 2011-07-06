@@ -9,7 +9,7 @@ from unittest import TestCase
 import networkx as nx
 
 # Local
-from sa import make_name_num_dicts, relabel_part
+from cocotools.sa import make_name_num_dicts, relabel_part
 
 #------------------------------------------------------------------------------
 # Test Classes
