@@ -37,7 +37,7 @@ With the database in place, analyses can be prepared.  The first step
 is to transform the stored XML files into one or more NetworkX
 graphs.
 
->>> from ...
+>>> from ... # doctest: +SKIP
 
 Although graphs of the raw data can be subjected to direct analysis,
 it is expected that users will want to condense the morasse of
