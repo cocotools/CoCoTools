@@ -1,12 +1,19 @@
-"""Functions that make use of the query_utils library."""
+"""Prepare and execute CoCoMac queries, clean up raw XML, and store result."""
 
-from query_utils import searchterms2results
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
-import urllib2
-
-# For tests
-import nose.tools as nt
+# Stdlib
 import os
+import urllib
+import urllib2
+import xml.parsers.expat
+from xml.etree.ElementTree import ElementTree
+import re
+from cStringIO import StringIO
+from time import sleep
+import sqlite3
 
 #------------------------------------------------------------------------------
 # Constants
@@ -66,11 +73,142 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'Z69', 'Z71', 'Z73', 'Z77', 'Z78a', 'Z78b', 'Z78c', 'ZR03',
            'ZSCR93']
 
+
 #------------------------------------------------------------------------------
-# Functions
+# Classes
 #------------------------------------------------------------------------------
 
+class DB(object):
+
+    def __init__(self, name):
+        """Create sqlite database for storing CoCoMac XML.
+
+        Parameters
+        ----------
+        name : string
+        Name for the .sqlite file (.sqlite will be appended).
+
+        Returns
+        -------
+        None
+        """
+        pjoin = os.path.join
+        dbdir = pjoin(os.environ['HOME'], '.cache')
+        if not os.path.exists(dbdir):
+            os.mkdir(dbdir)
+        dbpath = pjoin(dbdir, '%s.sqlite' % name)
+        conn = sqlite3.connect(dbpath, check_same_thread = False)
+        c = conn.cursor()
+        c.execute("""create table if not exists Mapping
+                     (bmap text, xml text)""")
+        c.execute("""create table if not exists Connectivity
+                     (bmap text, xml text)""")
+        conn.commit()
+        c.close()
+        self.conn = conn
+    
+    def cache(self, table, bmap, xml):
+        c = self.conn.cursor()
+        if table == 'Mapping':
+            c.execute('insert into Mapping values (?, ?)', (bmap, xml))
+        elif table == 'Connectivity':
+            c.execute('insert into Connectivity values (?, ?)', (bmap, xml))
+        else:
+            raise ValueError, 'table != Mapping or Connectivity'
+        self.conn.commit()
+        c.close()
+
+#-------------------------------------------------------------------------
+# Functions
+#-------------------------------------------------------------------------
+
+def scrub_xml(raw):
+    """Remove spurious data before start of XML headers.
+
+    The CoCoMac server is returning the SQL query string prepended to the
+    output before the start of the XML header.  This routine strips all data
+    before the start of a valid XML header.
+
+    If the otuput does not contain any valid XML header, ValueError is raised.
+
+    The routine also removes a few invalid characters we've seen appear in
+    CoCoMac output.
+
+    Parameters
+    ----------
+    raw : string
+      Raw data returned by CoCoMac.
+
+    Returns
+    -------
+    xml : string
+      Cleaned-up XML.
+
+    Note
+    ----
+    Other than enforce that a valid XML header is present, this routine does
+    not validate the output as real XML.
+    """
+    match = re.match('(.*)(<\?xml.*\?>.*)', raw, re.DOTALL)
+    if match:
+        out =  match.group(2)
+        # The invalid characters seen do not appear to cover
+        # exhaustively a specific range, so we've added them
+        # one-by-one to this string.
+        invalids = '[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2\x92\x96' + \
+                    '\xed\x84\x94\xb0]'
+        return re.sub(invalids, '', out)
+    else:
+        raise ValueError('input does not contain valid xml header')
+
+
+def query_cocomac(url):
+    """Query cocomac and return raw XML output.
+
+    Parameters
+    ----------
+    url : string
+      A URL corresponding to CoCoMac query results in XML format.
+
+    Returns
+    -------
+    xml : string
+      Raw XML output from the query.
+    """
+    return urllib2.urlopen(url, timeout=120).read()
+
+
+def mk_query_url(search_type, bmap):
+    """Make a fully encoded query URL from a dict with the query data.
+
+    Parameters
+    ----------
+    search_type : string
+      'Mapping' or 'Connectivity'.
+
+    bmap : string
+      CoCoMac BrainMap.
+
+    Returns
+    -------
+    url : string
+      Fully encoded query URL.
+    """
+    data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
+    search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (bmap, bmap)
+    query_dict = dict(user='teamcoco',
+                      password='teamcoco',
+                      Search=search_type,
+                      SearchString=search_string,
+                      DataSet=data_sets[search_type],
+                      OutputType='XML_Browser')
+
+    # The site appears to have changed from cocomac.org to 134.95.56.239:
+    return 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
+
+
 def populate_database(maps=ALLMAPS):
+
     """Executes mapping and connectivity queries for specified maps.
 
     If no argument is given, queries are made for all maps in CoCoMac.  When
@@ -89,19 +227,27 @@ def populate_database(maps=ALLMAPS):
       Dict with lists for each query type of CoCoMac maps for which URLErrors
       occurred, preventing data acquisition.
     """
+
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
 
+    db = DB('query_cocomac')
+
     count = {'Mapping': 0, 'Connectivity': 0}
     unable = {'Mapping': [], 'Connectivity': []}
+
     for bmap in maps:
         for search_type in ('Mapping', 'Connectivity'):
+
             try:
-                searchterms2results(search_type, bmap)
+                xml = scrub_xml(query_cocomac(mk_query_url(search_type, bmap)))
+
             except urllib2.URLError:
                 unable[search_type].append(bmap)
                 continue
+
             else:
+                db.cache(search_type, bmap, xml)
                 count[search_type] += 1
                 print('Completed %d map, %d conn (%d maps requested)' %
                       (count['Mapping'], count['Connectivity'], len(maps)))

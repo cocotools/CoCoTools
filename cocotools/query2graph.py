@@ -1,3 +1,43 @@
+"""Create from query XML a NetworkX graph."""
+
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+# Classes
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+def fetch_cocomac_tree(url):
+    """Open an XML query URL at the CoCoMac website and return an ElementTree.
+
+    Parameters
+    ----------
+    url : string
+      A URL corresponding to CoCoMac query results in XML format.
+
+    Returns
+    -------
+    tree : ElementTree
+      XML tree made from CoCoMac query output.
+    """
+    s_io = StringIO()
+    s_io.write(query_cocomac(url))
+    # Reset the file pointer to the start so ElementTree can read it
+    s_io.seek(0)
+    tree = ElementTree()
+    tree.parse(s_io)
+    s_io.close()
+    return tree
+
 def walk_tree(node, match, callback):
     """Walk an ElementTree, calling a function for all matching nodes.
 
