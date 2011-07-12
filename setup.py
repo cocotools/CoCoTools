@@ -11,7 +11,7 @@ setup(name='CoCoTools',
       maintainer_email='dbliss@berkeley.edu',
       url='',
       packages=['cocotools'],
-      requires=['decorator', 'brainx', 'networkx'],
+      requires=['brainx', 'networkx'],
       provides=['cocotools'],
       package_data={'cocotools': ['tests/doc.txt']}
       )
