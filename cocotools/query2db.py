@@ -104,19 +104,31 @@ class DB(object):
         c.execute("""create table if not exists Connectivity
                      (bmap text, xml text)""")
         conn.commit()
-        c.close()
-        self.conn = conn
-    
+        self.conn, self.c = conn, c
+
+    def exists(self, table, bmap):
+        try:
+            if table == 'Mapping':
+                self.c.execute('select xml from Mapping where bmap=?',
+                               (bmap,))
+            elif table == 'Connectivity':
+                self.c.execute('select xml from Connectivity where bmap=?',
+                               (bmap,))
+            else:
+                raise ValueError, 'table != Mapping or Connectivity'
+        except IndexError:
+            return False
+        return True
+
     def cache(self, table, bmap, xml):
-        c = self.conn.cursor()
         if table == 'Mapping':
-            c.execute('insert into Mapping values (?, ?)', (bmap, xml))
+            self.c.execute('insert into Mapping values (?, ?)', (bmap, xml))
         elif table == 'Connectivity':
-            c.execute('insert into Connectivity values (?, ?)', (bmap, xml))
+            self.c.execute('insert into Connectivity values (?, ?)',
+                           (bmap, xml))
         else:
             raise ValueError, 'table != Mapping or Connectivity'
         self.conn.commit()
-        c.close()
 
 #-------------------------------------------------------------------------
 # Functions
@@ -247,11 +259,14 @@ def populate_database(maps=ALLMAPS):
                 continue
 
             else:
-                db.cache(search_type, bmap, xml)
+                if not db.exists(search_type, bmap):
+                    db.cache(search_type, bmap, xml)
                 count[search_type] += 1
                 print('Completed %d map, %d conn (%d maps requested)' %
                       (count['Mapping'], count['Connectivity'], len(maps)))
 
+    db.c.close()
+                
     print('Mapping queries failed for %s' % str(unable['Mapping']))
     print('Connectivity queries failed for %s' % str(unable['Connectivity']))
 
