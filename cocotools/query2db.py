@@ -162,7 +162,7 @@ def scrub_xml(raw):
         raise ValueError('input does not contain valid xml header')
 
 
-def query_cocomac(search_type, bmap):
+def query_cocomac(search_type, bmap, perform=True):
     """Query cocomac and return raw XML output."""
     data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
     search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (bmap, bmap)
@@ -174,6 +174,8 @@ def query_cocomac(search_type, bmap):
                       OutputType='XML_Browser')
     # The site appears to have changed from cocomac.org to 134.95.56.239:
     url = 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
+    if not perform:
+        return url
     return urllib2.urlopen(url, timeout=120).read()
 
 def populate_database(maps='all', db_name='query_cocomac'):
