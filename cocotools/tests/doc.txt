@@ -1,20 +1,22 @@
 CoCoTools is a package that facilitates interaction with the CoCoMac
-database and analysis of downloaded data.  Because the server at
-www.cocomac.org is slow and unreliable, it is recommended that users
-of CoCoTools begin by populating a local sqlite database with query
-results for all BrainMaps of interest.  The CoCoMac server returns
-data in XML format.  Once stored locally, these XML files can be
-retrieved very quickly for analysis.
+database and analysis of downloaded data.  To free users from the
+slowness and unreliability of the server at www.cocomac.org, CoCoTools
+has been designed to store CoCoMac query results for all BrainMaps of
+interest in a local sqlite database.  Of the procedures within
+CoCoTools, only the population of this database is subject to the
+website's limitations.
 
->>> from cocotools.query import populate_database
+>>> from cocotools.query2db import populate_database
 
-When called with an iterable container of BrainMaps, or the path to a
-file containing one BrainMap per line, populate_database queries
-CoCoMac for Mapping and Connectivity data referring to these BrainMaps
-and returns a dictionary detailing which queries failed.  (Failures
-are most often due to the CoCoMac server hanging.)  When no argument
-is supplied to populate_database, queries are performed for all
-BrainMaps in CoCoMac.
+populate_database queries CoCoMac for Mapping and Connectivity data
+referring to certain BrainMaps and returns a dict detailing which
+queries failed.  (Failures are most often due to the CoCoMac server
+hanging.)  The function takes two optional arguments: maps and
+db_name.  maps must be an iterable container of BrainMaps or the path
+to a file containing one BrainMap per line; its default value is all
+the maps in the online database.  db_name is the name (without the
+.sqlite suffix) for the local database that will be created; its
+default value is 'query_cocomac'.
 
 >>> failed = populate_database(['PP99', 'PP02'])
 Completed 1 map, 0 conn (2 maps requested)
@@ -26,27 +28,25 @@ Connectivity queries failed for []
 >>> failed
 {'Connectivity': [], 'Mapping': []}
 
-The sqlite database is kept in the subdirectory
-".cache/py-string-funcs/" in the user's home directory.
+The sqlite database is placed in a subdirectory of the directory
+.cache in the user's home directory.
 
->>> from os import listdir, environ
->>> listdir(environ['HOME']+'/.cache/py-string-funcs/')
-['query_cocomac.sqlite']
+>>> from os.path import join, exists
+>>> from os import environ as en
+>>> db = join(en['HOME'], '.cache', 'py-string-funcs', 'query_cocomac.sqlite')
+>>> exists(db)
+True
 
-With the database in place, analyses can be prepared.  The first step
-is to transform the stored XML files into one or more NetworkX
-graphs.
+With the database in place, analyses can be prepared.  Although graphs
+of the raw data can be subjected to direct analysis, it is expected
+that users will want to condense the morasse of incompatible
+statements that is CoCoMac into a summary connectivity graph before
+attempting to draw conclusions about macaque neuroanatomy.  The
+Objective Relational Transformation (ORT) procedure was designed for
+this purpose.  A full formal specification of ORT is given in Stephan
+et al. (2000).
 
->>> from ... # doctest: +SKIP
+As preparation for ORT, a transformation graph is constructed from the
+downloaded Mapping data.
 
-Although graphs of the raw data can be subjected to direct analysis,
-it is expected that users will want to condense the morasse of
-incompatible statements that is CoCoMac into a summary connectivity
-graph before attempting to draw conclusions about general macaque
-neuroanatomy.  The Objective Relational Transformation (ORT) procedure
-was designed for this purpose.  A full formal specification of ORT is
-given in Stephan et al. (2000).
-
-As preparation for ORT, a graph of the downloaded Mapping data is constructed.
-
->>> 
+>>> from cocotools.query2graph import TrGraph #doctest: +SKIP

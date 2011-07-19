@@ -59,16 +59,6 @@ class TestDB(TestCase):
         self.assertEqual(db.con.execute('select * from Mapping').fetchall(),
                          [('PP99', 'stuff')])
         
-    def test_update_cache(self):
-        db = self.db
-        db.con.execute('insert into Connectivity values ("PP02", "whatever")')
-        db.update_cache('Connectivity', 'PP02', 'whatever')
-        db.update_cache('Connectivity', 'B09', 'blah!')
-        cur = db.con.cursor()
-        cur.execute('select * from Connectivity')
-        self.assertEqual(sorted(cur.fetchall()),
-                         [('B09', 'blah!'), ('PP02', 'whatever')])
-
 #------------------------------------------------------------------------------
 # Test Functions
 #------------------------------------------------------------------------------

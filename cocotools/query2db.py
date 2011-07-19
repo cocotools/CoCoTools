@@ -118,10 +118,6 @@ class DB(object):
             raise ValueError('invalid table')
         con.commit()
 
-    def update_cache(self, table, bmap, xml):
-        if not self.fetch_xml(table, bmap):
-            self.insert(table, bmap, xml)
-
 #-------------------------------------------------------------------------
 # Functions
 #-------------------------------------------------------------------------
@@ -166,38 +162,8 @@ def scrub_xml(raw):
         raise ValueError('input does not contain valid xml header')
 
 
-def query_cocomac(url):
-    """Query cocomac and return raw XML output.
-
-    Parameters
-    ----------
-    url : string
-      A URL corresponding to CoCoMac query results in XML format.
-
-    Returns
-    -------
-    xml : string
-      Raw XML output from the query.
-    """
-    return urllib2.urlopen(url, timeout=120).read()
-
-
-def mk_query_url(search_type, bmap):
-    """Make a fully encoded query URL from a dict with the query data.
-
-    Parameters
-    ----------
-    search_type : string
-      'Mapping' or 'Connectivity'.
-
-    bmap : string
-      CoCoMac BrainMap.
-
-    Returns
-    -------
-    url : string
-      Fully encoded query URL.
-    """
+def query_cocomac(search_type, bmap):
+    """Query cocomac and return raw XML output."""
     data_sets = {'Mapping': 'PrimRel', 'Connectivity': 'IntPrimProj'}
     search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (bmap, bmap)
     query_dict = dict(user='teamcoco',
@@ -206,13 +172,11 @@ def mk_query_url(search_type, bmap):
                       SearchString=search_string,
                       DataSet=data_sets[search_type],
                       OutputType='XML_Browser')
-
     # The site appears to have changed from cocomac.org to 134.95.56.239:
-    return 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
-
+    url = 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
+    return urllib2.urlopen(url, timeout=120).read()
 
 def populate_database(maps='all', db_name='query_cocomac'):
-
     """Executes mapping and connectivity queries for specified maps.
 
     If maps is not supplied, queries are made for all maps in CoCoMac.  When
@@ -233,35 +197,27 @@ def populate_database(maps='all', db_name='query_cocomac'):
       occurred, preventing data acquisition.
 
     """
-
     if maps == 'all':
         maps = ALLMAPS
-
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
-
     db = DB(db_name)
-
     count = {'Mapping': 0, 'Connectivity': 0}
     unable = {'Mapping': [], 'Connectivity': []}
-
     for bmap in maps:
         for search_type in ('Mapping', 'Connectivity'):
-
-            try:
-                xml = scrub_xml(query_cocomac(mk_query_url(search_type, bmap)))
-
-            except urllib2.URLError:
-                unable[search_type].append(bmap)
-                continue
-
-            else:
-                db.update_cache(search_type, bmap, xml)
-                count[search_type] += 1
-                print('Completed %d map, %d conn (%d maps requested)' %
-                      (count['Mapping'], count['Connectivity'], len(maps)))
-
+            if not db.fetch_xml(search_type, bmap):
+                try:
+                    xml = scrub_xml(query_cocomac(search_type, bmap))
+                except urllib2.URLError:
+                    unable[search_type].append(bmap)
+                    continue
+                db.insert(search_type, bmap, xml)
+            count[search_type] += 1
+            print('Completed %d map, %d conn (%d maps requested)' %
+                  (count['Mapping'], count['Connectivity'], len(maps)))
     print('Mapping queries failed for %s' % str(unable['Mapping']))
     print('Connectivity queries failed for %s' % str(unable['Connectivity']))
-
     return unable
+
+
