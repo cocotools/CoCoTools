@@ -6,6 +6,7 @@
 
 # Stdlib
 import os
+import errno
 import urllib
 import urllib2
 import xml.parsers.expat
@@ -73,7 +74,6 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'Z69', 'Z71', 'Z73', 'Z77', 'Z78a', 'Z78b', 'Z78c', 'ZR03',
            'ZSCR93']
 
-
 #------------------------------------------------------------------------------
 # Classes
 #------------------------------------------------------------------------------
@@ -81,54 +81,46 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
 class DB(object):
 
     def __init__(self, name):
-        """Create sqlite database for storing CoCoMac XML.
-
-        Parameters
-        ----------
-        name : string
-        Name for the .sqlite file (.sqlite will be appended).
-
-        Returns
-        -------
-        None
-        """
-        pjoin = os.path.join
-        dbdir = pjoin(os.environ['HOME'], '.cache')
-        if not os.path.exists(dbdir):
-            os.mkdir(dbdir)
-        dbpath = pjoin(dbdir, '%s.sqlite' % name)
-        conn = sqlite3.connect(dbpath, check_same_thread = False)
-        c = conn.cursor()
-        c.execute("""create table if not exists Mapping
-                     (bmap text, xml text)""")
-        c.execute("""create table if not exists Connectivity
-                     (bmap text, xml text)""")
-        conn.commit()
-        self.conn, self.c = conn, c
-
-    def exists(self, table, bmap):
-        try:
-            if table == 'Mapping':
-                self.c.execute('select xml from Mapping where bmap=?',
-                               (bmap,))
-            elif table == 'Connectivity':
-                self.c.execute('select xml from Connectivity where bmap=?',
-                               (bmap,))
-            else:
-                raise ValueError, 'table != Mapping or Connectivity'
-        except IndexError:
-            return False
-        return True
-
-    def cache(self, table, bmap, xml):
-        if table == 'Mapping':
-            self.c.execute('insert into Mapping values (?, ?)', (bmap, xml))
-        elif table == 'Connectivity':
-            self.c.execute('insert into Connectivity values (?, ?)',
-                           (bmap, xml))
+        if name != ':memory:':
+            pjoin = os.path.join
+            cache_dir = pjoin(os.environ['HOME'], '.cache', 'py-string-funcs')
+            try:
+                os.makedirs(cache_dir)
+            except OSError, e:
+                if e.errno != errno.EEXIST:
+                    raise
+            con = sqlite3.connect(pjoin(cache_dir, '%s.sqlite' % name))
         else:
-            raise ValueError, 'table != Mapping or Connectivity'
-        self.conn.commit()
+            con = sqlite3.connect(name)
+        con.execute('create table if not exists Mapping (bmap, xml)')
+        con.execute('create table if not exists Connectivity (bmap, xml)')
+        con.commit()
+        self.con = con
+
+    def fetch_xml(self, table, bmap):
+        con = self.con
+        if table == 'Mapping':
+            return con.execute('select xml from Mapping where bmap=?',
+                             (bmap,)).fetchall()
+        elif table == 'Connectivity':
+            return con.execute('select xml from Connectivity where bmap=?',
+                             (bmap,)).fetchall()
+        else:
+            raise ValueError('invalid table')
+
+    def insert(self, table, bmap, xml):
+        con = self.con
+        if table == 'Mapping':
+            con.execute('insert into Mapping values (?, ?)', (bmap, xml))
+        elif table == 'Connectivity':
+            con.execute('insert into Connectivity values (?, ?)', (bmap, xml))
+        else:
+            raise ValueError('invalid table')
+        con.commit()
+
+    def update_cache(self, table, bmap, xml):
+        if not self.fetch_xml(table, bmap):
+            self.insert(table, bmap, xml)
 
 #-------------------------------------------------------------------------
 # Functions
@@ -161,14 +153,14 @@ def scrub_xml(raw):
     Other than enforce that a valid XML header is present, this routine does
     not validate the output as real XML.
     """
-    match = re.match('(.*)(<\?xml.*\?>.*)', raw, re.DOTALL)
+    match = re.match('(.*)(<\?xml.*\?>.*)', raw, re.S)
     if match:
         out =  match.group(2)
-        # The invalid characters seen do not appear to cover
-        # exhaustively a specific range, so we've added them
-        # one-by-one to this string.
-        invalids = '[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2\x92\x96' + \
-                    '\xed\x84\x94\xb0]'
+        # The invalid characters seen do not cover exhaustively a
+        # specific range, so we've added them one-by-one to this
+        # string.
+        invalids = """\
+[\xb4\xfc\xd6\r\xdc\xe4\xdf\xf6\x85\xf3\xf2\x92\x96\xed\x84\x94\xb0]"""
         return re.sub(invalids, '', out)
     else:
         raise ValueError('input does not contain valid xml header')
@@ -219,14 +211,15 @@ def mk_query_url(search_type, bmap):
     return 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
 
 
-def populate_database(maps=ALLMAPS):
+def populate_database(maps='all', db_name='query_cocomac'):
 
     """Executes mapping and connectivity queries for specified maps.
 
-    If no argument is given, queries are made for all maps in CoCoMac.  When
-    specified, maps must a list of strings or a file with one map per line.
-    Query results are stored in a local SQLite database, making subsequent
-    retrieval much quicker than accessing the CoCoMac website.
+    If maps is not supplied, queries are made for all maps in CoCoMac.  When
+    specified, maps must be a list of strings or a file with one map per line.
+    Query results are stored in a local SQLite database named according to
+    db_name, making subsequent retrieval much quicker than accessing the
+    CoCoMac website.
 
     Parameters
     ----------
@@ -238,12 +231,16 @@ def populate_database(maps=ALLMAPS):
     unable : dict
       Dict with lists for each query type of CoCoMac maps for which URLErrors
       occurred, preventing data acquisition.
+
     """
+
+    if maps == 'all':
+        maps = ALLMAPS
 
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
 
-    db = DB('query_cocomac')
+    db = DB(db_name)
 
     count = {'Mapping': 0, 'Connectivity': 0}
     unable = {'Mapping': [], 'Connectivity': []}
@@ -259,14 +256,11 @@ def populate_database(maps=ALLMAPS):
                 continue
 
             else:
-                if not db.exists(search_type, bmap):
-                    db.cache(search_type, bmap, xml)
+                db.update_cache(search_type, bmap, xml)
                 count[search_type] += 1
                 print('Completed %d map, %d conn (%d maps requested)' %
                       (count['Mapping'], count['Connectivity'], len(maps)))
 
-    db.c.close()
-                
     print('Mapping queries failed for %s' % str(unable['Mapping']))
     print('Connectivity queries failed for %s' % str(unable['Connectivity']))
 
