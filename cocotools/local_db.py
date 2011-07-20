@@ -24,17 +24,14 @@ class CoCoDBError(Exception):
 class LocalDB(object):
 
     def __init__(self, memory=False):
-        if not memory:
-            db_dirs = DB_PATH.replace(os.path.basename(DB_PATH), '')
-            if db_dirs:
-                try:
-                    os.makedirs(db_dirs)
-                except OSError, e:
-                    if e.errno != errno.EEXIST:
-                        raise
-            con = sqlite3.connect(DB_PATH)
-        else:
+        if memory:
             con = sqlite3.connect(':memory:')
+        else:
+            db_dirs = DB_PATH.replace(os.path.basename(DB_PATH), '')
+            if db_dirs and not os.path.exists(db_dirs):
+                os.makedirs(db_dirs)
+            con = sqlite3.connect(DB_PATH)
+        con.text_factory = str
         con.execute('create table if not exists Mapping (bmap, xml)')
         con.execute('create table if not exists Connectivity (bmap, xml)')
         con.commit()
