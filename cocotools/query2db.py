@@ -140,7 +140,7 @@ def populate_database(maps=False, memory=False):
     unable = {'Mapping': [], 'Connectivity': []}
     for bmap in maps:
         for search_type in ('Mapping', 'Connectivity'):
-            if not db.fetch_xml(search_type, bmap):
+            if not db.check_for_entry(search_type, bmap):
                 try:
                     xml = scrub_xml(query_cocomac(search_type, bmap))
                 except urllib2.URLError:

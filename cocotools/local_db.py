@@ -18,6 +18,9 @@ DB_PATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools',
 # Classes
 #------------------------------------------------------------------------------
 
+class CoCoDBError(Exception):
+    pass
+
 class LocalDB(object):
 
     def __init__(self, memory=False):
@@ -37,16 +40,22 @@ class LocalDB(object):
         con.commit()
         self.con = con
 
-    def fetch_xml(self, table, bmap):
+    def check_for_entry(self, table, bmap):
         con = self.con
         if table == 'Mapping':
-            return con.execute('select xml from Mapping where bmap=?',
+            xml = con.execute('select xml from Mapping where bmap=?',
                              (bmap,)).fetchall()
         elif table == 'Connectivity':
-            return con.execute('select xml from Connectivity where bmap=?',
+            xml = con.execute('select xml from Connectivity where bmap=?',
                              (bmap,)).fetchall()
         else:
             raise ValueError('invalid table')
+        if len(xml) == 1:
+            return True
+        elif len(xml) > 1:
+            raise CoCoDBError('multiple xml entries for bmap %s' % bmap)
+        else:
+            return False
 
     def insert(self, table, bmap, xml):
         con = self.con
