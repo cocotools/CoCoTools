@@ -178,7 +178,7 @@ def query_cocomac(search_type, bmap, perform=True):
         return url
     return urllib2.urlopen(url, timeout=120).read()
 
-def populate_database(maps='all', db_name='query_cocomac'):
+def populate_database(maps=None, db_name='query_cocomac'):
     """Executes mapping and connectivity queries for specified maps.
 
     If maps is not supplied, queries are made for all maps in CoCoMac.  When
@@ -199,7 +199,7 @@ def populate_database(maps='all', db_name='query_cocomac'):
       occurred, preventing data acquisition.
 
     """
-    if maps == 'all':
+    if not maps:
         maps = ALLMAPS
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
