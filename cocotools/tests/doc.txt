@@ -30,8 +30,8 @@ Connectivity queries failed for []
 {'Connectivity': [], 'Mapping': []}
 
 >>> from os.path import join, exists
->>> from os import environ as en
->>> db = join(en['HOME'], '.cache', 'py-string-funcs', 'query_cocomac.sqlite')
+>>> from os import environ
+>>> db = join(environ['HOME'], '.cache', 'cocotools', 'cocotools.sqlite')
 >>> exists(db)
 True
 

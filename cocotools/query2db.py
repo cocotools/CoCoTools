@@ -74,8 +74,8 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'Z69', 'Z71', 'Z73', 'Z77', 'Z78a', 'Z78b', 'Z78c', 'ZR03',
            'ZSCR93']
 
-DB_PATH = os.path.join(os.environ['HOME'], '.cache', 'py-string-funcs',
-                       'query_cocomac.sqlite')
+DB_PATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools',
+                       'cocotools.sqlite')
 
 #------------------------------------------------------------------------------
 # Classes
