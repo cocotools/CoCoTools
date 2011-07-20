@@ -4,11 +4,6 @@
 
 # Stdlib
 from unittest import TestCase
-from os import environ, unlink
-from os.path import exists, join
-
-# Third party
-import nose.tools as nt
 
 # Local
 from cocotools import query2db as q2d
@@ -37,24 +32,3 @@ class TestScrubXML(TestCase):
                   '<?xml?>With <TextPageNumber>.200</TextPageNumber>']
         for text, valid in zip(texts, valids):
             self.assertEqual(q2d.scrub_xml(text), valid)
-
-class TestDB(TestCase):
-
-    def setUp(self):
-        self.db = q2d.DB(True)
-
-    def tearDown(self):
-        self.db = None
-
-    def test_fetch_xml(self):
-        db = self.db
-        self.assertFalse(db.fetch_xml('Mapping', 'PP99'))
-        db.con.execute('insert into Mapping values ("PP99", "1")')
-        self.assertTrue(db.fetch_xml('Mapping', 'PP99'))
-
-    def test_insert(self):
-        db = self.db
-        self.assertFalse(db.con.execute('select * from Mapping').fetchall())
-        db.insert('Mapping', 'PP99', 'stuff')
-        self.assertEqual(db.con.execute('select * from Mapping').fetchall(),
-                         [('PP99', 'stuff')])

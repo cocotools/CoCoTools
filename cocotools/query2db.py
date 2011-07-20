@@ -5,16 +5,12 @@
 #-----------------------------------------------------------------------------
 
 # Stdlib
-import os
-import errno
 import urllib
 import urllib2
-import xml.parsers.expat
-from xml.etree.ElementTree import ElementTree
 import re
-from cStringIO import StringIO
-from time import sleep
-import sqlite3
+
+# Local
+from cocotools.local_db import LocalDB
 
 #------------------------------------------------------------------------------
 # Constants
@@ -73,53 +69,6 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'YP88', 'YP89', 'YP91b', 'YP93', 'YP94', 'YP95', 'YP97', 'YTHI90',
            'Z69', 'Z71', 'Z73', 'Z77', 'Z78a', 'Z78b', 'Z78c', 'ZR03',
            'ZSCR93']
-
-DB_PATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools',
-                       'cocotools.sqlite')
-
-#------------------------------------------------------------------------------
-# Classes
-#------------------------------------------------------------------------------
-
-class DB(object):
-
-    def __init__(self, memory=False):
-        if not memory:
-            db_dirs = DB_PATH.replace(os.path.basename(DB_PATH), '')
-            if db_dirs:
-                try:
-                    os.makedirs(db_dirs)
-                except OSError, e:
-                    if e.errno != errno.EEXIST:
-                        raise
-            con = sqlite3.connect(DB_PATH)
-        else:
-            con = sqlite3.connect(':memory:')
-        con.execute('create table if not exists Mapping (bmap, xml)')
-        con.execute('create table if not exists Connectivity (bmap, xml)')
-        con.commit()
-        self.con = con
-
-    def fetch_xml(self, table, bmap):
-        con = self.con
-        if table == 'Mapping':
-            return con.execute('select xml from Mapping where bmap=?',
-                             (bmap,)).fetchall()
-        elif table == 'Connectivity':
-            return con.execute('select xml from Connectivity where bmap=?',
-                             (bmap,)).fetchall()
-        else:
-            raise ValueError('invalid table')
-
-    def insert(self, table, bmap, xml):
-        con = self.con
-        if table == 'Mapping':
-            con.execute('insert into Mapping values (?, ?)', (bmap, xml))
-        elif table == 'Connectivity':
-            con.execute('insert into Connectivity values (?, ?)', (bmap, xml))
-        else:
-            raise ValueError('invalid table')
-        con.commit()
 
 #-------------------------------------------------------------------------
 # Functions
@@ -186,7 +135,7 @@ def populate_database(maps=False, memory=False):
         maps = ALLMAPS
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
-    db = DB(memory)
+    db = LocalDB(memory)
     count = {'Mapping': 0, 'Connectivity': 0}
     unable = {'Mapping': [], 'Connectivity': []}
     for bmap in maps:
