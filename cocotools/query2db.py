@@ -74,24 +74,27 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'Z69', 'Z71', 'Z73', 'Z77', 'Z78a', 'Z78b', 'Z78c', 'ZR03',
            'ZSCR93']
 
+DB_PATH = os.path.join(os.environ['HOME'], '.cache', 'py-string-funcs',
+                       'query_cocomac.sqlite')
+
 #------------------------------------------------------------------------------
 # Classes
 #------------------------------------------------------------------------------
 
 class DB(object):
 
-    def __init__(self, name):
-        if name != ':memory:':
-            pjoin = os.path.join
-            cache_dir = pjoin(os.environ['HOME'], '.cache', 'py-string-funcs')
-            try:
-                os.makedirs(cache_dir)
-            except OSError, e:
-                if e.errno != errno.EEXIST:
-                    raise
-            con = sqlite3.connect(pjoin(cache_dir, '%s.sqlite' % name))
+    def __init__(self, memory=False):
+        if not memory:
+            db_dirs = DB_PATH.replace(os.path.basename(DB_PATH), '')
+            if db_dirs:
+                try:
+                    os.makedirs(db_dirs)
+                except OSError, e:
+                    if e.errno != errno.EEXIST:
+                        raise
+            con = sqlite3.connect(DB_PATH)
         else:
-            con = sqlite3.connect(name)
+            con = sqlite3.connect(':memory:')
         con.execute('create table if not exists Mapping (bmap, xml)')
         con.execute('create table if not exists Connectivity (bmap, xml)')
         con.commit()
@@ -178,32 +181,12 @@ def query_cocomac(search_type, bmap, perform=True):
         return url
     return urllib2.urlopen(url, timeout=120).read()
 
-def populate_database(maps=None, db_name='query_cocomac'):
-    """Executes mapping and connectivity queries for specified maps.
-
-    If maps is not supplied, queries are made for all maps in CoCoMac.  When
-    specified, maps must be a list of strings or a file with one map per line.
-    Query results are stored in a local SQLite database named according to
-    db_name, making subsequent retrieval much quicker than accessing the
-    CoCoMac website.
-
-    Parameters
-    ----------
-    maps : list or string
-      List of CoCoMac maps or path to a text file containing one map per line.
-
-    Returns
-    -------
-    unable : dict
-      Dict with lists for each query type of CoCoMac maps for which URLErrors
-      occurred, preventing data acquisition.
-
-    """
+def populate_database(maps=False, memory=False):
     if not maps:
         maps = ALLMAPS
     if type(maps) == str:
         maps = [line.strip() for line in open(maps).readlines()]
-    db = DB(db_name)
+    db = DB(memory)
     count = {'Mapping': 0, 'Connectivity': 0}
     unable = {'Mapping': [], 'Connectivity': []}
     for bmap in maps:

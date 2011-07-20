@@ -41,7 +41,7 @@ class TestScrubXML(TestCase):
 class TestDB(TestCase):
 
     def setUp(self):
-        self.db = q2d.DB(':memory:')
+        self.db = q2d.DB(True)
 
     def tearDown(self):
         self.db = None
@@ -58,13 +58,3 @@ class TestDB(TestCase):
         db.insert('Mapping', 'PP99', 'stuff')
         self.assertEqual(db.con.execute('select * from Mapping').fetchall(),
                          [('PP99', 'stuff')])
-        
-#------------------------------------------------------------------------------
-# Test Functions
-#------------------------------------------------------------------------------
-
-def test_db_file_creation():
-    db = q2d.DB('delete_me')
-    p = join(environ['HOME'], '.cache', 'py-string-funcs', 'delete_me.sqlite')
-    assert exists(p)
-    unlink(p)
