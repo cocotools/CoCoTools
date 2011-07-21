@@ -20,13 +20,13 @@ class TestDB(TestCase):
     def tearDown(self):
         self.db = None
 
-    def test_check_for_entry(self):
+    def test_fetch_xml(self):
         db = self.db
-        self.assertFalse(db.check_for_entry('Mapping', 'PP99'))
+        self.assertFalse(db.fetch_xml('Mapping', 'PP99'))
         db.con.execute('insert into Mapping values ("PP99", "1")')
-        self.assertTrue(db.check_for_entry('Mapping', 'PP99'))
+        self.assertEqual(db.fetch_xml('Mapping', 'PP99'), '1')
         db.con.execute('insert into Mapping values ("PP99", "2")')
-        self.assertRaises(CoCoDBError, db.check_for_entry, 'Mapping', 'PP99')
+        self.assertRaises(CoCoDBError, db.fetch_xml, 'Mapping', 'PP99')
 
     def test_insert(self):
         db = self.db

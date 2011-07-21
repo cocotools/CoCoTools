@@ -37,7 +37,7 @@ class LocalDB(object):
         con.commit()
         self.con = con
 
-    def check_for_entry(self, table, bmap):
+    def fetch_xml(self, table, bmap):
         con = self.con
         if table == 'Mapping':
             xml = con.execute('select xml from Mapping where bmap=?',
@@ -47,8 +47,10 @@ class LocalDB(object):
                              (bmap,)).fetchall()
         else:
             raise ValueError('invalid table')
+        # Make sure only one row.
         if len(xml) == 1:
-            return True
+            # Return first (and only) column of first (and only) row.
+            return xml[0][0]
         elif len(xml) > 1:
             raise CoCoDBError('multiple xml entries for bmap %s' % bmap)
         else:
