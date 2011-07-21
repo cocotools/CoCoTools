@@ -28,6 +28,13 @@ class TestDB(TestCase):
         db.con.execute('insert into Mapping values ("PP99", "2")')
         self.assertRaises(CoCoDBError, db.fetch_xml, 'Mapping', 'PP99')
 
+    def test_fetch_bmaps(self):
+        db = self.db
+        entries = [('PP99', '1'), ('PP02', '2'), ('PP94', '3')]
+        db.con.executemany('insert into Mapping values (?, ?)', entries)
+        self.assertEqual(sorted(db.fetch_bmaps('Mapping')),
+                         ['PP02', 'PP94', 'PP99'])
+
     def test_insert(self):
         db = self.db
         self.assertFalse(db.con.execute('select * from Mapping').fetchall())

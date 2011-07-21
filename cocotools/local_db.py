@@ -56,6 +56,16 @@ class LocalDB(object):
         else:
             return False
 
+    def fetch_bmaps(self, table):
+        con = self.con
+        if table == 'Mapping':
+            rows = con.execute('select bmap from Mapping').fetchall()
+        elif table == 'Connectivity':
+            rows = con.execute('select bmap from Connectivity').fetchall()
+        else:
+            raise ValueError('invalid table')
+        return [row[0] for row in rows]
+
     def insert(self, table, bmap, xml):
         con = self.con
         if table == 'Mapping':
