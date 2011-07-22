@@ -11,31 +11,49 @@ from cStringIO import StringIO
 import xml.parsers.expat
 from xml.etree.ElementTree import parse
 
-
 #------------------------------------------------------------------------------
 # Classes
 #------------------------------------------------------------------------------
 
+class XMLReader(object):
 
+    def __init__(self, search_type, xml_string):
+        self.search_type = search_type
+        self.prefix = '{http://www.cocomac.org}'
+        self.prim_iterator = self.string2primiter(xml_string)
 
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
+    def string2primiter(self, xml_string):
+        s = StringIO()
+        s.write(xml_string)
+        s.seek(0)
+        tree = parse(s)
+        s.close()
+        elem_names = {'Mapping': ('MapData', 'PrimaryRelation'),
+                      'Connectivity': ('ProcessedConnectivityData',
+                                       'IntegratedPrimaryProjection')}
+        pfix, stype = self.prefix, self.search_type
+        # find and iterfind methods can reach only one level down.
+        data_elem = tree.find('%s%s' % (pfix, elem_names[stype][0]))
+        return data_elem.iterfind('%s%s' % (pfix, elem_names[stype][1]))
 
-def string2iterprim(xml_string, search_type):
-    s = StringIO()
-    s.write(xml_string)
-    s.seek(0)
-    tree = parse(s)
-    s.close()
-    elem_names = {'Mapping': ('PrimaryRelation', 'MapData'),
-                  'Connectivity': ('IntegratedPrimaryProjection',
-                                   'ProcessedConnectivityData')}
-    prefix = '{http://www.cocomac.org}'
-    # find and iterfind methods can reach only one level down.
-    data_elem = tree.find('%s%s' % (prefix, elem_names[search_type][1]))
-    return data_elem.iterfind('%s%s' % (prefix, elem_names[search_type][0]))
+    def find_text(self):
+        pass
     
+    def prim2data(self, prim):
+        stype, pfix = self.search_type, self.prefix
+        if stype == 'Mapping':
+            return [prim.find('%sSourceBrainSite' % pfix).find('%sID_BrainSite' % pfix).text,
+                    prim.find('%sTargetBrainSite' % pfix).find('%sID_BrainSite' % pfix).text,
+                    prim.find('%sRC' % pfix).text,
+                    prim.find('%sReference' % pfix).find('%sPDC' % pfix).text]
+        elif stype == 'Connectivity':
+            return []
+        else:
+            raise ValueError('invalid search type')
+
+    def fetch_data(self):
+        pass
+
 
 # def walk_tree(node, match, callback):
 #     """Walk an ElementTree, calling a function for all matching nodes.
