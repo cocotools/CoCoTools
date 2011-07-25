@@ -3,10 +3,10 @@
 #------------------------------------------------------------------------------
 
 # Stdlib
-from xml.etree.ElementTree import Element
+import xml.etree.ElementTree as etree
 
 # Third party
-from mocker import MockerTestCase
+from mocker import MockerTestCase, MATCH
 
 # Local
 from cocotools import db2graph as d2g
@@ -17,51 +17,37 @@ from cocotools import db2graph as d2g
 
 class TestXMLReader(MockerTestCase):
 
-    def test_init(self):
-        # Method string2primiter is called by __init__, so this will
-        # serve as a test for that method as well.
-        xml_string = """\
-<?xml version="1.0" encoding="UTF-8"?><CoCoMacExport xmlns="http://www.cocomac.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cocomac.org http://www.cocomac.org/cocomac.xsd">
-<Header></Header>
-<MapData>
-<PrimaryRelation></PrimaryRelation>
-<PrimaryRelation></PrimaryRelation>
-</MapData>
-</CoCoMacExport>
-"""
-        reader = d2g.XMLReader('Mapping', xml_string)
-        self.assertEqual(reader.search_type, 'Mapping')
-        self.assertEqual(reader.prefix, '{http://www.cocomac.org}')
-        for time in (1, 2):
-            assert isinstance(reader.prim_iterator.next(), Element)
-        self.assertRaises(StopIteration, reader.prim_iterator.next)
+    def setUp(self):
+        f = open('cocotools/tests/sample_map.xml')
+        self.xml_string = f.read()
+        f.seek(0)
+        self.f = f
+        self.tag_prefix = './/{http://www.cocomac.org}'
+
+    def tearDown(self):
+        self.f.close()
+
+    def test_string2primiter(self):
+        # Because string2primiter is called upon the instantiation of
+        # XMLReader, this will serve as a test of __init__ as well.
+        prefix = self.tag_prefix
+        reader = d2g.XMLReader('Mapping', self.xml_string)
+        self.assertEqual(reader.prim_tag, 'PrimaryRelation')
+        self.assertEqual(reader.tag_prefix, prefix)
+        for x in range(144):
+            next = reader.prim_iterator.next
+            self.assertEqual(next().tag, '%sPrimaryRelation' % prefix[3:])
+        self.assertRaises(StopIteration, next)
 
     def test_prim2data(self):
-
+        prefix = self.tag_prefix
+        prim = etree.parse(self.f).find('%sPrimaryRelation' % prefix)
         mocker = self.mocker
-
-        # Mock the XML.
-        prim = mocker.mock()
-        prefix = '{http://www.cocomac.org}'
-        prim.find('%sSourceBrainSite' % prefix).find('%sID_BrainSite' %
-                                                          prefix).text
-        mocker.result('B05-19')
-        prim.find('%sTargetBrainSite' % prefix).find('%sID_BrainSite' %
-                                                          prefix).text
-        mocker.result('PP99-19')
-        prim.find('%sRC' % prefix).text
-        mocker.result('I')
-        prim.find('%sReference' % prefix).find('%sPDC' % prefix).text
-        mocker.result('P')
-
-        # Mock XMLReader.
         reader = mocker.mock()
-        reader.search_type
-        mocker.result('Mapping')
-        reader.prefix
+        reader.tag_prefix
         mocker.result(prefix)
-        
+        reader.prim_tag
+        mocker.result('PrimaryRelation')
         mocker.replay()
-
         self.assertEqual(d2g.XMLReader.prim2data.im_func(reader, prim),
-                         ['B05-19', 'PP99-19', 'I', 'P'])
+                         ('B05-19', 'PP99-19', {'RC': ['I'], 'PDC': ['P']}))

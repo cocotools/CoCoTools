@@ -1,0 +1,3351 @@
+<?xml version="1.0" encoding="UTF-8"?><CoCoMacExport xmlns="http://www.cocomac.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cocomac.org http://www.cocomac.org/cocomac.xsd">
+<Header>
+<Creator>CoCoMac-Online</Creator>
+<CoCoMacVersion>20</CoCoMacVersion>
+<ExportDate>2011-06-20T11:29:45+01:00</ExportDate>
+<DataType>InterMapRelations_originalData</DataType>
+<Feedback>
+<Query>
+<HttpString>Search=MAPPING&amp;OutputType=XML_BROWSER&amp;SearchString=('PP99')[SOURCEMAP]OR('PP99')[TARGETMAP]&amp;Details=</HttpString>
+<SearchString>('PP99')[SOURCEMAP]OR('PP99')[TARGETMAP]</SearchString>
+<SqlString>SELECT  Top 32767  RelationCode, InterMapRelations.ID AS RelationID, BrainSite_A, BrainSite_B, PDC_Relation, ID_Literature, Reference_Text, Reference_Figures, Comments FROM InterMapRelations WHERE  ID_BrainSite_A IN  (SELECT ID FROM BrainMaps_BrainSites WHERE ID_BrainMaps=244)OR ID_BrainSite_B IN  (SELECT ID FROM BrainMaps_BrainSites WHERE ID_BrainMaps=244)</SqlString>
+</Query>
+<Results>144</Results>
+</Feedback>
+<Comments>CocoMac XML Output</Comments>
+</Header>
+<MapData>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>B05-19</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>19</Acronym>
+<FullName>Area 19</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-19</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>19</Acronym>
+<FullName>Area 19</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 19 without explicitly stating what map it is taken from. As 19 commonly is defined according to Brodmann (1905, 1909), and B05 is referred to during the article of PP99, we assume that 19 is meant to be Brodmann&apos;s 19.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>B05-23</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>23</Acronym>
+<FullName>Area 23</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-23</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>23</Acronym>
+<FullName>Area 23</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 23 without explicitly stating what map it is taken from. We thus assume that it refers to the standard parellation scheme of Brodmann (1905).</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>BB47-TEO</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TEO</Acronym>
+<FullName>Posterior inferior temporal cortex</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-TEO</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TEO</Acronym>
+<FullName>Posterior inferior temporal cortex</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>As area TEO is not explicitly defined by PP99, we assume that is equivalent to area TEO of a standard parcellation scheme, i.e. that of Bonin &amp; Bailey (1947).</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>BB47-TF</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TF</Acronym>
+<FullName>Temporal area TF</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-TF</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TF</Acronym>
+<FullName>Temporal area TF</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area TF without explicitly stating what map it is taken from. As TF commonly is defined according to Bonin &amp; Bailey (1947), we assume that this is the case here as well.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>BB47-TH</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TH</Acronym>
+<FullName>Temporal area TH</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-TH</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TH</Acronym>
+<FullName>Temporal area TH</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area TH without explicitly stating what map it is taken from. As TH commonly is defined according to Bonin &amp; Bailey (1947), we assume that this is the case here as well.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>BP87-6DR</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>6DR</Acronym>
+<FullName>Premotor area 6DR</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-6DR</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>6DR</Acronym>
+<FullName>Premotor area 6DR</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 6DR without explicitly stating what map it is taken from. One common parcellation scheme which defines an area 6DR is that of Barbas &amp; Pandya.  (1987). As Pandya also is a co-author of both articles,  we assume that PP99-6DR is identical to BP87-6DR.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>FV91-FST</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>FST</Acronym>
+<FullName>Floor of superior temporal sulcus</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-FST</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>FST</Acronym>
+<FullName>Floor of superior temporal sulcus</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>As area FST is not explicitly defined by PP99, we assume that is equivalent to area FST of a standard parcellation scheme of visual cortex, i.e. that of Felleman &amp; Van Essen 1991.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>FV91-V4</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>V4</Acronym>
+<FullName>Visual area 4</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-V4</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>V4</Acronym>
+<FullName>Visual area 4</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>As area V4 is not explicitly defined by PP99, we assume that is equivalent to area V4 of a standard parcellation scheme of visual cortex, i.e. that of Felleman &amp; Van Essen (1991).</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-10</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>10</Acronym>
+<FullName>Area 10</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-10</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>10</Acronym>
+<FullName>Area 10</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-11</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>11</Acronym>
+<FullName>Area 11</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-11</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>11</Acronym>
+<FullName>Area 11</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-13</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>13</Acronym>
+<FullName>Orbitofrontal area 13</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-13</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>13</Acronym>
+<FullName>Orbitofrontal area 13</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-14</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>14</Acronym>
+<FullName>Orbitofrontal area 14</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-14</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>14</Acronym>
+<FullName>Orbitofrontal area 14</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-25</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>25</Acronym>
+<FullName>Area 25</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-25</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>25</Acronym>
+<FullName>Area 25</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-44</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>44</Acronym>
+<FullName>Cortical area 44</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-44</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>44</Acronym>
+<FullName>Cortical area 44</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-47/12</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>47/12</Acronym>
+<FullName>Prefrontal area 47/12</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-47/12</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>47/12</Acronym>
+<FullName>Prefrontal area 47/12</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-8Ad</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Ad</Acronym>
+<FullName>Dorsal portion of area 8A</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8Ad</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Ad</Acronym>
+<FullName>Dorsal portion of area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 32</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences, we distinguish between two subdivisions of 9/46, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot;</Quotation>
+<PDC>H</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 32</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences, we distinguish between two subdivisions of 9/46, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot;</Quotation>
+<PDC>H</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 32</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences, we distinguish between two subdivisions of 9/46, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot;</Quotation>
+<PDC>H</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 32</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences, we distinguish between two subdivisions of 9/46, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot;</Quotation>
+<PDC>H</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP94-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-10</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>10</Acronym>
+<FullName>Area 10</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-10</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>10</Acronym>
+<FullName>Area 10</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-10</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>10</Acronym>
+<FullName>Area 10</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCpol</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCpol</Acronym>
+<FullName>Pole of prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-11</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>11</Acronym>
+<FullName>Area 11</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-11</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>11</Acronym>
+<FullName>Area 11</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-13</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>13</Acronym>
+<FullName>Orbitofrontal area 13</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-13</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>13</Acronym>
+<FullName>Orbitofrontal area 13</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-14</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>14</Acronym>
+<FullName>Orbitofrontal area 14</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-14</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>14</Acronym>
+<FullName>Orbitofrontal area 14</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-19</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>19</Acronym>
+<FullName>Area 19</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>B05-19</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>19</Acronym>
+<FullName>Area 19</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 19 without explicitly stating what map it is taken from. As 19 commonly is defined according to Brodmann (1905, 1909), and B05 is referred to during the article of PP99, we assume that 19 is meant to be Brodmann&apos;s 19.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-23</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>23</Acronym>
+<FullName>Area 23</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>B05-23</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>23</Acronym>
+<FullName>Area 23</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 23 without explicitly stating what map it is taken from. We thus assume that it refers to the standard parellation scheme of Brodmann (1905).</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24b</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24b</Acronym>
+<FullName>Area 24b</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp. 1022-1031</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>E</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24a</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24a</Acronym>
+<FullName>Area 24a</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp. 1022-1031</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<Comments>PP99 refer to areas 24a, 24b, and 24c throughout the text, whereas their Fig 3 only shows one large area 24.</Comments>
+<PDC>E</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24c</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24c</Acronym>
+<FullName>Area 24c (rostral part of the cingulate sulcus)</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp 1022-1031</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>E</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24a</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24a</Acronym>
+<FullName>Area 24a</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>VPR87-24a</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24a</Acronym>
+<FullName>Area 24a</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 24a without explicitly stating what map it is taken from. As 24a is commonly defined according to Vogt et al.  (1987) and Pandya is a co-author of both articles, we assume that PP99-24a is identical to VPR87-24a.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24a</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24a</Acronym>
+<FullName>Area 24a</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp. 1022-1031</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<Comments>PP99 refer to areas 24a, 24b, and 24c throughout the text, whereas their Fig 3 only shows one large area 24.</Comments>
+<PDC>E</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24b</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24b</Acronym>
+<FullName>Area 24b</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>VPR87-24b</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24b</Acronym>
+<FullName>Area 24b</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 24b without explicitly stating what map it is taken from. As 24b is commonly defined according to Vogt et al.  (1987) and Pandya is a co-author of both articles, we assume that PP99-24b is identical to VPR87-24b.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24b</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24b</Acronym>
+<FullName>Area 24b</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp. 1022-1031</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>E</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24c</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24c</Acronym>
+<FullName>Area 24c (rostral part of the cingulate sulcus)</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24</Acronym>
+<FullName>Anterior cingulate area 24</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp 1022-1031</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>E</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-24c</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24c</Acronym>
+<FullName>Area 24c (rostral part of the cingulate sulcus)</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>VPR87-24c</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24c</Acronym>
+<FullName>Area 24c (rostral part of the cingulate sulcus)</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 24c without explicitly stating what map it is taken from. As 24c is commonly defined according to Vogt et al.  (1987) and Pandya is a co-author of both articles, we assume that PP99-24c is identical to VPR87-24c.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-25</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>25</Acronym>
+<FullName>Area 25</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-25</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>25</Acronym>
+<FullName>Area 25</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-29</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>29</Acronym>
+<FullName>Area 29</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>VPR87-29</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>29</Acronym>
+<FullName>Area 29</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 29 without explicitly stating what map it is taken from. One common parcellation scheme which defines area 29 is that of Vogt et al.  (1987). Also, Pandya is a co-author of both articles, thus we assume that PP99-29 is identical to VPR87-29.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-30</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>30</Acronym>
+<FullName>Retrosplenial area 30</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>VPR87-30</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>30</Acronym>
+<FullName>Retrosplenial area 30</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 30 without explicitly stating what map it is taken from. One common parcellation scheme which defines area 30 is that of Vogt et al.  (1987). Also, Pandya is a co-author of both articles, thus we assume that PP99-30 is identical to VPR87-30.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-31</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>31</Acronym>
+<FullName>Area 31</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>VPR87-31</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>31</Acronym>
+<FullName>Area 31</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 31 without explicitly stating what map it is taken from. One common parcellation scheme which defines area 31 is that of Vogt et al.  (1987). Also, Pandya is a co-author of both articles, thus we assume that PP99-31 is identical to VPR87-31.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCm</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCm</Acronym>
+<FullName>Medial prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>TNHTMTal04-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>TNHTMTal04</ID_Literature>
+<TextPageNumber>p.3337</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;.., including areas 8B, 9 and 32 (Barbas &amp; Pandya, 1989; Preuss &amp; Goldman-Rakic, 1991; Petrides &amp; Pandya, 1999),..&amp;quot;</Quotation>
+<Comments>-</Comments>
+<PDC>G</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-44</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>44</Acronym>
+<FullName>Cortical area 44</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-44</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>44</Acronym>
+<FullName>Cortical area 44</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>L</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>L</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>L</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45</Acronym>
+<FullName>Cortical area 45</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>Fig. 3</FigureNumber>
+<PDC>L</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCcl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCcl</Acronym>
+<FullName>Centrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;...area 46 in the monkey, as defined by Walker (1940), is not homogeneous...Only the cortex of in the banks of the principal sulcus and the cortex surrounding the rostral part of this sulcus has cytoarchitectonic characteristics that resemble those of human area 46. We therefore restrict the use of the designation &apos;area 46&apos; in the monkey to this cortex (Fig. 3B).&amp;quot; (p. 1020)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1031</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;In the current comparative architectonic analysis, we observed that, in the monkey, only a limited part of the large region that Walker labelled as area 46 has features similar to those of area 46 of the human brain...We have therefore restricted the designation &apos;area 46&apos; to this cortical region of the monkey...&amp;quot; (p. 1031)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-47/12</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>47/12</Acronym>
+<FullName>Prefrontal area 47/12</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-47/12</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>47/12</Acronym>
+<FullName>Prefrontal area 47/12</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-47/12</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>47/12</Acronym>
+<FullName>Prefrontal area 47/12</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-6DR</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>6DR</Acronym>
+<FullName>Premotor area 6DR</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>BP87-6DR</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>6DR</Acronym>
+<FullName>Premotor area 6DR</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 6DR without explicitly stating what map it is taken from. One common parcellation scheme which defines an area 6DR is that of Barbas &amp; Pandya.  (1987). As Pandya also is a co-author of both articles,  we assume that PP99-6DR is identical to BP87-6DR.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1017</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;We identify two subdivisions of area 8A: 8Ad (dorsal) and 8Av (ventral) (Fig. 3B).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1028</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;The present limits of area 8A agree with those of Walker (1940)...&amp;quot; (p. 1028)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8Ad</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Ad</Acronym>
+<FullName>Dorsal portion of area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1017</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;We identify two subdivisions of area 8A: 8Ad (dorsal) and 8Av (ventral) (Fig. 3B).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8Ad</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Ad</Acronym>
+<FullName>Dorsal portion of area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1017</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;We identify two subdivisions of area 8A: 8Ad (dorsal) and 8Av (ventral) (Fig. 3B).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8Ad</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Ad</Acronym>
+<FullName>Dorsal portion of area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-8Ad</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Ad</Acronym>
+<FullName>Dorsal portion of area 8A</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1017</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;We identify two subdivisions of area 8A: 8Ad (dorsal) and 8Av (ventral) (Fig. 3B).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCd</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCd</Acronym>
+<FullName>Dorsal (lateral and medial) prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1024</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;...injections of FB were placed in lateral 8B as defined by Walker (1940) (Fig. 2A) and the present segmentation (Fig. 3B).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>TNHTMTal04-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>TNHTMTal04</ID_Literature>
+<TextPageNumber>p.3337</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;.., including areas 8B, 9 and 32 (Barbas &amp; Pandya, 1989; Preuss &amp; Goldman-Rakic, 1991; Petrides &amp; Pandya, 1999),..&amp;quot;</Quotation>
+<Comments>-</Comments>
+<PDC>G</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCdl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdl</Acronym>
+<FullName>Dorsolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCdm</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdm</Acronym>
+<FullName>Dorsomedial prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1017</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;Area 8B in the monkey was originally identified by Walker (1940) (Fig. 2A)...In the present re-examination of the architecture of the frontal lobe of the monkey, we have identified an area interposed between area 9 and the dorsal part of area 6 and, following Walker (1940), we designated it as area 8B (Fig. 3B).&amp;quot; (p. 1017)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>TNHTMTal04-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>TNHTMTal04</ID_Literature>
+<TextPageNumber>p.3337</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;.., including areas 8B, 9 and 32 (Barbas &amp; Pandya, 1989; Preuss &amp; Goldman-Rakic, 1991; Petrides &amp; Pandya, 1999),..&amp;quot;</Quotation>
+<Comments>-</Comments>
+<PDC>G</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;Area 9, as delimited by Walker (1940), has the following characteristics...The architectonic characteristics of Walker&apos;s area 9 in the monkey resemble those of the portion of Brodmann&apos;s area 9that lies on the superior frontal gyrus in the human brain...Note that only this part of the human frontal cortex is referred to as area 9 in the current segmentation...In this way, the designations 9...refer to similar areas in both species.&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCdl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdl</Acronym>
+<FullName>Dorsolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCdm</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdm</Acronym>
+<FullName>Dorsomedial prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCd</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCd</Acronym>
+<FullName>Dorsal (lateral and medial) prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;...the cortex that lies just above and below the caudal part of the sulcus principalis (and which Walker included in area 46)...We have therefore designated this area as 9/46 in...the monkey (Fig. 3B)...&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>R00-PFCcl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCcl</Acronym>
+<FullName>Centrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences...we distinguish between two subdivisions of 9/46 in the monkey, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot; (p. 1020)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences...we distinguish between two subdivisions of 9/46 in the monkey, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1035</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;We refer to this area as 9/46 in both species in order to acknowledge...that in the classical maps of the human brain...it had been referred to as area 9, whereas in the maps of monkey brain it was part of area 46 (Walker 1940).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp. 1031, 1033</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;The cortex that lies on the lips of the caudal portion of the sulcus principalis and the immediately adjacent cortex (which Walker included as part of area 46)...we have elected to designate this part of the mid-dorsolateral frontal cortex...as area &apos;9/46&apos;...&amp;quot; (pp. 1031, 1033)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46d</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46d</Acronym>
+<FullName>Cortical area 9/46d</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences...we distinguish between two subdivisions of 9/46 in the monkey, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>S</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;On the basis of minor architectonic differences...we distinguish between two subdivisions of 9/46 in the monkey, namely 9/46d, for the dorsal part, and 9/46v, for the ventral part.&amp;quot; (p. 1020)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP94-9/46v</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46v</Acronym>
+<FullName>Cortical area 9/46v</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>Although the relation between the two parcellations is not mentioned in PP99, both articles apply the same criteria to delineate prefrontal cortex. Furthermore, the two maps presented (Fig. 3B in PP99 and Fig. 6B in PP94) are virtually identical figures. It thus appears that the areas of PP99 and PP94 are identical.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-FST</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>FST</Acronym>
+<FullName>Floor of superior temporal sulcus</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>FV91-FST</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>FST</Acronym>
+<FullName>Floor of superior temporal sulcus</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>As area FST is not explicitly defined by PP99, we assume that is equivalent to area FST of a standard parcellation scheme of visual cortex, i.e. that of Felleman &amp; Van Essen 1991.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-TEO</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TEO</Acronym>
+<FullName>Posterior inferior temporal cortex</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>BB47-TEO</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TEO</Acronym>
+<FullName>Posterior inferior temporal cortex</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>As area TEO is not explicitly defined by PP99, we assume that is equivalent to area TEO of a standard parcellation scheme, i.e. that of Bonin &amp; Bailey (1947).</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-TF</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TF</Acronym>
+<FullName>Temporal area TF</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>BB47-TF</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TF</Acronym>
+<FullName>Temporal area TF</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area TF without explicitly stating what map it is taken from. As TF commonly is defined according to Bonin &amp; Bailey (1947), we assume that this is the case here as well.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-TH</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TH</Acronym>
+<FullName>Temporal area TH</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>BB47-TH</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>TH</Acronym>
+<FullName>Temporal area TH</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area TH without explicitly stating what map it is taken from. As TH commonly is defined according to Bonin &amp; Bailey (1947), we assume that this is the case here as well.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>PP99-V4</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>V4</Acronym>
+<FullName>Visual area 4</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>FV91-V4</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>V4</Acronym>
+<FullName>Visual area 4</FullName>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>As area V4 is not explicitly defined by PP99, we assume that is equivalent to area V4 of a standard parcellation scheme of visual cortex, i.e. that of Felleman &amp; Van Essen (1991).</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCcl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCcl</Acronym>
+<FullName>Centrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCcl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCcl</Acronym>
+<FullName>Centrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCd</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCd</Acronym>
+<FullName>Dorsal (lateral and medial) prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCd</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCd</Acronym>
+<FullName>Dorsal (lateral and medial) prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCdl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdl</Acronym>
+<FullName>Dorsolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCdl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdl</Acronym>
+<FullName>Dorsolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCdm</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdm</Acronym>
+<FullName>Dorsomedial prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCdm</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCdm</Acronym>
+<FullName>Dorsomedial prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>O</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCm</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCm</Acronym>
+<FullName>Medial prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCpol</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCpol</Acronym>
+<FullName>Pole of prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-10</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>10</Acronym>
+<FullName>Area 10</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-47/12</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>47/12</Acronym>
+<FullName>Prefrontal area 47/12</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8Av</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8Av</Acronym>
+<FullName>Ventral portion of area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45B</Acronym>
+<FullName>Cortical area 45B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>R00-PFCvl</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>PFCvl</Acronym>
+<FullName>Ventrolateral prefrontal cortex</FullName>
+<DefType>D</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-45A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>45A</Acronym>
+<FullName>Cortical area 45A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>R00</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>TNHTMTal04-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-32</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>32</Acronym>
+<FullName>Area 32</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>TNHTMTal04</ID_Literature>
+<TextPageNumber>p.3337</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;.., including areas 8B, 9 and 32 (Barbas &amp; Pandya, 1989; Preuss &amp; Goldman-Rakic, 1991; Petrides &amp; Pandya, 1999),..&amp;quot;</Quotation>
+<Comments>-</Comments>
+<PDC>G</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>TNHTMTal04-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>TNHTMTal04</ID_Literature>
+<TextPageNumber>p.3337</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;.., including areas 8B, 9 and 32 (Barbas &amp; Pandya, 1989; Preuss &amp; Goldman-Rakic, 1991; Petrides &amp; Pandya, 1999),..&amp;quot;</Quotation>
+<Comments>-</Comments>
+<PDC>G</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>TNHTMTal04-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>TNHTMTal04</ID_Literature>
+<TextPageNumber>p.3337</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;.., including areas 8B, 9 and 32 (Barbas &amp; Pandya, 1989; Preuss &amp; Goldman-Rakic, 1991; Petrides &amp; Pandya, 1999),..&amp;quot;</Quotation>
+<Comments>-</Comments>
+<PDC>G</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>VPR87-24a</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24a</Acronym>
+<FullName>Area 24a</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24a</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24a</Acronym>
+<FullName>Area 24a</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 24a without explicitly stating what map it is taken from. As 24a is commonly defined according to Vogt et al.  (1987) and Pandya is a co-author of both articles, we assume that PP99-24a is identical to VPR87-24a.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>VPR87-24b</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24b</Acronym>
+<FullName>Area 24b</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24b</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24b</Acronym>
+<FullName>Area 24b</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 24b without explicitly stating what map it is taken from. As 24b is commonly defined according to Vogt et al.  (1987) and Pandya is a co-author of both articles, we assume that PP99-24b is identical to VPR87-24b.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>VPR87-24c</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24c</Acronym>
+<FullName>Area 24c (rostral part of the cingulate sulcus)</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-24c</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>24c</Acronym>
+<FullName>Area 24c (rostral part of the cingulate sulcus)</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 24c without explicitly stating what map it is taken from. As 24c is commonly defined according to Vogt et al.  (1987) and Pandya is a co-author of both articles, we assume that PP99-24c is identical to VPR87-24c.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>VPR87-29</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>29</Acronym>
+<FullName>Area 29</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-29</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>29</Acronym>
+<FullName>Area 29</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 29 without explicitly stating what map it is taken from. One common parcellation scheme which defines area 29 is that of Vogt et al.  (1987). Also, Pandya is a co-author of both articles, thus we assume that PP99-29 is identical to VPR87-29.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>VPR87-30</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>30</Acronym>
+<FullName>Retrosplenial area 30</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-30</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>30</Acronym>
+<FullName>Retrosplenial area 30</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 30 without explicitly stating what map it is taken from. One common parcellation scheme which defines area 30 is that of Vogt et al.  (1987). Also, Pandya is a co-author of both articles, thus we assume that PP99-30 is identical to VPR87-30.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>VPR87-31</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>31</Acronym>
+<FullName>Area 31</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-31</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>31</Acronym>
+<FullName>Area 31</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>-</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>For the description of label, PP99 refer to an area 31 without explicitly stating what map it is taken from. One common parcellation scheme which defines area 31 is that of Vogt et al.  (1987). Also, Pandya is a co-author of both articles, thus we assume that PP99-31 is identical to VPR87-31.</Quotation>
+<PDC>P</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;...area 46 in the monkey, as defined by Walker (1940), is not homogeneous...Only the cortex of in the banks of the principal sulcus and the cortex surrounding the rostral part of this sulcus has cytoarchitectonic characteristics that resemble those of human area 46. We therefore restrict the use of the designation &apos;area 46&apos; in the monkey to this cortex (Fig. 3B).&amp;quot; (p. 1020)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>pp. 1031, 1033</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;The cortex that lies on the lips of the caudal portion of the sulcus principalis and the immediately adjacent cortex (which Walker included as part of area 46)...we have elected to designate this part of the mid-dorsolateral frontal cortex...as area &apos;9/46&apos;...&amp;quot; (pp. 1031, 1033)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1035</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;We refer to this area as 9/46 in both species in order to acknowledge...that in the classical maps of the human brain...it had been referred to as area 9, whereas in the maps of monkey brain it was part of area 46 (Walker 1940).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1031</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;In the current comparative architectonic analysis, we observed that, in the monkey, only a limited part of the large region that Walker labelled as area 46 has features similar to those of area 46 of the human brain...We have therefore restricted the designation &apos;area 46&apos; to this cortical region of the monkey...&amp;quot; (p. 1031)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>46</Acronym>
+<FullName>Cortical area 46</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9/46</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9/46</Acronym>
+<FullName>Cortical area 9/46</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>L</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>-</FigureNumber>
+<Quotation>&amp;quot;...the cortex that lies just above and below the caudal part of the sulcus principalis (and which Walker included in area 46)...We have therefore designated this area as 9/46 in...the monkey (Fig. 3B)...&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8A</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8A</Acronym>
+<FullName>Area 8A</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1028</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;The present limits of area 8A agree with those of Walker (1940)...&amp;quot; (p. 1028)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1024</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;...injections of FB were placed in lateral 8B as defined by Walker (1940) (Fig. 2A) and the present segmentation (Fig. 3B).&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-8B</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>8B</Acronym>
+<FullName>Area 8B</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1017</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;Area 8B in the monkey was originally identified by Walker (1940) (Fig. 2A)...In the present re-examination of the architecture of the frontal lobe of the monkey, we have identified an area interposed between area 9 and the dorsal part of area 6 and, following Walker (1940), we designated it as area 8B (Fig. 3B).&amp;quot; (p. 1017)</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>W40-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>PP99-9</ID_BrainSite>
+<SiteClass>Area_IsoCtx</SiteClass>
+<Acronym>9</Acronym>
+<FullName>Area 9</FullName>
+<DefType>D</DefType>
+</TargetBrainSite>
+<RC>I</RC>
+<Reference>
+<ID_Literature>PP99</ID_Literature>
+<TextPageNumber>p. 1020</TextPageNumber>
+<FigureNumber>Figs. 2A, 3B</FigureNumber>
+<Quotation>&amp;quot;Area 9, as delimited by Walker (1940), has the following characteristics...The architectonic characteristics of Walker&apos;s area 9 in the monkey resemble those of the portion of Brodmann&apos;s area 9that lies on the superior frontal gyrus in the human brain...Note that only this part of the human frontal cortex is referred to as area 9 in the current segmentation...In this way, the designations 9...refer to similar areas in both species.&amp;quot;</Quotation>
+<PDC>C</PDC>
+</Reference>
+</PrimaryRelation>
+</MapData>
+</CoCoMacExport>
