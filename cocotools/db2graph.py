@@ -40,6 +40,25 @@ class TrGraph(nx.DiGraph):
                     edge_dict['RC'].append(edge_attr['RC'][0])
                     edge_dict['PDC'].append(edge_attr['PDC'][0])
 
+    def tr_path(self, p, node, s):
+        bits = {}
+        for bit in ((0, p, node), (1, node, s)):
+            try:
+                bits[bit[0]] = self[bit[1]][bit[2]]['TP']
+            except KeyError:
+                bits[bit[0]] = []
+        return bits[0] + [node] + bits[1]
+
+    def deduce_edges(self):
+        nodes = self.nodes_iter()
+        for node in nodes:
+            ebunch = ()
+            for p in self.predecessors(node):
+                for s in self.successors(node):
+                    if p.split('-')[0] != s.split('-')[0]:
+                        tp = self.tr_path(p, node, s)
+
+
 class XMLReader(object):
 
     def __init__(self, search_type, xml):

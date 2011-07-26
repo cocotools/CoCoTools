@@ -4,9 +4,11 @@
 
 # Stdlib
 import xml.etree.ElementTree as etree
+from unittest import TestCase
 
 # Third party
 from mocker import MockerTestCase, MATCH
+import networkx as nx
 
 # Local
 from cocotools import db2graph as d2g
@@ -14,6 +16,16 @@ from cocotools import db2graph as d2g
 #------------------------------------------------------------------------------
 # Test Classes
 #------------------------------------------------------------------------------
+
+class TestTrGraph(TestCase):
+
+    def test_tr_path(self):
+        g = nx.DiGraph()
+        ebunch = (('A-1', 'B-1'), ('B-1', 'C-1', {'TP': ['D-1']}))
+        g.add_edges_from(ebunch)
+        self.assertEqual(d2g.TrGraph.tr_path.im_func(g, 'A-1', 'B-1', 'C-1'),
+                         ['B-1', 'D-1'])
+                         
 
 class TestXMLReader(MockerTestCase):
 
