@@ -8,9 +8,35 @@
 from cStringIO import StringIO
 import xml.etree.ElementTree as etree
 
+# Third party
+import networkx as nx
+
+# Local
+from cocotools.local_db import LocalDB
+
 #------------------------------------------------------------------------------
 # Classes
 #------------------------------------------------------------------------------
+
+class TrGraph(nx.DiGraph):
+
+    def __init__(self, bmaps=False):
+        nx.DiGraph.__init__(self)
+        db = LocalDB()
+        if not bmaps:
+            bmaps = db.fetch_bmaps('Mapping')
+        for bmap in bmaps:
+            xml = db.fetch_xml('Mapping', bmap)
+            if xml:
+                reader = XMLReader('Mapping', xml)
+            for prim in reader.prim_iterator:
+                source, target, edge_attr = reader.prim2data(prim)
+                if not self.has_edge(source, target):
+                    self.add_edge(source, target, edge_attr)
+                else:
+                    edge_dict = self[source][target]
+                    edge_dict['RC'].append(edge_attr['RC'][0])
+                    edge_dict['PDC'].append(edge_attr['PDC'][0])
 
 class XMLReader(object):
 

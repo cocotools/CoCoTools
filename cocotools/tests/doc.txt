@@ -1,10 +1,10 @@
 CoCoTools is a package that facilitates interaction with the CoCoMac
 database and analysis of downloaded data.  To free users from the
 slowness and unreliability of the server at www.cocomac.org, CoCoTools
-has been designed to store CoCoMac query results for all BrainMaps of
-interest in a local sqlite database.  Of the procedures within
-CoCoTools, only the population of this database is subject to the
-website's limitations.
+enables storage of CoCoMac query results for all BrainMaps of interest
+in a local sqlite database.  Of the procedures within CoCoTools, only
+the population of this database is subject to the website's
+limitations.
 
 >>> from cocotools.query2db import populate_database
 
@@ -35,16 +35,42 @@ Connectivity queries failed for []
 >>> exists(db)
 True
 
-With the database in place, analyses can be prepared.  Although graphs
-of the raw data can be subjected to direct analysis, it is expected
-that users will want to condense the morasse of incompatible
-statements that is CoCoMac into a summary connectivity graph before
-attempting to draw conclusions about macaque neuroanatomy.  The
-Objective Relational Transformation (ORT) procedure was designed for
-this purpose.  A full formal specification of ORT is given in Stephan
-et al. (2000).
+The sqlite database stores query results in XML, the format
+www.cocomac.org returns.  However, the data are better represented as
+a set of NetworkX graphs, as Objective Relational Transformation (ORT;
+Stephan et al., 2000) makes use of graph-theoretical techniques.  ORT
+is an algorithm that condenses the morasse of incompatible statements
+that is CoCoMac into a summary connectivity graph that uses a single,
+user-chosen nomenclature from the literature.  The discussion that
+follows assumes knowledge of ORT; please refer to Stephan et
+al. (2000) and Kotter and Wanke (2005).
 
-As preparation for ORT, a transformation graph is constructed from the
-downloaded Mapping data.
+A transformation graph is constructed from the downloaded Mapping data
+using the TrGraph object, a custom subclass of the NetworkX DiGraph.
 
->>> from cocotools.query2graph import TrGraph #doctest: +SKIP
+>>> from cocotools.db2graph import TrGraph
+
+Similar to populate_database, TrGraph can be initialized with all maps
+available in the local database (the default) or with a specified
+subset of these.  TrGraph will raise an error if cocotools.sqlite does
+not exist in the expected location, and maps provided in the call to
+TrGraph that are not in the local database will be ignored.
+
+>>> pfc = TrGraph(['PP94', 'CP94', 'W40'])
+>>> pfc['CP94-13l']['W40-13']
+{'PDC': ['C'], 'RC': ['S']}
+>>> pfc['W40-13']['PP94-13']
+{'PDC': ['H'], 'RC': ['I']}
+>>> pfc['CP94-13l'].has_key('PP94-13')
+False
+>>> pfc['PP94-13'].has_key('CP94-13l')
+False
+
+In the previous example, pfc has an edge with RC=S from CP94-13l to
+W40-13 and one with RC=I from W40-13 to PP94-13.  One can deduce that
+CP94-13l is smaller than PP94-13; however, pfc lacks edges to this
+effect because the literature from which the data were derived lack
+explicit statements about this relationship.  The first step of ORT,
+available in CoCoTools as the deduce_edges method of TrGraph, adds
+missing deducible edges to the transformation graph.
+
