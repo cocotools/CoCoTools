@@ -49,14 +49,16 @@ A transformation graph is constructed from the downloaded Mapping data
 using the TrGraph object, a custom subclass of the NetworkX DiGraph.
 
 >>> from cocotools.db2graph import TrGraph
+>>> pfc = TrGraph()
 
-Similar to populate_database, TrGraph can be initialized with all maps
-available in the local database (the default) or with a specified
-subset of these.  TrGraph will raise an error if cocotools.sqlite does
-not exist in the expected location, and maps provided in the call to
+Similar to populate_database, the add_edges_from_bmaps method of
+TrGraph can be called without any arguments (defaulting to all maps
+available in the local database the default) or with a specified
+subset of maps.  TrGraph will raise an error if cocotools.sqlite does
+not exist in the expected location.  Maps provided in the call to
 TrGraph that are not in the local database will be ignored.
 
->>> pfc = TrGraph(['PP94', 'CP94', 'W40'])
+>>> pfc.add_edges_from_bmaps(['PP94', 'CP94', 'W40'])
 >>> pfc['CP94-13l']['W40-13']
 {'PDC': ['C'], 'RC': ['S']}
 >>> pfc['W40-13']['PP94-13']
@@ -74,3 +76,4 @@ explicit statements about this relationship.  The first step of ORT,
 available in CoCoTools as the deduce_edges method of TrGraph, adds
 missing deducible edges to the transformation graph.
 
+>>> new_edges = pfc.deduce_edges()

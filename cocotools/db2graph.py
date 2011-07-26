@@ -22,6 +22,8 @@ class TrGraph(nx.DiGraph):
 
     def __init__(self, bmaps=False):
         nx.DiGraph.__init__(self)
+
+    def add_edges_from_bmaps(self, bmaps=False):
         db = LocalDB()
         if not bmaps:
             bmaps = db.fetch_bmaps('Mapping')
