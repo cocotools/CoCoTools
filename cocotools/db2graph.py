@@ -5,7 +5,6 @@
 #------------------------------------------------------------------------------
 
 # Stdlib
-import sqlite3
 from cStringIO import StringIO
 import xml.etree.ElementTree as etree
 
@@ -36,8 +35,12 @@ class XMLReader(object):
         prefix = self.tag_prefix
         site_ids = prim.findall(prefix + 'ID_BrainSite')
         if self.prim_tag == 'PrimaryRelation':
-            edge_attr = {'rc': [prim.find(prefix + 'RC').text],
-                         'pdc': [prim.find(prefix + 'PDC').text]}
+            edge_attr = {}
+            for datum in ('RC', 'PDC'):
+                try:
+                    edge_attr[datum] = [prim.find(prefix + datum).text]
+                except AttributeError:
+                    edge_attr[datum] = [None]
         elif self.prim_tag == 'IntegratedPrimaryProjection':
             site_pdcs = prim.findall(prefix + 'PDC_Site')
             ecs = prim.findall(prefix + 'EC')
