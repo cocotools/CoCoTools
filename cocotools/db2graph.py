@@ -15,12 +15,12 @@ import xml.etree.ElementTree as etree
 
 class XMLReader(object):
 
-    def __init__(self, search_type, xml_string):
+    def __init__(self, search_type, xml):
         prim_tag = {'Mapping': 'PrimaryRelation',
                     'Connectivity': 'IntegratedPrimaryProjection'}
         self.prim_tag = prim_tag[search_type]
         self.tag_prefix = './/{http://www.cocomac.org}'
-        self.prim_iterator = self.string2primiter(xml_string)
+        self.search_string, self.prim_iterator = self.string2primiter(xml)
 
     def string2primiter(self, xml_string):
         s = StringIO()
@@ -28,7 +28,9 @@ class XMLReader(object):
         s.seek(0)
         tree = etree.parse(s)
         s.close()
-        return tree.iterfind(self.tag_prefix + self.prim_tag)
+        prefix = self.tag_prefix
+        return (tree.find('%sSearchString' % prefix).text,
+                tree.iterfind('%s%s' % (prefix, self.prim_tag)))
 
     def prim2data(self, prim):
         prefix = self.tag_prefix

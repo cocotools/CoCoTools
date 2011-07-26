@@ -34,10 +34,10 @@ class TestXMLReader(MockerTestCase):
         reader = d2g.XMLReader('Mapping', self.xml_string)
         self.assertEqual(reader.prim_tag, 'PrimaryRelation')
         self.assertEqual(reader.tag_prefix, prefix)
-        for x in range(144):
-            next = reader.prim_iterator.next
-            self.assertEqual(next().tag, '%sPrimaryRelation' % prefix[3:])
-        self.assertRaises(StopIteration, next)
+        self.assertEqual(reader.prim_iterator.next().tag,
+                         '%sPrimaryRelation' % prefix[3:])
+        self.assertEqual(reader.search_string,
+                         "('PP99')[SOURCEMAP]OR('PP99')[TARGETMAP]")
 
     def test_prim2data(self):
         prefix = self.tag_prefix
