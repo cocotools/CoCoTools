@@ -19,6 +19,10 @@ from cocotools import db2graph as d2g
 
 class TestTrGraph(TestCase):
 
+    def test_rc_res(self):
+        self.assertEqual(d2g.TrGraph.rc_res('IIISSSIII'), 'S')
+        self.assertFalse(d2g.TrGraph.rc_res('LOSL'))
+
     def test_path_code(self):
         mocker = Mocker()
         g = mocker.mock()

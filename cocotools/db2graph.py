@@ -95,6 +95,28 @@ class TrGraph(nx.DiGraph):
             middle += best_rc(tp[i], tp[i + 1])
         return best_rc(p, tp[0]) + middle + best_rc(tp[-1], s)
 
+    @staticmethod
+    def rc_res(tpc):
+        map_step = {'I': {'I': 'I', 'S': 'S', 'L': 'L', 'O': 'O'},
+                    'S': {'I': 'S', 'S': 'S'},
+                    'L': {'I': 'L', 'S': 'ISLO', 'L': 'L', 'O': 'LO'},
+                    'O': {'I': 'O', 'S': 'SO'},
+                    'SO': {'I': 'SO', 'S': 'SO'},
+                    'LO': {'I': 'LO', 'S': 'ISLO'},
+                    'ISLO': {'I': 'ISLO', 'S': 'ISLO'}}
+        rc_res = 'I'
+        for rc in tpc:
+            try:
+                rc_res = map_step[rc_res][rc]
+            except KeyError:
+                return False
+        if len(rc_res) > 1:
+            return False
+        elif len(rc_res) == 1:
+            return rc_res
+        else:
+            raise ValueError('rc_res has length zero.')
+
     def deduce_edges(self):
         """Deduce new edges based on those in the graph.
         
@@ -123,6 +145,8 @@ class TrGraph(nx.DiGraph):
                     if p.split('-')[0] != s.split('-')[0]:
                         tp = self.tr_path(p, node, s)
                         tpc = self.path_code(p, tp, s)
+                        if self.rc_res(tpc):
+                            pass
 
 
 class XMLReader(object):
