@@ -19,9 +19,20 @@ from cocotools import db2graph as d2g
 
 class TestTrGraph(TestCase):
 
+    def test_update(self):
+        a = nx.DiGraph()
+        d = a.copy()
+        ebunch = {'TP': ['C'], 'RC': 'I'}
+        d2g.TrGraph.update.im_func(a, 'A', 'B', ebunch)
+        d.add_edge('A', 'B', ebunch)
+        for node in ('A', 'B'):
+            self.assertEqual(a.edge[node], d.edge[node])
+        
+
     def test_rc_res(self):
-        self.assertEqual(d2g.TrGraph.rc_res('IIISSSIII'), 'S')
-        self.assertFalse(d2g.TrGraph.rc_res('LOSL'))
+        rc_res = d2g.TrGraph.rc_res
+        self.assertEqual(rc_res('IIISSSIII'), 'S')
+        self.assertFalse(rc_res('LOSL'))
 
     def test_path_code(self):
         mocker = Mocker()
@@ -51,7 +62,8 @@ class TestTrGraph(TestCase):
 
     def test_tr_path(self):
         g = nx.DiGraph()
-        ebunch = (('A-1', 'B-1'), ('B-1', 'C-1', {'TP': ['D-1']}))
+        ebunch = (('A-1', 'B-1', {'TP': [[]]}),
+                  ('B-1', 'C-1', {'TP': [['D-1']]}))
         g.add_edges_from(ebunch)
         self.assertEqual(d2g.TrGraph.tr_path.im_func(g, 'A-1', 'B-1', 'C-1'),
                          ['B-1', 'D-1'])

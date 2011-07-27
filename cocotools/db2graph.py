@@ -33,20 +33,18 @@ class TrGraph(nx.DiGraph):
                 reader = XMLReader('Mapping', xml)
             for prim in reader.prim_iterator:
                 source, target, edge_attr = reader.prim2data(prim)
-                if not self.has_edge(source, target):
-                    self.add_edge(source, target, edge_attr)
-                else:
-                    edge_dict = self[source][target]
-                    edge_dict['RC'].append(edge_attr['RC'][0])
-                    edge_dict['PDC'].append(edge_attr['PDC'][0])
+                edge_attr['TP'] = [[]]
+                self.update(source, target, edge_attr)
 
     def tr_path(self, p, node, s):
         bits = {}
         for bit in ((0, p, node), (1, node, s)):
-            try:
-                bits[bit[0]] = self[bit[1]][bit[2]]['TP']
-            except KeyError:
-                bits[bit[0]] = []
+            tps = self[bit[1]][bit[2]]['TP']
+            shortest = tps[0]
+            for tp in tps:
+                if len(tp) < len(shortest):
+                    shortest = tp
+            bits[bit[0]] = tp
         return bits[0] + [node] + bits[1]
 
     def best_rc(self, p, s):
@@ -117,6 +115,15 @@ class TrGraph(nx.DiGraph):
         else:
             raise ValueError('rc_res has length zero.')
 
+    def update(self, source, target, edge_attr):
+        if not self.has_edge(source, target):
+            self.add_edge(source, target, edge_attr)
+        else:
+            edge_dict = self[source][target]
+            edge_dict['RC'].append(edge_attr['RC'][0])
+            edge_dict['PDC'].append(edge_attr['PDC'][0])
+            edge_dict['TP'].append(edge_attr['TP'][0])
+
     def deduce_edges(self):
         """Deduce new edges based on those in the graph.
         
@@ -136,6 +143,7 @@ class TrGraph(nx.DiGraph):
         comparisons between it and the one returned to be misleading.
 
         """
+        g = self.copy()
         nx.freeze(self)
         nodes = self.nodes_iter()
         for node in nodes:
@@ -145,8 +153,11 @@ class TrGraph(nx.DiGraph):
                     if p.split('-')[0] != s.split('-')[0]:
                         tp = self.tr_path(p, node, s)
                         tpc = self.path_code(p, tp, s)
-                        if self.rc_res(tpc):
-                            pass
+                        rc_res = self.rc_res(tpc)
+                        if rc_res:
+                            attr = {'TP': [tp], 'RC': [rc_res], 'PDC': [None]}
+                            g.update(p, s, attr)
+        return g
 
 
 class XMLReader(object):
