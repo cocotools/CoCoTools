@@ -49,7 +49,7 @@ A transformation graph is constructed from the downloaded Mapping data
 using the TrGraph object, a custom subclass of the NetworkX DiGraph.
 
 >>> import cocotools.graphs as cg
->>> pfc = cg.TrGraph()
+>>> mpfc = cg.TrGraph()
 
 Similar to populate_database, the add_edges_from_bmaps method of
 TrGraph can be called without any arguments (defaulting to all maps
@@ -58,41 +58,49 @@ subset of maps.  TrGraph will raise an error if cocotools.sqlite does
 not exist in the expected location.  Maps provided in the call to
 TrGraph that are not in the local database will be ignored.
 
->>> pfc.add_edges_from_bmaps(['PP94', 'CP94', 'W40'])
->>> pfc['CP94-13l']['W40-13']
+>>> mpfc.add_edges_from_bmaps(['PP94', 'CP94', 'W40'])
+>>> mpfc['CP94-13l']['W40-13']
 {'PDC': ['C'], 'TP': [[]], 'RC': ['S']}
->>> pfc['W40-13']['PP94-13']
+>>> mpfc['W40-13']['PP94-13']
 {'PDC': ['H'], 'TP': [[]], 'RC': ['I']}
->>> pfc['CP94-13l'].has_key('PP94-13')
+>>> mpfc['CP94-13l'].has_key('PP94-13')
 False
->>> pfc['PP94-13'].has_key('CP94-13l')
+>>> mpfc['PP94-13'].has_key('CP94-13l')
 False
 
-In the previous example, pfc has an edge with RC=S from CP94-13l to
+In the previous example, mpfc has an edge with RC=S from CP94-13l to
 W40-13 and one with RC=I from W40-13 to PP94-13.  One can deduce that
-CP94-13l is smaller than PP94-13; however, pfc lacks edges to this
+CP94-13l is smaller than PP94-13; however, mpfc lacks edges to this
 effect because the literature from which the data were derived lack
 explicit statements about this relationship.  The first step of ORT,
 available in CoCoTools as the deduce_edges method of TrGraph, produces
 a new transformation graph with all of the edges of the original graph
 plus the missing deducible ones.
 
->>> pfc_plus = pfc.deduce_edges()
->>> pfc_plus['CP94-13l']['PP94-13']
+>>> mpfc_plus = mpfc.deduce_edges()
+>>> mpfc_plus['CP94-13l']['PP94-13']
 {'PDC': [None], 'TP': [['W40-13']], 'RC': ['S']}
->>> pfc_plus['PP94-13']['CP94-13l']
+>>> mpfc_plus['PP94-13']['CP94-13l']
 {'PDC': [None], 'TP': [['W40-13']], 'RC': ['L']}
 
-pfc_plus correctly claims that CP94-13l is smaller than PP94-13 and
+mpfc_plus correctly claims that CP94-13l is smaller than PP94-13 and
 bases this claim on their relationships to W40-13.
 
-pfc has not been modified, and in fact was frozen before new edges
+mpfc has not been modified, and in fact was frozen before new edges
 were deduced to prevent accidental modification, which would make
-comparisons between it and pfc_plus misleading.
+comparisons between it and mpfc_plus misleading.
 
->>> pfc['CP94-13l'].has_key('PP94-13')
+>>> mpfc['CP94-13l'].has_key('PP94-13')
 False
->>> pfc['PP94-13'].has_key('CP94-13l')
+>>> mpfc['PP94-13'].has_key('CP94-13l')
 False
 
+The next step is to prepare a connectivity graph, which will enter the
+algebra of transformation with the expanded transformation graph.
 
+>>> cpfc = cg.CoGraph()
+
+Like TrGraph, CoGraph is subclassed from DiGraph and has an
+add_edges_from_bmaps method.
+
+>>> cpfc.add_edges_from_bmaps(['PP94', 'CP94', 'W40'])

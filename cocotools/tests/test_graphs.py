@@ -16,17 +16,19 @@ import cocotools.graphs as cg
 # Test Classes
 #------------------------------------------------------------------------------
 
-class TestTrGraph(TestCase):
+class TestCoGraph(TestCase):
 
     def test_update(self):
         a = nx.DiGraph()
         d = a.copy()
         ebunch = {'TP': ['C'], 'RC': 'I'}
-        cg.TrGraph.update.im_func(a, 'A', 'B', ebunch)
+        cg.CoGraph.update.im_func(a, 'A', 'B', ebunch)
         d.add_edge('A', 'B', ebunch)
         for node in ('A', 'B'):
             self.assertEqual(a.edge[node], d.edge[node])
-        
+
+
+class TestTrGraph(TestCase):
 
     def test_rc_res(self):
         rc_res = cg.TrGraph.rc_res
@@ -48,7 +50,6 @@ class TestTrGraph(TestCase):
         self.assertEqual(path_code(g, 'X', ['A', 'B', 'C'], 'Y'), 'SIIL')
         mocker.restore()
         mocker.verify()
-
 
     def test_best_rc(self):
         g = nx.DiGraph()

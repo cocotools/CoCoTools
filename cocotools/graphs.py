@@ -13,24 +13,41 @@ from cocotools.parse_xml import XMLReader
 # Classes
 #------------------------------------------------------------------------------
 
-class TrGraph(nx.DiGraph):
+class CoGraph(nx.DiGraph):
 
-    def __init__(self, bmaps=False):
+    def __init__(self):
         nx.DiGraph.__init__(self)
+        self.table = 'Connectivity'
 
+    def update(self, source, target, edge_attr):
+        if not self.has_edge(source, target):
+            self.add_edge(source, target, edge_attr)
+        else:
+            edge_dict = self[source][target]
+            for key in edge_attr.iterkeys():
+                edge_dict[key].append(edge_attr[key][0])
+    
     def add_edges_from_bmaps(self, bmaps=False):
+        table = self.table
         db = LocalDB()
         if not bmaps:
-            bmaps = db.fetch_bmaps('Mapping')
+            bmaps = db.fetch_bmaps(table)
         for bmap in bmaps:
-            xml = db.fetch_xml('Mapping', bmap)
+            xml = db.fetch_xml(table, bmap)
             if xml:
-                reader = XMLReader('Mapping', xml)
+                reader = XMLReader(table, xml)
             for prim in reader.prim_iterator:
                 source, target, edge_attr = reader.prim2data(prim)
                 edge_attr['TP'] = [[]]
                 self.update(source, target, edge_attr)
+    
 
+class TrGraph(CoGraph):
+
+    def __init__(self):
+        nx.DiGraph.__init__(self)
+        self.table = 'Mapping'
+    
     def tr_path(self, p, node, s):
         bits = {}
         for bit in ((0, p, node), (1, node, s)):
@@ -109,15 +126,6 @@ class TrGraph(nx.DiGraph):
             return rc_res
         else:
             raise ValueError('rc_res has length zero.')
-
-    def update(self, source, target, edge_attr):
-        if not self.has_edge(source, target):
-            self.add_edge(source, target, edge_attr)
-        else:
-            edge_dict = self[source][target]
-            edge_dict['RC'].append(edge_attr['RC'][0])
-            edge_dict['PDC'].append(edge_attr['PDC'][0])
-            edge_dict['TP'].append(edge_attr['TP'][0])
 
     def deduce_edges(self):
         """Deduce new edges based on those in the graph.
