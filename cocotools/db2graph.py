@@ -50,6 +50,25 @@ class TrGraph(nx.DiGraph):
         return bits[0] + [node] + bits[1]
 
     def deduce_edges(self):
+        """Deduce new edges based on those in the graph.
+        
+        Returns
+        -------
+        New TrGraph instance that contains all the current one's edges
+        as well as the additional deduced ones.
+        
+        Notes
+        -----
+        Adding the deduced edges to the current graph is undesirable
+        because the graph would be left in a confusing incomplete state
+        were the process to raise an exception midway.
+
+        The current graph is frozen before any new edges are deduced to
+        prevent its accidental modification, which would cause
+        comparisons between it and the one returned to be misleading.
+
+        """
+        nx.freeze(self)
         nodes = self.nodes_iter()
         for node in nodes:
             ebunch = ()
