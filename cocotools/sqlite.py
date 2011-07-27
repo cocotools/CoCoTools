@@ -1,4 +1,4 @@
-"""Prepare and execute CoCoMac queries, clean up raw XML, and store result."""
+"""Setup and use local sqlite database."""
 
 #-----------------------------------------------------------------------------
 # Imports
@@ -8,13 +8,15 @@
 import urllib
 import urllib2
 import re
-
-# Local
-from cocotools.local_db import LocalDB
+import os
+import sqlite3
 
 #------------------------------------------------------------------------------
 # Constants
 #------------------------------------------------------------------------------
+
+DB_PATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools',
+                       'cocotools.sqlite')
 
 ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'AF42', 'AF45', 'AHGWU00', 'AI92', 'AIC87', 'AM02', 'AM84', 'AP34',
@@ -69,6 +71,68 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 'AC80',
            'YP88', 'YP89', 'YP91b', 'YP93', 'YP94', 'YP95', 'YP97', 'YTHI90',
            'Z69', 'Z71', 'Z73', 'Z77', 'Z78a', 'Z78b', 'Z78c', 'ZR03',
            'ZSCR93']
+
+#------------------------------------------------------------------------------
+# Classes
+#------------------------------------------------------------------------------
+
+class CoCoDBError(Exception):
+    pass
+
+class LocalDB(object):
+
+    def __init__(self, memory=False):
+        if memory:
+            con = sqlite3.connect(':memory:')
+        else:
+            db_dirs = DB_PATH.replace(os.path.basename(DB_PATH), '')
+            if db_dirs and not os.path.exists(db_dirs):
+                os.makedirs(db_dirs)
+            con = sqlite3.connect(DB_PATH)
+        con.text_factory = str
+        con.execute('create table if not exists Mapping (bmap, xml)')
+        con.execute('create table if not exists Connectivity (bmap, xml)')
+        con.commit()
+        self.con = con
+
+    def fetch_xml(self, table, bmap):
+        con = self.con
+        if table == 'Mapping':
+            xml = con.execute('select xml from Mapping where bmap=?',
+                             (bmap,)).fetchall()
+        elif table == 'Connectivity':
+            xml = con.execute('select xml from Connectivity where bmap=?',
+                             (bmap,)).fetchall()
+        else:
+            raise ValueError('invalid table')
+        # Make sure only one row.
+        if len(xml) == 1:
+            # Return first (and only) column of first (and only) row.
+            return xml[0][0]
+        elif len(xml) > 1:
+            raise CoCoDBError('multiple xml entries for bmap %s' % bmap)
+        else:
+            return False
+
+    def fetch_bmaps(self, table):
+        con = self.con
+        if table == 'Mapping':
+            rows = con.execute('select bmap from Mapping').fetchall()
+        elif table == 'Connectivity':
+            rows = con.execute('select bmap from Connectivity').fetchall()
+        else:
+            raise ValueError('invalid table')
+        return [row[0] for row in rows]
+
+    def insert(self, table, bmap, xml):
+        con = self.con
+        if table == 'Mapping':
+            con.execute('insert into Mapping values (?, ?)', (bmap, xml))
+        elif table == 'Connectivity':
+            con.execute('insert into Connectivity values (?, ?)', (bmap, xml))
+        else:
+            raise ValueError('invalid table')
+        con.commit()
 
 #-------------------------------------------------------------------------
 # Functions

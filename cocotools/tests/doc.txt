@@ -6,7 +6,7 @@ in a local sqlite database.  Of the procedures within CoCoTools, only
 the population of this database is subject to the website's
 limitations.
 
->>> from cocotools.query2db import populate_database
+>>> from cocotools.sqlite import populate_database
 
 populate_database queries CoCoMac for Mapping and Connectivity data
 referring to certain BrainMaps and returns a dict detailing which
@@ -48,8 +48,8 @@ al. (2000) and Kotter and Wanke (2005).
 A transformation graph is constructed from the downloaded Mapping data
 using the TrGraph object, a custom subclass of the NetworkX DiGraph.
 
->>> from cocotools.db2graph import TrGraph
->>> pfc = TrGraph()
+>>> import cocotools.graphs as cg
+>>> pfc = cg.TrGraph()
 
 Similar to populate_database, the add_edges_from_bmaps method of
 TrGraph can be called without any arguments (defaulting to all maps

@@ -6,16 +6,38 @@
 from unittest import TestCase
 
 # Local
-from cocotools.local_db import LocalDB, CoCoDBError
+import cocotools.sqlite as cs
 
 #------------------------------------------------------------------------------
 # Test Classes
 #------------------------------------------------------------------------------
 
+class TestScrubXML(TestCase):
+
+    def test_clean_header(self):
+        header = "SELECT  Top 32767  "
+        xmls  = ['<?xml version="1.0" encoding="UTF-8"?>',
+                 '<?xml version="1.0" encoding="UTF-8"?>\n<Header>']
+        for xml in xmls:
+            raw = header+xml
+            clean = cs.scrub_xml(raw)
+            self.assertEqual(cs.scrub_xml(raw), xml)
+            self.assertEqual(cs.scrub_xml(xml), xml)
+            self.assertRaises(ValueError, cs.scrub_xml, header)
+
+    def test_clean_body(self):
+        texts = ['<?xml?>With \xb4junk',
+                 '<?xml?>With <TextPageNumber>\xfc.200</TextPageNumber>']
+        valids = ['<?xml?>With junk',
+                  '<?xml?>With <TextPageNumber>.200</TextPageNumber>']
+        for text, valid in zip(texts, valids):
+            self.assertEqual(cs.scrub_xml(text), valid)
+
+
 class TestDB(TestCase):
 
     def setUp(self):
-        self.db = LocalDB(True)
+        self.db = cs.LocalDB(True)
 
     def tearDown(self):
         self.db = None
@@ -26,7 +48,7 @@ class TestDB(TestCase):
         db.con.execute('insert into Mapping values ("PP99", "1")')
         self.assertEqual(db.fetch_xml('Mapping', 'PP99'), '1')
         db.con.execute('insert into Mapping values ("PP99", "2")')
-        self.assertRaises(CoCoDBError, db.fetch_xml, 'Mapping', 'PP99')
+        self.assertRaises(cs.CoCoDBError, db.fetch_xml, 'Mapping', 'PP99')
 
     def test_fetch_bmaps(self):
         db = self.db
