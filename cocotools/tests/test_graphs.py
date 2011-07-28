@@ -53,9 +53,9 @@ class TestTrGraph(TestCase):
 
     def test_best_rc(self):
         g = nx.DiGraph()
-        ebunch = (('A-1', 'B-1', {'RC': ['O', 'I'], 'PDC': ['A', 'A']}),
-                  ('B-1', 'C-1', {'RC': ['I', 'S'], 'PDC': ['A', 'H']}))
-        g.add_edges_from(ebunch)
+        e = (('A-1', 'B-1', {'RC': ['O', 'I'], 'PDC': ['A', 'A']}),
+             ('B-1', 'C-1', {'RC': ['I', 'S', 'I'], 'PDC': ['H', 'H', 'A']}))
+        g.add_edges_from(e)
         best_rc = cg.TrGraph.best_rc.im_func
         self.assertRaises(ValueError, best_rc, g, 'A-1', 'B-1')
         self.assertEqual(best_rc(g, 'B-1', 'C-1'), 'I')

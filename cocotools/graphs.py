@@ -89,13 +89,18 @@ class TrGraph(CoGraph):
                 best_seen_rank = current_rank
                 best_i = i
             elif current_rank == best_seen_rank and rcs[i] != rcs[best_i]:
-                raise ValueError('Conflicting RCs for (%s, %s)' % (p, s))
+                best_i = (best_i, i)
         try:
-            return rcs[best_i]
+            if len(best_i) > 1:
+                raise ValueError('Conflicting RCs for (%s, %s)' % (p, s))
         except UnboundLocalError:
             # If best_i hasn't been set, there are no PDCs for this edge
             # and any RC is as good as any other.  Return the first one.
             return edge_attr['RC'][0]
+        except TypeError:
+            # If best_i has no len(), it's an int, indicating a single
+            # best.
+            return rcs[best_i]
 
     def path_code(self, p, tp, s):
         best_rc = self.best_rc
