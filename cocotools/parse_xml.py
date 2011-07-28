@@ -39,6 +39,7 @@ class XMLReader(object):
                     edge_attr[datum] = [prim.find(prefix + datum).text]
                 except AttributeError:
                     edge_attr[datum] = [None]
+            edge_attr['TP'] = [[]]
         elif self.prim_tag == 'IntegratedPrimaryProjection':
             site_pdcs = prim.findall(prefix + 'PDC_Site')
             ecs = prim.findall(prefix + 'EC')

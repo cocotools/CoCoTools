@@ -50,4 +50,5 @@ class TestXMLReader(MockerTestCase):
         mocker.result('PrimaryRelation')
         mocker.replay()
         self.assertEqual(cpx.XMLReader.prim2data.im_func(reader, prim),
-                         ('B05-19', 'PP99-19', {'RC': ['I'], 'PDC': ['P']}))
+                         ('B05-19', 'PP99-19',
+                          {'RC': ['I'], 'PDC': ['P'], 'TP': [[]]}))

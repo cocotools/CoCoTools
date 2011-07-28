@@ -38,7 +38,6 @@ class CoGraph(nx.DiGraph):
                 reader = XMLReader(table, xml)
             for prim in reader.prim_iterator:
                 source, target, edge_attr = reader.prim2data(prim)
-                edge_attr['TP'] = [[]]
                 self.update(source, target, edge_attr)
     
 
