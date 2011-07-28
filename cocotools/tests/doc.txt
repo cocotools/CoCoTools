@@ -19,13 +19,14 @@ True, the local database will be created in RAM and not on disk;
 otherwise it is placed in a subdirectory of the directory .cache in
 the user's home directory.
 
->>> failed = populate_database(['PP99', 'PP02'])
-Completed 1 map, 0 conn (2 maps requested)
-Completed 1 map, 1 conn (2 maps requested)
-Completed 2 map, 1 conn (2 maps requested)
-Completed 2 map, 2 conn (2 maps requested)
-Mapping queries failed for []
-Connectivity queries failed for []
+>>> failed = populate_database(['PP99', 'CP95b', 'PP94'])
+... # doctest: +NORMALIZE_WHITESPACE
+Completed 1 map, 0 conn (3 maps requested)
+Completed 1 map, 1 conn (3 maps requested)
+Completed 2 map, 1 conn (3 maps requested)
+Completed 2 map, 2 conn (3 maps requested)
+Completed 3 map, 2 conn (3 maps requested)
+Completed 3 map, 3 conn (3 maps requested)
 >>> failed
 {'Connectivity': [], 'Mapping': []}
 

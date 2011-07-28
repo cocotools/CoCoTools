@@ -4,6 +4,8 @@
 # Imports
 #-----------------------------------------------------------------------------
 
+from __future__ import print_function
+
 # Stdlib
 import urllib
 import urllib2
@@ -213,9 +215,8 @@ def populate_database(maps=False, memory=False):
                 db.insert(search_type, bmap, xml)
             count[search_type] += 1
             print('Completed %d map, %d conn (%d maps requested)' %
-                  (count['Mapping'], count['Connectivity'], len(maps)))
-    print('Mapping queries failed for %s' % str(unable['Mapping']))
-    print('Connectivity queries failed for %s' % str(unable['Connectivity']))
+                  (count['Mapping'], count['Connectivity'], len(maps)),
+                  end='\r')
     return unable
 
 
