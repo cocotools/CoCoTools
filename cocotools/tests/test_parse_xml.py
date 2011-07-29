@@ -18,20 +18,17 @@ import cocotools.parse_xml as cpx
 class TestXMLReader(MockerTestCase):
 
     def setUp(self):
-        f = open('cocotools/tests/sample_map.xml')
-        self.xml_string = f.read()
-        f.seek(0)
-        self.f = f
+        self.xml = open('cocotools/tests/sample_map.xml')
         self.tag_prefix = './/{http://www.cocomac.org}'
 
     def tearDown(self):
-        self.f.close()
+        self.xml.close()
 
-    def test_string2primiter(self):
-        # Because string2primiter is called upon the instantiation of
-        # XMLReader, this will serve as a test of __init__ as well.
+    def test___init__(self):
+        # Because __init__ calls string2primiter, this is a test of
+        # that method as well.
         prefix = self.tag_prefix
-        reader = cpx.XMLReader('Mapping', self.xml_string)
+        reader = cpx.XMLReader('Mapping', self.xml.read())
         self.assertEqual(reader.prim_tag, 'PrimaryRelation')
         self.assertEqual(reader.tag_prefix, prefix)
         self.assertEqual(reader.prim_iterator.next().tag,
@@ -41,7 +38,7 @@ class TestXMLReader(MockerTestCase):
 
     def test_prim2data(self):
         prefix = self.tag_prefix
-        prim = etree.parse(self.f).find('%sPrimaryRelation' % prefix)
+        prim = etree.parse(self.xml).find('%sPrimaryRelation' % prefix)
         mocker = self.mocker
         reader = mocker.mock()
         reader.tag_prefix
