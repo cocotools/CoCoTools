@@ -76,9 +76,12 @@ class TestReGraph(TestCase):
             return attr
         def mock_valid_attr(attr):
             return True
+        def mock_remove_invalid(attr):
+            return attr
         with Replacer() as r:
             r.replace('cocotools.graphs.clean_attr', mock_clean_attr)
             r.replace('cocotools.graphs.valid_attr', mock_valid_attr)
+            r.replace('cocotools.graphs.remove_invalid', mock_remove_invalid)
             g = cg.ReGraph()
             edge_count = g.number_of_edges
             self.assertEqual(edge_count(), 0)
