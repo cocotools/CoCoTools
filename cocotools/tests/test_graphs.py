@@ -17,23 +17,68 @@ import cocotools.graphs as cg
 # Test Classes
 #------------------------------------------------------------------------------
 
-class TestReGraph(TestCase):
+class AttrFunctionsTestCase(TestCase):
 
     def test_valid_attr(self):
-        g = cg.ReGraph()
-        self.assertTrue(g.valid_attr({'RC': ['I']}))
-        self.assertFalse(g.valid_attr({'source_ec': ['X']}))
-        self.assertTrue(g.valid_attr({'source_ec': ['X'], 'target_ec': ['P']}))
-        self.assertFalse(g.valid_attr({'source_ec': [1], 'target_ec': ['P']}))
+        self.assertTrue(cg.valid_attr({'RC': ['I']}))
+        self.assertFalse(cg.valid_attr({'source_ec': ['X']}))
+        good = {'source_ec': ['X'], 'target_ec': ['P']}
+        self.assertTrue(cg.valid_attr(good))
+        bad = {'source_ec': [1], 'target_ec': ['P']}
+        self.assertFalse(cg.valid_attr(bad))
+    
+    def test_clean_attr(self):
+        a = {'RC': ['i'],
+             'PDC': ['A', '-', 'H', None],
+             'source_ec': ['U'],
+             'source_ec_pdc': ['-']}
+        d = {'RC': ['I'],
+             'PDC': ['A', None, 'H', None],
+             'source_ec': [None],
+             'source_ec_pdc': [None]}
+        self.assertEqual(cg.clean_attr(a), d)
+        # A new dict has not been created: a has been altered.
+        self.assertEqual(a, d)
+
+    def test_remove_invalid(self):
+        input_map_attr = {'RC': ['I', None, 'S'],
+                          'PDC': [None, 'A', 'B'],
+                          'TP': [['A'], ['B'], ['C', 'D']]}
+        output_map_attr = {'RC': ['I', 'S'],
+                           'PDC': [None, 'B'],
+                           'TP': [['A'], ['C', 'D']]}
+        self.assertEqual(cg.remove_invalid(input_map_attr), output_map_attr)
+        self.assertEqual(input_map_attr, output_map_attr)
+        input_con_attr = {'source_pdc': ['A', 'H', None],
+                          'source_ec': ['X', None, 'P'],
+                          'source_ec_pdc': ['J', 'C', None],
+                          'target_pdc': ['B', 'K', None],
+                          'target_ec': [None, 'C', 'N'],
+                          'target_ec_pdc': ['H', 'C', None],
+                          'weight': ['X', '-', '1'],
+                          'weight_pdc': ['C', 'A', 'H']}
+        output_con_attr = {'source_pdc': [None],
+                           'source_ec': ['P'],
+                           'source_ec_pdc': [None],
+                           'target_pdc': [None],
+                           'target_ec': ['N'],
+                           'target_ec_pdc': [None],
+                           'weight': ['1'],
+                           'weight_pdc': ['H']}
+        self.assertEqual(cg.remove_invalid(input_con_attr), output_con_attr)
+        self.assertEqual(input_con_attr, output_con_attr)
+
+        
+class TestReGraph(TestCase):
 
     def test_update(self):
-        def mock_clean_attr(self, attr):
+        def mock_clean_attr(attr):
             return attr
-        def mock_valid_attr(self, attr):
+        def mock_valid_attr(attr):
             return True
         with Replacer() as r:
-            r.replace('cocotools.graphs.ReGraph.clean_attr', mock_clean_attr)
-            r.replace('cocotools.graphs.ReGraph.valid_attr', mock_valid_attr)
+            r.replace('cocotools.graphs.clean_attr', mock_clean_attr)
+            r.replace('cocotools.graphs.valid_attr', mock_valid_attr)
             g = cg.ReGraph()
             edge_count = g.number_of_edges
             self.assertEqual(edge_count(), 0)
@@ -44,20 +89,7 @@ class TestReGraph(TestCase):
             g.update('A', 'B', {'TP': [['E']], 'RC': ['I']})
             self.assertEqual(edge, {'TP': [['D'], ['E']], 'RC': ['S', 'I']})
 
-    def test_clean_attr(self):
-        a = {'RC': ['i'],
-             'PDC': ['A', '-', 'H', None],
-             'source_ec': ['U'],
-             'source_ec_pdc': ['-']}
-        d = {'RC': ['I'],
-             'PDC': ['A', None, 'H', None],
-             'source_ec': [None],
-             'source_ec_pdc': [None]}
-        self.assertEqual(cg.ReGraph.clean_attr.im_func(None, a), d)
-        # A new dict has not been created: a has been altered.
-        self.assertEqual(a, d)
-
-
+            
 class TestCoGraph(TestCase):
 
     def test_best_ecs(self):

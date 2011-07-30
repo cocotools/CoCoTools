@@ -41,80 +41,21 @@ class ReGraph(nx.DiGraph):
             count += 1
             print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
 
-    def valid_attr(self, attr):
-        """Return bool corresponding to whether attr has valid ECs or RC."""
-        if 'RC' in attr:
-            for value in attr['RC']:
-                if value in ALLOWED_VALUES['RC']:
-                    return True
-        elif 'source_ec' in attr and 'target_ec' in attr:
-            for label in ('source_ec', 'target_ec'):
-                for value in attr[label]:
-                    if value in ALLOWED_VALUES['EC']:
-                        break
-                else:
-                    return False
-            return True
-        return False
-
     def update(self, source, target, new_attr):
         """Add new edge data to the graph.
 
         First call self.clean_attr(new_attr) and then
         self.valid_attr(new_attr); abort if latter returns False.
         """
-        self.clean_attr(new_attr)
-        if not self.valid_attr(new_attr):
-            return
-        if not self.has_edge(source, target):
-            self.add_edge(source, target, new_attr)
-        else:
-            old_attr = self[source][target]
-            for key, new_value in new_attr.iteritems():
-                old_attr[key] += new_value
+        if valid_attr(remove_invalid(clean_attr(new_attr))):
+            if not self.has_edge(source, target):
+                self.add_edge(source, target, new_attr)
+            else:
+                old_attr = self[source][target]
+                for key, new_value in new_attr.iteritems():
+                    old_attr[key] += new_value
 
-    def clean_attr(self, attr):
-        """Clean invalid entries in attr.
-
-        Lowercase letters of the correct set are capitalized; invalid
-        characters are changed to None.
-
-        Returns
-        -------
-        attr : dict
-          Same as input but with invalid entries changed either to valid
-          ones or None.
-
-        Notes
-        -----
-        attr is modified in place.
-
-        U is a disallowed EC.
-        """
-        lowercase, invalid = [], []
-        for key, values in attr.iteritems():
-            try:
-                allowed_values = ALLOWED_VALUES[key.split('_')[-1].upper()]
-            except KeyError:
-                continue
-            for i, value in enumerate(values):
-                if value not in allowed_values:
-                    try:
-                        possible_correction = value.upper()
-                    except AttributeError:
-                        invalid.append((key, i))
-                    else:
-                        if possible_correction in allowed_values:
-                            lowercase.append((key, i))
-                        else:
-                            invalid.append((key, i))
-        for key, i in lowercase:
-            attr[key][i] = attr[key][i].upper()
-        for key, i in invalid:
-            attr[key][i] = None
-        return attr
-
-
+                    
 class CoGraph(ReGraph):
 
     def __init__(self):
@@ -349,3 +290,89 @@ class TrGraph(CoGraph):
                             attr = {'TP': [tp], 'RC': [rc_res], 'PDC': [None]}
                             g.update(p, s, attr)
         return g
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+def valid_attr(attr):
+    """Return bool corresponding to whether attr has valid ECs or RC."""
+    if 'RC' in attr:
+        for value in attr['RC']:
+            if value in ALLOWED_VALUES['RC']:
+                return True
+    elif 'source_ec' in attr and 'target_ec' in attr:
+        for label in ('source_ec', 'target_ec'):
+            for value in attr[label]:
+                if value in ALLOWED_VALUES['EC']:
+                    break
+            else:
+                return False
+        return True
+    return False
+
+
+def remove_invalid(attr):
+    """Remove entries that share index where RC or EC is invalid."""
+    if 'RC' in attr:
+        bad = []
+        for i, value in enumerate(attr['RC']):
+            if value not in ALLOWED_VALUES['RC']:
+                bad.append(i)
+        for key in attr:
+            for i in bad:
+                attr[key].pop(i)
+    elif 'source_ec' in attr and 'target_ec' in attr:
+        for ec in ('source_ec', 'target_ec'):
+            bad = []
+            for i, value in enumerate(attr[ec]):
+                if value not in ALLOWED_VALUES['EC']:
+                    bad.append(i)
+            for key in attr:
+                for i in bad:
+                    attr[key].pop(i)
+    else:
+        raise ValueError('Attribute dict is missing essential attribute(s).')
+    return attr
+
+
+def clean_attr(attr):
+    """Clean invalid entries in attr.
+
+    Lowercase letters of the correct set are capitalized; invalid
+    characters are changed to None.
+
+    Returns
+    -------
+    attr : dict
+      Same as input but with invalid entries changed either to valid
+      ones or None.
+
+    Notes
+    -----
+    attr is modified in place.
+
+    U is a disallowed EC.
+    """
+    lowercase, invalid = [], []
+    for key, values in attr.iteritems():
+        try:
+            allowed_values = ALLOWED_VALUES[key.split('_')[-1].upper()]
+        except KeyError:
+            continue
+        for i, value in enumerate(values):
+            if value not in allowed_values:
+                try:
+                    possible_correction = value.upper()
+                except AttributeError:
+                    invalid.append((key, i))
+                else:
+                    if possible_correction in allowed_values:
+                        lowercase.append((key, i))
+                    else:
+                        invalid.append((key, i))
+    for key, i in lowercase:
+        attr[key][i] = attr[key][i].upper()
+    for key, i in invalid:
+        attr[key][i] = None
+    return attr
