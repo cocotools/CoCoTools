@@ -44,14 +44,14 @@ class XMLReader(object):
             site_pdcs = prim.findall(prefix + 'PDC_Site')
             ecs = prim.findall(prefix + 'EC')
             ec_pdcs = prim.findall(prefix + 'PDC_EC')
-            edge_attr = {'source_pdc': [site_pdcs[0].text],
-                         'source_ec': [ecs[0].text],
-                         'source_ec_pdc': [ec_pdcs[0].text],
-                         'target_pdc': [site_pdcs[1].text],
-                         'target_ec': [ecs[1].text],
-                         'target_ec_pdc': [ec_pdcs[1].text],
-                         'weight': [prim.find(prefix + 'Degree').text],
-                         'weight_pdc': [prim.find(prefix + 'PDC_Density').text]
+            edge_attr = {'S_PDC': [site_pdcs[0].text],
+                         'S_EC': [ecs[0].text],
+                         'S_EC_PDC': [ec_pdcs[0].text],
+                         'T_PDC': [site_pdcs[1].text],
+                         'T_EC': [ecs[1].text],
+                         'T_EC_PDC': [ec_pdcs[1].text],
+                         'WEIGHT': [prim.find(prefix + 'Degree').text],
+                         'WEIGHT_PDC': [prim.find(prefix + 'PDC_Density').text]
                          }
         else:
             raise ValueError('invalid search type')

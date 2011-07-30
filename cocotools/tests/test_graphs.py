@@ -21,21 +21,21 @@ class AttrFunctionsTestCase(TestCase):
 
     def test_valid_attr(self):
         self.assertTrue(cg.valid_attr({'RC': ['I']}))
-        self.assertFalse(cg.valid_attr({'source_ec': ['X']}))
-        good = {'source_ec': ['X'], 'target_ec': ['P']}
+        self.assertFalse(cg.valid_attr({'S_EC': ['X']}))
+        good = {'S_EC': ['X'], 'T_EC': ['P']}
         self.assertTrue(cg.valid_attr(good))
-        bad = {'source_ec': [1], 'target_ec': ['P']}
+        bad = {'S_EC': [1], 'T_EC': ['P']}
         self.assertFalse(cg.valid_attr(bad))
     
     def test_clean_attr(self):
         a = {'RC': ['i'],
              'PDC': ['A', '-', 'H', None],
-             'source_ec': ['U'],
-             'source_ec_pdc': ['-']}
+             'S_EC': ['U'],
+             'S_EC_PDC': ['-']}
         d = {'RC': ['I'],
              'PDC': ['A', None, 'H', None],
-             'source_ec': [None],
-             'source_ec_pdc': [None]}
+             'S_EC': [None],
+             'S_EC_PDC': [None]}
         self.assertEqual(cg.clean_attr(a), d)
         # A new dict has not been created: a has been altered.
         self.assertEqual(a, d)
@@ -50,18 +50,18 @@ class AttrFunctionsTestCase(TestCase):
         self.assertEqual(cg.remove_invalid(input_map_attr), output_map_attr)
         self.assertEqual(input_map_attr, output_map_attr)
         input_con_attr = {'source_pdc': ['A', 'H', None],
-                          'source_ec': ['X', None, 'P'],
+                          'S_EC': ['X', None, 'P'],
                           'source_ec_pdc': ['J', 'C', None],
                           'target_pdc': ['B', 'K', None],
-                          'target_ec': [None, 'C', 'N'],
+                          'T_EC': [None, 'C', 'N'],
                           'target_ec_pdc': ['H', 'C', None],
                           'weight': ['X', '-', '1'],
                           'weight_pdc': ['C', 'A', 'H']}
         output_con_attr = {'source_pdc': [None],
-                           'source_ec': ['P'],
+                           'S_EC': ['P'],
                            'source_ec_pdc': [None],
                            'target_pdc': [None],
-                           'target_ec': ['N'],
+                           'T_EC': ['N'],
                            'target_ec_pdc': [None],
                            'weight': ['1'],
                            'weight_pdc': ['H']}

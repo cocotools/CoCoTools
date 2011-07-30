@@ -27,6 +27,10 @@ ALLOWED_VALUES = {'PDC': ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G',
 
 class ReGraph(nx.DiGraph):
 
+    def __init__(self):
+        nx.DiGraph.__init__(self)
+        self.crucial = ['S_EC', 'T_EC']
+
     def add_transformed_edges(self, mapp, conn, desired_bmap):
         count = 0
         for source, target in conn.edges():
@@ -35,8 +39,8 @@ class ReGraph(nx.DiGraph):
             new_targets = transform(target, target_ec, desired_bmap)
             for new_source in new_sources:
                 for new_target in new_targets:
-                    new_attr = {'source_ec': new_sources[new_source],
-                                'target_ec': new_targets[new_target]}
+                    new_attr = {'S_EC': new_sources[new_source],
+                                'T_EC': new_targets[new_target]}
                     self.update(new_source, new_target, new_attr)
             count += 1
             print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
@@ -59,7 +63,7 @@ class ReGraph(nx.DiGraph):
 class CoGraph(ReGraph):
 
     def __init__(self):
-        nx.DiGraph.__init__(self)
+        ReGraph.__init__(self)
         self.table = 'Connectivity'
 
     def add_edges_from_bmaps(self, bmaps=False):
@@ -170,6 +174,7 @@ class TrGraph(CoGraph):
     def __init__(self):
         nx.DiGraph.__init__(self)
         self.table = 'Mapping'
+        self.crucial = ['RC']
     
     def tp(self, p, node, s):
         """Return the shortest path from p, through node, to s.
@@ -301,8 +306,8 @@ def valid_attr(attr):
         for value in attr['RC']:
             if value in ALLOWED_VALUES['RC']:
                 return True
-    elif 'source_ec' in attr and 'target_ec' in attr:
-        for label in ('source_ec', 'target_ec'):
+    elif 'S_EC' in attr and 'T_EC' in attr:
+        for label in ('S_EC', 'T_EC'):
             for value in attr[label]:
                 if value in ALLOWED_VALUES['EC']:
                     break
@@ -322,8 +327,8 @@ def remove_invalid(attr):
         for key in attr:
             for i in bad:
                 attr[key].pop(i)
-    elif 'source_ec' in attr and 'target_ec' in attr:
-        for ec in ('source_ec', 'target_ec'):
+    elif 'S_EC' in attr and 'T_EC' in attr:
+        for ec in ('S_EC', 'T_EC'):
             bad = []
             for i, value in enumerate(attr[ec]):
                 if value not in ALLOWED_VALUES['EC']:
@@ -357,7 +362,7 @@ def clean_attr(attr):
     lowercase, invalid = [], []
     for key, values in attr.iteritems():
         try:
-            allowed_values = ALLOWED_VALUES[key.split('_')[-1].upper()]
+            allowed_values = ALLOWED_VALUES[key.split('_')[-1]]
         except KeyError:
             continue
         for i, value in enumerate(values):

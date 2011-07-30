@@ -106,14 +106,17 @@ add_edges_from_bmaps method.
 
 >>> cpfc.add_edges_from_bmaps(['CP95b', 'PP99'])
 >>> cpfc['PP99-9/46d']['PP99-8Ad'] # doctest: +NORMALIZE_WHITESPACE
-{'weight_pdc': [None],
- 'weight': ['X'],
- 'source_ec': ['X'],
- 'source_ec_pdc': [None],
- 'source_pdc': ['A'],
- 'target_pdc': ['C'],
- 'target_ec_pdc': [None],
- 'target_ec': ['X']}
+{'S_PDC': ['A'],
+ 'T_EC_PDC': [None],
+ 'S_EC': ['X'],
+ 'T_EC': ['X'],
+ 'WEIGHT': ['X'],
+ 'S_EC_PDC': [None],
+ 'T_PDC': ['C'],
+ 'WEIGHT_PDC': [None]}
+
+In the edge attributes for CoGraph, S stands for the source node of
+the edge and T for the target node.
 
 A final graph type is needed for the algebra of transformation.
 
