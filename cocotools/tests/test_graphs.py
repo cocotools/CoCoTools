@@ -17,82 +17,75 @@ import cocotools.graphs as cg
 # Test Classes
 #------------------------------------------------------------------------------
 
-class AttrFunctionsTestCase(TestCase):
+class AssertValidAttrConTestCase(TestCase):
 
-    def test_valid_attr(self):
-        self.assertTrue(cg.valid_attr({'RC': ['I']}))
-        self.assertFalse(cg.valid_attr({'S_EC': ['X']}))
-        good = {'S_EC': ['X'], 'T_EC': ['P']}
-        self.assertTrue(cg.valid_attr(good))
-        bad = {'S_EC': [1], 'T_EC': ['P']}
-        self.assertFalse(cg.valid_attr(bad))
+    def setUp(self):
+        self.g = cg.ReGraph()
+        self.valid_attr = {'PDC_Site_Source': ['A'],
+                           'EC_Source': ['P'],
+                           'PDC_EC_Source': ['A'],
+                           'PDC_Site_Target': ['A'],
+                           'EC_Target': ['X'],
+                           'PDC_EC_Target': ['A'],
+                           'Degree': ['X'],
+                           'PDC_Density': ['A']}
+
+    def test_valid(self):
+        self.assertEqual(self.g.assert_valid_attr(self.valid_attr), None)
     
-    def test_clean_attr(self):
-        a = {'RC': ['i'],
-             'PDC': ['A', '-', 'H', None],
-             'S_EC': ['U'],
-             'S_EC_PDC': ['-']}
-        d = {'RC': ['I'],
-             'PDC': ['A', None, 'H', None],
-             'S_EC': [None],
-             'S_EC_PDC': [None]}
-        self.assertEqual(cg.clean_attr(a), d)
-        # A new dict has not been created: a has been altered.
-        self.assertEqual(a, d)
+    def test_missing_key(self):
+        g = self.g
+        missing_crucial = self.valid_attr.copy()
+        missing_crucial.pop('EC_Source')
+        self.assertRaises(ValueError, g.assert_valid_attr, missing_crucial)
+        missing_noncrucial = self.valid_attr
+        self.assertTrue(missing_noncrucial.has_key('EC_Source'))
+        missing_noncrucial.pop('PDC_Site_Source')
+        self.assertRaises(ValueError, g.assert_valid_attr, missing_noncrucial)
 
-    def test_remove_invalid(self):
-        input_map_attr = {'RC': ['I', None, 'S'],
-                          'PDC': [None, 'A', 'B'],
-                          'TP': [['A'], ['B'], ['C', 'D']]}
-        output_map_attr = {'RC': ['I', 'S'],
-                           'PDC': [None, 'B'],
-                           'TP': [['A'], ['C', 'D']]}
-        self.assertEqual(cg.remove_invalid(input_map_attr), output_map_attr)
-        self.assertEqual(input_map_attr, output_map_attr)
-        input_con_attr = {'source_pdc': ['A', 'H', None],
-                          'S_EC': ['X', None, 'P'],
-                          'source_ec_pdc': ['J', 'C', None],
-                          'target_pdc': ['B', 'K', None],
-                          'T_EC': [None, 'C', 'N'],
-                          'target_ec_pdc': ['H', 'C', None],
-                          'weight': ['X', '-', '1'],
-                          'weight_pdc': ['C', 'A', 'H']}
-        output_con_attr = {'source_pdc': [None],
-                           'S_EC': ['P'],
-                           'source_ec_pdc': [None],
-                           'target_pdc': [None],
-                           'T_EC': ['N'],
-                           'target_ec_pdc': [None],
-                           'weight': ['1'],
-                           'weight_pdc': ['H']}
-        self.assertEqual(cg.remove_invalid(input_con_attr), output_con_attr)
-        self.assertEqual(input_con_attr, output_con_attr)
+    def test_invalid_value_group(self):
+        g = self.g
+        nonlist_present = self.valid_attr.copy()
+        nonlist_present['Degree'] = 'X'
+        self.assertRaises(ValueError, g.assert_valid_attr, nonlist_present)
+        multiple_entries = self.valid_attr
+        multiple_entries['EC_Target'] = ['X', 'P']
+        self.assertRaises(ValueError, g.assert_valid_attr, multiple_entries)
 
+    def test_None_noncrucial(self):
+        valid_attr = self.valid_attr
+        none_noncrucial = valid_attr.copy()
+        for key in valid_attr:
+            if key.split('_')[0] != 'EC':
+                none_noncrucial[key] = [None]
+        self.assertEqual(self.g.assert_valid_attr(none_noncrucial), None)
         
-class TestReGraph(TestCase):
+    def test_None_crucial(self):
+        g = self.g
+        none_crucial = self.valid_attr
+        none_crucial['EC_Target'] = [None]
+        self.assertEqual(g.assert_valid_attr(none_crucial), None)
+        none_crucial['EC_Source'] = [None]
+        self.assertRaises(ValueError, g.assert_valid_attr, none_crucial)
 
-    def test_update(self):
-        def mock_clean_attr(attr):
-            return attr
-        def mock_valid_attr(attr):
-            return True
-        def mock_remove_invalid(attr):
-            return attr
-        with Replacer() as r:
-            r.replace('cocotools.graphs.clean_attr', mock_clean_attr)
-            r.replace('cocotools.graphs.valid_attr', mock_valid_attr)
-            r.replace('cocotools.graphs.remove_invalid', mock_remove_invalid)
-            g = cg.ReGraph()
-            edge_count = g.number_of_edges
-            self.assertEqual(edge_count(), 0)
-            g.update('A', 'B', {'TP': [['D']], 'RC': ['S']})
-            self.assertEqual(edge_count(), 1)
-            edge = g['A']['B']
-            self.assertEqual(edge, {'TP': [['D']], 'RC': ['S']})
-            g.update('A', 'B', {'TP': [['E']], 'RC': ['I']})
-            self.assertEqual(edge, {'TP': [['D'], ['E']], 'RC': ['S', 'I']})
+    def test_invalid_value(self):
+        g = self.g
+        valid_attr = self.valid_attr
+        invalid_crucial = valid_attr.copy()
+        invalid_crucial['EC_Target'] = ['x']
+        self.assertRaises(ValueError, g.assert_valid_attr, invalid_crucial)
+        invalid_noncrucial = valid_attr
+        invalid_noncrucial['PDC_Density'] = ['a']
+        self.assertRaises(ValueError, g.assert_valid_attr, invalid_noncrucial)
 
-            
+
+class AssertValidAttrMapTestCase(TestCase):
+
+    def test_valid(self):
+        g = cg.TrGraph()
+        valid_attr = {'RC': ['I'], 'PDC': ['C'], 'TP': [[]]}
+        self.assertEqual(g.assert_valid_attr(valid_attr), None)
+
 class TestCoGraph(TestCase):
 
     def test_best_ecs(self):

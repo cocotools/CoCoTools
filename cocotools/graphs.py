@@ -9,17 +9,7 @@ import networkx as nx
 
 # Local
 from cocotools.sqlite import LocalDB
-from cocotools.parse_xml import XMLReader
-
-#------------------------------------------------------------------------------
-# Constants
-#------------------------------------------------------------------------------
-
-# The lower the index of a letter in PDC, the higher its precision.
-ALLOWED_VALUES = {'PDC': ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G',
-                          'E', 'K', 'I', 'O', 'M', 'P', 'Q', 'R'),
-                  'RC': ('I', 'S', 'L', 'O', 'SO', 'LO', 'ISLO'),
-                  'EC': ('C', 'P', 'X', 'N')}
+from cocotools.parse_xml import XMLReader, ALLOWED_VALUES
 
 #------------------------------------------------------------------------------
 # Classes
@@ -29,7 +19,10 @@ class ReGraph(nx.DiGraph):
 
     def __init__(self):
         nx.DiGraph.__init__(self)
-        self.crucial = ['S_EC', 'T_EC']
+        self.keys = ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 
+                     'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
+                     'Degree', 'PDC_Density')
+        self.crucial = ('EC_Source', 'EC_Target')
 
     def add_transformed_edges(self, mapp, conn, desired_bmap):
         count = 0
@@ -39,25 +32,59 @@ class ReGraph(nx.DiGraph):
             new_targets = transform(target, target_ec, desired_bmap)
             for new_source in new_sources:
                 for new_target in new_targets:
-                    new_attr = {'S_EC': new_sources[new_source],
-                                'T_EC': new_targets[new_target]}
+                    new_attr = {'EC_Source': new_sources[new_source],
+                                'EC_Target': new_targets[new_target]}
                     self.update(new_source, new_target, new_attr)
             count += 1
             print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
 
-    def update(self, source, target, new_attr):
-        """Add new edge data to the graph.
+    def assert_valid_attr(self, attr):
+        """Raise ValueError if attr is invalid.
 
-        First call self.clean_attr(new_attr) and then
-        self.valid_attr(new_attr); abort if latter returns False.
+        To be valid, attr must have all keys in self.keys, and its
+        values must be lists containing one valid entry or None.  For
+        one key in self.crucial, the list cannot contain None.
+
+        Parameters
+        ----------
+        attr : dict
+          Edge attributes
+
+        Notes
+        -----
+        In MapGraphs, the validity of 'TP' entries is not checked.
         """
-        if valid_attr(remove_invalid(clean_attr(new_attr))):
-            if not self.has_edge(source, target):
-                self.add_edge(source, target, new_attr)
-            else:
-                old_attr = self[source][target]
-                for key, new_value in new_attr.iteritems():
-                    old_attr[key] += new_value
+        crucial_count = 0
+        for key in self.keys:
+            try:
+                values = attr[key]
+            except KeyError:
+                raise ValueError('new_attr lacks %s' % key)
+            if not isinstance(values, list) or not len(values) == 1:
+                raise ValueError('%s in new_attr has invalid value' % key)
+            if key == 'TP':
+                return
+            value = values[0]
+            if value:
+                if value in ALLOWED_VALUES[key.split('_')[0]]:
+                    if key in self.crucial:
+                        crucial_count += 1
+                else:
+                    raise ValueError('%s in new_attr has invalid value' % key)
+        if not crucial_count:
+            raise ValueError('Crucial keys in new_attr have value of [None]')
+
+    def update(self, source, target, new_attr):
+        """Add edge data to the graph if it's valid.
+
+        Call self.assert_valid_attr(new_attr) to check validity.
+        """
+        self.assert_valid_attr(new_attr)
+        if not self.has_edge(source, target):
+            self.add_edge(source, target, new_attr)
+        else:
+            for key, new_value in new_attr.iteritems():
+                self[source][target][key] += new_value
 
                     
 class CoGraph(ReGraph):
@@ -172,9 +199,10 @@ class CoGraph(ReGraph):
 class TrGraph(CoGraph):
 
     def __init__(self):
-        nx.DiGraph.__init__(self)
+        ReGraph.__init__(self)
         self.table = 'Mapping'
-        self.crucial = ['RC']
+        self.keys = ('RC', 'PDC', 'TP')
+        self.crucial = ('RC',)
     
     def tp(self, p, node, s):
         """Return the shortest path from p, through node, to s.
@@ -295,89 +323,3 @@ class TrGraph(CoGraph):
                             attr = {'TP': [tp], 'RC': [rc_res], 'PDC': [None]}
                             g.update(p, s, attr)
         return g
-
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
-
-def valid_attr(attr):
-    """Return bool corresponding to whether attr has valid ECs or RC."""
-    if 'RC' in attr:
-        for value in attr['RC']:
-            if value in ALLOWED_VALUES['RC']:
-                return True
-    elif 'S_EC' in attr and 'T_EC' in attr:
-        for label in ('S_EC', 'T_EC'):
-            for value in attr[label]:
-                if value in ALLOWED_VALUES['EC']:
-                    break
-            else:
-                return False
-        return True
-    return False
-
-
-def remove_invalid(attr):
-    """Remove entries that share index where RC or EC is invalid."""
-    if 'RC' in attr:
-        bad = []
-        for i, value in enumerate(attr['RC']):
-            if value not in ALLOWED_VALUES['RC']:
-                bad.append(i)
-        for key in attr:
-            for i in bad:
-                attr[key].pop(i)
-    elif 'S_EC' in attr and 'T_EC' in attr:
-        for ec in ('S_EC', 'T_EC'):
-            bad = []
-            for i, value in enumerate(attr[ec]):
-                if value not in ALLOWED_VALUES['EC']:
-                    bad.append(i)
-            for key in attr:
-                for i in bad:
-                    attr[key].pop(i)
-    else:
-        raise ValueError('Attribute dict is missing essential attribute(s).')
-    return attr
-
-
-def clean_attr(attr):
-    """Clean invalid entries in attr.
-
-    Lowercase letters of the correct set are capitalized; invalid
-    characters are changed to None.
-
-    Returns
-    -------
-    attr : dict
-      Same as input but with invalid entries changed either to valid
-      ones or None.
-
-    Notes
-    -----
-    attr is modified in place.
-
-    U is a disallowed EC.
-    """
-    lowercase, invalid = [], []
-    for key, values in attr.iteritems():
-        try:
-            allowed_values = ALLOWED_VALUES[key.split('_')[-1]]
-        except KeyError:
-            continue
-        for i, value in enumerate(values):
-            if value not in allowed_values:
-                try:
-                    possible_correction = value.upper()
-                except AttributeError:
-                    invalid.append((key, i))
-                else:
-                    if possible_correction in allowed_values:
-                        lowercase.append((key, i))
-                    else:
-                        invalid.append((key, i))
-    for key, i in lowercase:
-        attr[key][i] = attr[key][i].upper()
-    for key, i in invalid:
-        attr[key][i] = None
-    return attr

@@ -106,14 +106,14 @@ add_edges_from_bmaps method.
 
 >>> cpfc.add_edges_from_bmaps(['CP95b', 'PP99'])
 >>> cpfc['PP99-9/46d']['PP99-8Ad'] # doctest: +NORMALIZE_WHITESPACE
-{'S_PDC': ['A'],
- 'T_EC_PDC': [None],
- 'S_EC': ['X'],
- 'T_EC': ['X'],
- 'WEIGHT': ['X'],
- 'S_EC_PDC': [None],
- 'T_PDC': ['C'],
- 'WEIGHT_PDC': [None]}
+{'EC_Target': ['X'],
+ 'Degree': ['X'],
+ 'PDC_Site_Target': ['C'],
+ 'EC_Source': ['X'],
+ 'PDC_EC_Target': [None],
+ 'PDC_Density': [None],
+ 'PDC_Site_Source': ['A'],
+ 'PDC_EC_Source': [None]}
 
 In the edge attributes for CoGraph, S stands for the source node of
 the edge and T for the target node.
