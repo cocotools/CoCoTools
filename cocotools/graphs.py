@@ -34,7 +34,7 @@ class ReGraph(nx.DiGraph):
                 for new_target in new_targets:
                     new_attr = {'EC_Source': new_sources[new_source],
                                 'EC_Target': new_targets[new_target]}
-                    self.update(new_source, new_target, new_attr)
+                    self.add_edge(new_source, new_target, new_attr)
             count += 1
             print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
 
@@ -74,14 +74,14 @@ class ReGraph(nx.DiGraph):
         if not crucial_count:
             raise ValueError('Crucial keys in new_attr have value of [None]')
 
-    def update(self, source, target, new_attr):
+    def add_edge(self, source, target, new_attr):
         """Add edge data to the graph if it's valid.
 
         Call self.assert_valid_attr(new_attr) to check validity.
         """
         self.assert_valid_attr(new_attr)
         if not self.has_edge(source, target):
-            self.add_edge(source, target, new_attr)
+            nx.DiGraph.add_edge.im_func(self, source, target, new_attr)
         else:
             for key, new_value in new_attr.iteritems():
                 self[source][target][key] += new_value
@@ -104,7 +104,7 @@ class CoGraph(ReGraph):
                 reader = XMLReader(table, xml)
             for prim in reader.prim_iterator:
                 source, target, edge_attr = reader.prim2data(prim)
-                self.update(source, target, edge_attr)
+                self.add_edge(source, target, edge_attr)
 
     def best_ecs(self, source, target):
         """Return the most precise ECs available for the edge.
@@ -321,5 +321,5 @@ class TrGraph(CoGraph):
                         rc_res = self.rc_res(tpc)
                         if rc_res:
                             attr = {'TP': [tp], 'RC': [rc_res], 'PDC': [None]}
-                            g.update(p, s, attr)
+                            g.add_edge(p, s, attr)
         return g

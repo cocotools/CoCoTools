@@ -8,7 +8,7 @@ from unittest import TestCase
 # Third party
 import networkx as nx
 from mocker import Mocker, IN, ANY
-from testfixtures import Replacer
+from testfixtures import replace
 
 # Local
 import cocotools.graphs as cg
@@ -145,3 +145,15 @@ class TestTrGraph(TestCase):
         g.add_edges_from(ebunch)
         self.assertEqual(cg.TrGraph.tp.im_func(g, 'A-1', 'B-1', 'C-1'),
                          ['B-1', 'D-1'])
+
+    @replace('cocotools.graphs.ReGraph.assert_valid_attr', lambda s, a: None)
+    def test_add_edge(self):
+        g = cg.TrGraph()
+        attr = {'RC': ['I'], 'PDC': ['A'], 'TP': [[]]}
+        g.add_edge('A-1', 'B-1', attr)
+        self.assertEqual(g.number_of_edges(), 1)
+        self.assertEqual(g['A-1']['B-1'], attr)
+        g.add_edge('A-1', 'B-1', attr)
+        self.assertEqual(g.number_of_edges(), 1)
+        new_attr = {'RC': ['I', 'I'], 'PDC': ['A', 'A'], 'TP': [[], []]}
+        self.assertEqual(g['A-1']['B-1'], new_attr)
