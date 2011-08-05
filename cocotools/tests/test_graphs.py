@@ -11,7 +11,7 @@ from mocker import Mocker, IN, ANY
 from testfixtures import replace
 
 # Local
-import cocotools.graphs as cg
+import cocotools as coco
 
 #------------------------------------------------------------------------------
 # Test Classes
@@ -20,7 +20,7 @@ import cocotools.graphs as cg
 class AssertValidAttrConTestCase(TestCase):
 
     def setUp(self):
-        self.g = cg.ReGraph()
+        self.g = coco.EndGraph()
         self.valid_attr = {'PDC_Site_Source': ['A'],
                            'EC_Source': ['P'],
                            'PDC_EC_Source': ['A'],
@@ -82,11 +82,11 @@ class AssertValidAttrConTestCase(TestCase):
 class AssertValidAttrMapTestCase(TestCase):
 
     def test_valid(self):
-        g = cg.TrGraph()
+        g = coco.MapGraph()
         valid_attr = {'RC': ['I'], 'PDC': ['C'], 'TP': [[]]}
         self.assertEqual(g.assert_valid_attr(valid_attr), None)
 
-class TestCoGraph(TestCase):
+class TestConGraph(TestCase):
 
     def test_best_ecs(self):
         pass
@@ -101,15 +101,15 @@ class TestCoGraph(TestCase):
     #     g.add_edges_from(ebunch)
     #     g['B-1']['B-2']['source_ec_pdc'] = ['C', 'C']
     #     self.assertEqual(g['A-1']['A-2']['source_ec_pdc'][0], '-')
-    #     best_ecs = cg.CoGraph.best_ecs.im_func
+    #     best_ecs = coco.ConGraph.best_ecs.im_func
     #     self.assertEqual(best_ecs(g, 'A-1', 'A-2'), ['P', 'N'])
     #     self.assertRaises(ValueError, best_ecs, g, 'B-1', 'B-2')
 
 
-class TestTrGraph(TestCase):
+class TestMapGraph(TestCase):
 
     def test_rc_res(self):
-        rc_res = cg.TrGraph.rc_res.im_func
+        rc_res = coco.MapGraph.rc_res.im_func
         self.assertEqual(rc_res(None, 'IIISSSIII'), 'S')
         self.assertFalse(rc_res(None, 'LOSL'))
 
@@ -124,7 +124,7 @@ class TestTrGraph(TestCase):
         g.best_rc('C', 'Y')
         mocker.result('L')
         mocker.replay()
-        path_code = cg.TrGraph.path_code.im_func
+        path_code = coco.MapGraph.path_code.im_func
         self.assertEqual(path_code(g, 'X', ['A', 'B', 'C'], 'Y'), 'SIIL')
         mocker.restore()
         mocker.verify()
@@ -134,7 +134,7 @@ class TestTrGraph(TestCase):
         e = (('A-1', 'B-1', {'RC': ['O', 'I'], 'PDC': ['A', 'A']}),
              ('B-1', 'C-1', {'RC': ['I', 'S', 'I'], 'PDC': ['H', 'H', 'A']}))
         g.add_edges_from(e)
-        best_rc = cg.TrGraph.best_rc.im_func
+        best_rc = coco.MapGraph.best_rc.im_func
         self.assertRaises(ValueError, best_rc, g, 'A-1', 'B-1')
         self.assertEqual(best_rc(g, 'B-1', 'C-1'), 'I')
 
@@ -143,12 +143,12 @@ class TestTrGraph(TestCase):
         ebunch = (('A-1', 'B-1', {'TP': [['G-1'], []]}),
                   ('B-1', 'C-1', {'TP': [['D-1'], ['E-1', 'F-1']]}))
         g.add_edges_from(ebunch)
-        self.assertEqual(cg.TrGraph.tp.im_func(g, 'A-1', 'B-1', 'C-1'),
+        self.assertEqual(coco.MapGraph.tp.im_func(g, 'A-1', 'B-1', 'C-1'),
                          ['B-1', 'D-1'])
 
-    @replace('cocotools.graphs.ReGraph.assert_valid_attr', lambda s, a: None)
+    @replace('cocotools.graphs.EndGraph.assert_valid_attr', lambda s, a: None)
     def test_add_edge(self):
-        g = cg.TrGraph()
+        g = coco.MapGraph()
         attr = {'RC': ['I'], 'PDC': ['A'], 'TP': [[]]}
         g.add_edge('A-1', 'B-1', attr)
         self.assertEqual(g.number_of_edges(), 1)

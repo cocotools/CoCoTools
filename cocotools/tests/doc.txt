@@ -8,3 +8,5 @@ Performing Mapping query for CP94
 >>> failures
 []
 
+>>> pfc_map = coco.MapGraph()
+

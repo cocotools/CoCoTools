@@ -14,7 +14,7 @@ from cocotools.query import ALLOWED_VALUES
 # Classes
 #------------------------------------------------------------------------------
 
-class ReGraph(nx.DiGraph):
+class EndGraph(nx.DiGraph):
 
     def __init__(self):
         nx.DiGraph.__init__(self)
@@ -86,10 +86,10 @@ class ReGraph(nx.DiGraph):
                 self[source][target][key] += new_value
 
                     
-class CoGraph(ReGraph):
+class ConGraph(EndGraph):
 
     def __init__(self):
-        ReGraph.__init__(self)
+        EndGraph.__init__(self)
         self.table = 'Connectivity'
 
     def best_ecs(self, source, target):
@@ -182,10 +182,10 @@ class CoGraph(ReGraph):
         # return best_ecs
 
 
-class TrGraph(CoGraph):
+class MapGraph(ConGraph):
 
     def __init__(self):
-        ReGraph.__init__(self)
+        EndGraph.__init__(self)
         self.table = 'Mapping'
         self.keys = ('RC', 'PDC', 'TP')
         self.crucial = ('RC',)
@@ -280,7 +280,7 @@ class TrGraph(CoGraph):
         
         Returns
         -------
-        New TrGraph instance that contains all the current one's edges
+        New MapGraph instance that contains all the current one's edges
         as well as the additional deduced ones.
         
         Notes
