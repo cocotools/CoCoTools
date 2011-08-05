@@ -8,8 +8,7 @@ from __future__ import print_function
 import networkx as nx
 
 # Local
-from cocotools.sqlite import LocalDB
-from cocotools.parse_xml import XMLReader, ALLOWED_VALUES
+from cocotools.query import ALLOWED_VALUES
 
 #------------------------------------------------------------------------------
 # Classes
@@ -92,19 +91,6 @@ class CoGraph(ReGraph):
     def __init__(self):
         ReGraph.__init__(self)
         self.table = 'Connectivity'
-
-    def add_edges_from_bmaps(self, bmaps=False):
-        table = self.table
-        db = LocalDB()
-        if not bmaps:
-            bmaps = db.fetch_bmaps(table)
-        for bmap in bmaps:
-            xml = db.fetch_xml(table, bmap)
-            if xml:
-                reader = XMLReader(table, xml)
-            for prim in reader.prim_iterator:
-                source, target, edge_attr = reader.prim2data(prim)
-                self.add_edge(source, target, edge_attr)
 
     def best_ecs(self, source, target):
         """Return the most precise ECs available for the edge.
