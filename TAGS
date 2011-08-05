@@ -1,75 +1,0 @@
-
-cocotools/at.py,345
-class AT(27,806
-    def __init__(28,824
-    def find_areas(46,1431
-    def reverse_find(66,2075
-    def single_step(88,2747
-    def multi_step(109,3472
-    def iterate_trans_dict(204,6926
-    def get_ec(229,7795
-    def run_one_end(259,8928
-    def add_edge(275,9474
-    def process_one_edge(286,9927
-    def iterate_edges(328,11394
-
-cocotools/db2graph.py,221
-class TrGraph(21,570
-def fetch_cocomac_tree(29,778
-def walk_tree(51,1326
-def full_tag(74,2089
-def nfind(81,2261
-def parse_element(95,2572
-def parse_site(124,3576
-def tree2graph(145,4229
-    def add_edge(188,5830
-
-cocotools/deduce_rcs.py,258
-class Deducer(29,1109
-    def __init__(30,1132
-    def get_word(40,1433
-    def handle_new_edge(63,2111
-    def process_node(109,3895
-    def iterate_nodes(127,4500
-    def determine_rc_res(142,4829
-def no_tpath_dups(207,7819
-def fin_autom(235,8445
-
-cocotools/eliminate_contradictions.py,445
-class Eliminator(15,335
-    def __init__(16,361
-    def paths_blank_same_map(29,690
-    def contradictory_paths(47,1287
-    def keep_track_of_edges_to_remove(69,2113
-    def handleS(171,6351
-    def handleL(194,7163
-    def eliminate_contradiction(233,8605
-    def iterate_nodes(262,9929
-def test_remove_edges(287,10752
-def test_iterate_nodes(328,12692
-def test_paths_blank_same_map(429,16885
-def test_contradictory_paths(448,17611
-
-cocotools/local_db.py,98
-class LocalDB(21,673
-    def __init__(23,697
-    def fetch_xml(39,1305
-    def insert(50,1741
-
-cocotools/ort.py,108
-def remove_nodes(11,275
-def add_tpaths(20,484
-def test_add_tpaths(45,1355
-def test_remove_nodes(58,1742
-
-cocotools/query2db.py,83
-def scrub_xml(77,4657
-def query_cocomac(117,5864
-def populate_database(133,6632
-
-cocotools/sa.py,75
-def relabel_part(20,532
-def make_name_num_dicts(30,811
-def main(38,1008
-
-cocotools/__init__.py,0
