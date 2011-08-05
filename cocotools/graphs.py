@@ -1,41 +1,11 @@
-#------------------------------------------------------------------------------
-# Imports
-#------------------------------------------------------------------------------
-
 from __future__ import print_function
 
-# Third party
 import networkx as nx
 
-# Local
-from cocotools.query import ALLOWED_VALUES
+from cocotools import ALLOWED_VALUES
 
-#------------------------------------------------------------------------------
-# Classes
-#------------------------------------------------------------------------------
 
-class EndGraph(nx.DiGraph):
-
-    def __init__(self):
-        nx.DiGraph.__init__(self)
-        self.keys = ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 
-                     'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
-                     'Degree', 'PDC_Density')
-        self.crucial = ('EC_Source', 'EC_Target')
-
-    def add_transformed_edges(self, mapp, conn, desired_bmap):
-        count = 0
-        for source, target in conn.edges():
-            source_ec, target_ec = conn.best_ecs(source, target)
-            new_sources = transform(source, source_ec, desired_bmap)
-            new_targets = transform(target, target_ec, desired_bmap)
-            for new_source in new_sources:
-                for new_target in new_targets:
-                    new_attr = {'EC_Source': new_sources[new_source],
-                                'EC_Target': new_targets[new_target]}
-                    self.add_edge(new_source, new_target, new_attr)
-            count += 1
-            print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
+class CoCoGraph(nx.DiGraph):
 
     def assert_valid_attr(self, attr):
         """Raise ValueError if attr is invalid.
@@ -85,12 +55,36 @@ class EndGraph(nx.DiGraph):
             for key, new_value in new_attr.iteritems():
                 self[source][target][key] += new_value
 
+
+class EndGraph(CoCoGraph):
+
+    def __init__(self):
+        CoCoGraph.__init__(self)
+        self.keys = ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 
+                     'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
+                     'Degree', 'PDC_Density')
+        self.crucial = ('EC_Source', 'EC_Target')
+
+    def add_transformed_edges(self, mapp, conn, desired_bmap):
+        count = 0
+        for source, target in conn.edges():
+            source_ec, target_ec = conn.best_ecs(source, target)
+            new_sources = transform(source, source_ec, desired_bmap)
+            new_targets = transform(target, target_ec, desired_bmap)
+            for new_source in new_sources:
+                for new_target in new_targets:
+                    new_attr = {'EC_Source': new_sources[new_source],
+                                'EC_Target': new_targets[new_target]}
+                    self.add_edge(new_source, new_target, new_attr)
+            count += 1
+            print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
+
+
                     
-class ConGraph(EndGraph):
+class ConGraph(CoCoGraph):
 
     def __init__(self):
         EndGraph.__init__(self)
-        self.table = 'Connectivity'
 
     def best_ecs(self, source, target):
         """Return the most precise ECs available for the edge.
@@ -182,11 +176,10 @@ class ConGraph(EndGraph):
         # return best_ecs
 
 
-class MapGraph(ConGraph):
+class MapGraph(CoCoGraph):
 
     def __init__(self):
-        EndGraph.__init__(self)
-        self.table = 'Mapping'
+        CoCoGraph.__init__(self)
         self.keys = ('RC', 'PDC', 'TP')
         self.crucial = ('RC',)
     

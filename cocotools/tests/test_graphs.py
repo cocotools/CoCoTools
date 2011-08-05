@@ -1,21 +1,11 @@
-#------------------------------------------------------------------------------
-# Imports
-#------------------------------------------------------------------------------
-
-# Stdlib
 from unittest import TestCase
 
-# Third party
 import networkx as nx
 from mocker import Mocker, IN, ANY
 from testfixtures import replace
 
-# Local
 import cocotools as coco
 
-#------------------------------------------------------------------------------
-# Test Classes
-#------------------------------------------------------------------------------
 
 class AssertValidAttrConTestCase(TestCase):
 
