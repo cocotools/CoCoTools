@@ -1,11 +1,42 @@
 from unittest import TestCase
+from testfixtures import replace
 
 import networkx as nx
+import nose.tools as nt
 from mocker import Mocker, IN, ANY
-from testfixtures import replace
 
 import cocotools as coco
 
+#------------------------------------------------------------------------------
+# CoCoGraph Tests
+#------------------------------------------------------------------------------
+
+@replace('cocotools.graphs.CoCoGraph.assert_valid_attr', lambda s, a: None)
+def test_add_edge():
+    g = coco.CoCoGraph()
+    attr = {'RC': ['I'], 'PDC': ['A'], 'TP': [[]]}
+    g.add_edge('A-1', 'B-1', attr)
+    nt.assert_equal(g.number_of_edges(), 1)
+    nt.assert_equal(g['A-1']['B-1'], attr)
+    g.add_edge('A-1', 'B-1', attr)
+    nt.assert_equal(g.number_of_edges(), 1)
+    new_attr = {'RC': ['I', 'I'], 'PDC': ['A', 'A'], 'TP': [[], []]}
+    nt.assert_equal(g['A-1']['B-1'], new_attr)
+
+    
+@replace('cocotools.graphs.CoCoGraph.assert_valid_attr', lambda s, a: None)
+def test_add_edges_from():
+    g = coco.CoCoGraph()
+    g.add_edges_from([('A', 'B', {'Test': ['1']}),
+                      ('A', 'B', {'Test': ['1']})])
+    nt.assert_equal(g.number_of_edges(), 1)
+    nt.assert_equal(g['A']['B'], {'Test': ['1', '1']})
+    g.add_edges_from([('A', 'B', {'Test': ['2']}),
+                      ('C', 'D', {'Test': ['1']})])
+    nt.assert_equal(g.number_of_edges(), 2)
+    nt.assert_equal(g['A']['B'], {'Test': ['1', '1', '2']})
+    nt.assert_equal(g['C']['D'], {'Test': ['1']})
+    
 
 class AssertValidAttrConTestCase(TestCase):
 
@@ -76,6 +107,16 @@ class AssertValidAttrMapTestCase(TestCase):
         valid_attr = {'RC': ['I'], 'PDC': ['C'], 'TP': [[]]}
         self.assertEqual(g.assert_valid_attr(valid_attr), None)
 
+#------------------------------------------------------------------------------
+# EndGraph Tests
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+# ConGraph Tests
+#------------------------------------------------------------------------------
+
 class TestConGraph(TestCase):
 
     def test_best_ecs(self):
@@ -95,6 +136,9 @@ class TestConGraph(TestCase):
     #     self.assertEqual(best_ecs(g, 'A-1', 'A-2'), ['P', 'N'])
     #     self.assertRaises(ValueError, best_ecs, g, 'B-1', 'B-2')
 
+#------------------------------------------------------------------------------
+# MapGraph Tests
+#------------------------------------------------------------------------------
 
 class TestMapGraph(TestCase):
 
@@ -135,15 +179,3 @@ class TestMapGraph(TestCase):
         g.add_edges_from(ebunch)
         self.assertEqual(coco.MapGraph.tp.im_func(g, 'A-1', 'B-1', 'C-1'),
                          ['B-1', 'D-1'])
-
-    @replace('cocotools.graphs.EndGraph.assert_valid_attr', lambda s, a: None)
-    def test_add_edge(self):
-        g = coco.MapGraph()
-        attr = {'RC': ['I'], 'PDC': ['A'], 'TP': [[]]}
-        g.add_edge('A-1', 'B-1', attr)
-        self.assertEqual(g.number_of_edges(), 1)
-        self.assertEqual(g['A-1']['B-1'], attr)
-        g.add_edge('A-1', 'B-1', attr)
-        self.assertEqual(g.number_of_edges(), 1)
-        new_attr = {'RC': ['I', 'I'], 'PDC': ['A', 'A'], 'TP': [[], []]}
-        self.assertEqual(g['A-1']['B-1'], new_attr)

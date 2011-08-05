@@ -55,6 +55,15 @@ class CoCoGraph(nx.DiGraph):
             for key, new_value in new_attr.iteritems():
                 self[source][target][key] += new_value
 
+    def add_edges_from(self, ebunch):
+        """Add a bunch of edge datasets to the graph if they're valid.
+
+        Overriding DiGraph's method of the same name in this way is
+        necessary.
+        """
+        for (source, target, new_attr) in ebunch:
+            self.add_edge(source, target, new_attr)
+
 
 class EndGraph(CoCoGraph):
 
