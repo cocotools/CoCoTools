@@ -116,21 +116,26 @@ class ConGraph(CoCoGraph):
         4) Choose the majority EC among all the ECs for the node, again
            counting P and C as X.
 
-        If these steps are insufficient, a ValueError is raised so the
+        If these steps are insufficient, ECError is raised so the
         edge can be handled manually.
         """
         edge_attr = self[source][target]
         best_ecs = []
-        for node in ('source', 'target'):
-            ecs = edge_attr['%s_ec' % node]
-            if len(set(ecs)) > 1:
-                ec_pdcs = edge_attr['%s_ec_pdc' % node]
+        for node in ('Source', 'Target'):
+            ecs = edge_attr['EC_%s' % node]
+            unique_ecs = set(ecs) - set([None])
+            if len(unique_ecs) <= 1:
+                try:
+                    best_ecs.append(unique_ecs.pop())
+                except KeyError:
+                    best_ecs.append(None)
+            else:
+                # Proceed through steps 1-4 in docstring.
+                ec_pdcs = edge_attr['PDC_EC_%s' % node]
                 for i, ec_pdc in enumerate(ec_pdcs):
                     pass
+        return best_ecs
                 
-        #     else:
-        #         best_ecs.append(ecs[0])
-            
         #     best_seen_rank = 18
         #     pdcs = edge_attr['%s_pdc' % node]
         #         try:
