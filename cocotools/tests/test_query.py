@@ -42,7 +42,12 @@ def mock__scrub_element(e, attr_tag):
     return 'X'
 
 
+def pdc(pdc):
+    return pdc
+
+
 @replace('cocotools.query._scrub_element', mock__scrub_element)
+@replace('cocotools.utils.PDC', pdc)
 def test__element2edge():
     element2edge = cocoquery._element2edge
     # Mapping
