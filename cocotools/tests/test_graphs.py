@@ -117,25 +117,13 @@ class AssertValidAttrMapTestCase(TestCase):
 # ConGraph Tests
 #------------------------------------------------------------------------------
 
-class TestConGraph(TestCase):
-
-    def test_best_ecs(self):
-        pass
-    #     g = nx.DiGraph()
-    #     edge_attr = {'source_ec': ['X', 'P'],
-    #                  'source_pdc': ['A', 'L'],
-    #                  'source_ec_pdc': ['-', 'C'],
-    #                  'target_ec': ['C', 'N'],
-    #                  'target_pdc': ['J', 'H'],
-    #                  'target_ec_pdc': ['-', '-']}
-    #     ebunch = (('A-1', 'A-2', edge_attr), ('B-1', 'B-2', edge_attr))
-    #     g.add_edges_from(ebunch)
-    #     g['B-1']['B-2']['source_ec_pdc'] = ['C', 'C']
-    #     self.assertEqual(g['A-1']['A-2']['source_ec_pdc'][0], '-')
-    #     best_ecs = coco.ConGraph.best_ecs.im_func
-    #     self.assertEqual(best_ecs(g, 'A-1', 'A-2'), ['P', 'N'])
-    #     self.assertRaises(ValueError, best_ecs, g, 'B-1', 'B-2')
-
+def test_best_ecs():
+    best_ecs = coco.ConGraph.best_ecs.im_func
+    g = nx.DiGraph()
+    # No contradiction.
+    g.add_edge('A', 'B', {'EC_Source': [None, None], 'EC_Target': ['X', None]})
+    nt.assert_equal(best_ecs(g, 'A', 'B'), [None, 'X'])
+    
 #------------------------------------------------------------------------------
 # MapGraph Tests
 #------------------------------------------------------------------------------

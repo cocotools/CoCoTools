@@ -130,65 +130,7 @@ class ConGraph(CoCoGraph):
                     best_ecs.append(unique_ecs.pop())
                 except KeyError:
                     best_ecs.append(None)
-            else:
-                # Proceed through steps 1-4 in docstring.
-                ec_pdcs = edge_attr['PDC_EC_%s' % node]
-                for i, ec_pdc in enumerate(ec_pdcs):
-                    pass
         return best_ecs
-                
-        #     best_seen_rank = 18
-        #     pdcs = edge_attr['%s_pdc' % node]
-        #         try:
-        #             current_rank = PDC_HIERARCHY.index(ec_pdc)
-        #         except ValueError:
-        #             continue
-        #         if current_rank < best_seen_rank:
-        #             best_seen_rank = current_rank
-        #             best_i = i
-        #         elif current_rank == best_seen_rank and ec_pdcs[i] != ec_pdcs[best_i]:
-        #             best_i = (best_i, i)
-        #     try:
-        #         if len(best_i) > 1:
-        #             msg = 'Conflicting ECs for %s of (%s, %s)'
-        #             raise ValueError(msg % (node, source, target))
-        #     except UnboundLocalError:
-        #         # If best_i hasn't been set, there are no PDCs for
-        #         # this node's EC; processing should move to the node's
-        #         # PDCs. 
-        #         for i, pdc in enumerate(pdcs):
-        #             try:
-        #                 current_rank = PDC_HIERARCHY.index(pdc)
-        #             except ValueError:
-        #                 continue
-        #             if current_rank < best_seen_rank:
-        #                 best_seen_rank = current_rank
-        #                 best_i = i
-        #             elif current_rank == best_seen_rank and pdcs[i] != pdcs[best_i]:
-        #                 best_i = (best_i, i)
-        #         try:
-        #             if len(best_i) > 1:
-        #                 msg = 'Conflicting ECs for %s of (%s, %s)'
-        #                 raise ValueError(msg % (node, source, target))
-        #         except UnboundLocalError:
-        #             # If best_i hasn't been set, there are no PDCs for this node
-        #             # and any EC is as good as any other.  Return the first one.
-        #             best_ecs.append(ecs[0])
-        #         except TypeError:
-        #             # If best_i has no len(), it's an int, indicating a single
-        #             # best.
-        #             best_ecs.append(ecs[best_i])
-        #             del current_rank, best_i
-        #         else:
-        #             del current_rank, best_i
-        #     except TypeError:
-        #         # If best_i has no len(), it's an int, indicating a single
-        #         # best.
-        #         best_ecs.append(ecs[best_i])
-        #         del current_rank, best_i
-        #     else:
-        #         del current_rank, best_i
-        # return best_ecs
 
 
 class MapGraph(CoCoGraph):
