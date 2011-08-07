@@ -16,7 +16,7 @@ SPECS = {'Mapping': {'data_set': 'PrimRel', 'tags': ('PrimaryRelation',
                                     'PDC_Density'))}}
 # The lower the index of a letter in PDC, the higher its precision.
 ALLOWED_VALUES = {'PDC': ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G',
-                          'E', 'K', 'I', 'O', 'M', 'P', 'Q', 'R'),
+                          'E', 'K', 'I', 'O', 'M', 'P', 'Q', 'R', None),
                   'RC': ('I', 'S', 'L', 'O', 'SO', 'LO', 'ISLO'),
                   'EC': ('C', 'P', 'X', 'N'),
                   'Degree': ('0', '1', '2', '3', 'X')}
