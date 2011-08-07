@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import networkx as nx
 
-from cocotools import ALLOWED_VALUES
+from cocotools.utils import ALLOWED_VALUES
 
 
 class CoCoGraph(nx.DiGraph):

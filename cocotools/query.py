@@ -4,7 +4,7 @@ import urllib2
 import xml.etree.ElementTree as etree
 from cStringIO import StringIO
 
-from cocotools.utils import CoCoLite
+from cocotools.utils import CoCoLite, ALLOWED_VALUES
 
 
 P = './/{http://www.cocomac.org}'
@@ -14,12 +14,6 @@ SPECS = {'Mapping': {'data_set': 'PrimRel', 'tags': ('PrimaryRelation',
                           'tags': ('IntegratedPrimaryProjection',
                                    ('PDC_Site', 'EC', 'PDC_EC', 'Degree',
                                     'PDC_Density'))}}
-# The lower the index of a letter in PDC, the higher its precision.
-ALLOWED_VALUES = {'PDC': ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G',
-                          'E', 'K', 'I', 'O', 'M', 'P', 'Q', 'R', None),
-                  'RC': ('I', 'S', 'L', 'O', 'SO', 'LO', 'ISLO'),
-                  'EC': ('C', 'P', 'X', 'N'),
-                  'Degree': ('0', '1', '2', '3', 'X')}
 ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 
            'AF42', 'AF45', 'AHGWU00', 'AI92', 'AIC87', 'AM02', 'AM84', 
            'AP84', 'APA83', 'APPC92', 'ASM94', 'B00', 'B05', 'B09', 'B81',
