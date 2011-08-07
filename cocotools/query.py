@@ -4,7 +4,7 @@ import urllib2
 import xml.etree.ElementTree as etree
 from cStringIO import StringIO
 
-from cocotools.cocolite import CoCoLite
+from cocotools.utils import CoCoLite
 
 
 P = './/{http://www.cocomac.org}'

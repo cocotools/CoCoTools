@@ -9,7 +9,7 @@ from testfixtures import replace, Replacer
 
 import nose.tools as nt
 
-from cocotools import cocolite
+from cocotools import utils
 from cocotools import query_cocomac
 
 
@@ -38,9 +38,9 @@ def mock_func(search_type, bmap):
     return
 
 
-@replace('cocotools.cocolite.DBPATH', ':memory:')
+@replace('cocotools.utils.DBPATH', ':memory:')
 def test_CoCoLite():
-    db = cocolite.CoCoLite(mock_func)
+    db = utils.CoCoLite(mock_func)
     # Test that mock_func works as expected.
     nt.assert_equal(db.func(None, None), None)
     nt.assert_equal(db.func('Mapping', 'A'), 'xml Mapping A xml')
@@ -53,7 +53,7 @@ def test_CoCoLite():
     # Test selection with __call__, mocking select_xml.
     with Replacer() as r:
         mock_select_xml = lambda self, s, b: 'stuff'
-        r.replace('cocotools.cocolite.CoCoLite.select_xml', mock_select_xml)
+        r.replace('cocotools.utils.CoCoLite.select_xml', mock_select_xml)
         nt.assert_equal(db('Mapping', 'A'), 'stuff')
     # Test selection when cache has multiple matching entries
     # (select_xml).
