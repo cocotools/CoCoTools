@@ -14,6 +14,18 @@ DBPATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools.sqlite')
 DBDIR = os.path.dirname(DBPATH)
 
 
+class PDC(object):
+
+    def __init__(self, pdc):
+        if pdc not in ALLOWED_VALUES['PDC']:
+            raise ValueError('pdc not in allowed values.')
+        self.pdc = pdc
+
+    def __cmp__(self, other):
+        pdc_hierarchy = ALLOWED_VALUES['PDC']
+        return pdc_hierarchy.index(other.pdc) - pdc_hierarchy.index(self.pdc)
+
+
 class CoCoLite(object):
 
     def __init__(self, func):

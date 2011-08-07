@@ -12,6 +12,25 @@ import nose.tools as nt
 from cocotools import utils
 from cocotools import query_cocomac
 
+#------------------------------------------------------------------------------
+# Test PDC
+#------------------------------------------------------------------------------
+
+def test_PDC():
+    nt.assert_raises(ValueError, utils.PDC, 'X')
+    pdc1 = utils.PDC('A')
+    pdc2 = utils.PDC(None)
+    nt.assert_true(pdc1 > pdc2)
+    nt.assert_true(pdc2 < pdc1)
+    nt.assert_false(pdc1 < pdc2)
+    nt.assert_false(pdc2 > pdc1)
+    nt.assert_not_equal(pdc1, pdc2)
+    pdc3 = utils.PDC('A')
+    nt.assert_equal(pdc1, pdc3)
+
+#------------------------------------------------------------------------------
+# Test query_cocomac
+#------------------------------------------------------------------------------
 
 def mock_url(search_type, bmap):
     return 'http://www.google.com'
@@ -31,6 +50,9 @@ def test_query_cocomac():
     undecorated = query_cocomac.func
     nt.assert_equal(undecorated(None, None), '<!doctype ')
 
+#------------------------------------------------------------------------------
+# Test CoCoLite
+#------------------------------------------------------------------------------
 
 def mock_func(search_type, bmap):
     if search_type and bmap:
