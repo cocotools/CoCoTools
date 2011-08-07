@@ -108,7 +108,8 @@ class ConGraph(CoCoGraph):
 
         1) If none of the tied ECs is N, choose X.
 
-        2) Choose the EC associated with the higher node-PDC.
+        2) Among those tied, choose the EC associated with the higher
+           node-PDC.
 
         3) Choose the majority EC among those tied, counting P and C as
            X.
