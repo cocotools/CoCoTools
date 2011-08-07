@@ -12,18 +12,17 @@ class CoCoGraph(nx.DiGraph):
 
         To be valid, attr must have all keys in self.keys, and its
         values must be lists containing one valid entry or None.  For
-        one key in self.crucial, the list cannot contain None.
+        all keys in self.crucial, the list cannot contain None.
 
         Parameters
         ----------
         attr : dict
-          Edge attributes
+          Edge attributes.
 
         Notes
         -----
         In MapGraphs, the validity of 'TP' entries is not checked.
         """
-        crucial_count = 0
         for key in self.keys:
             try:
                 values = attr[key]
@@ -34,14 +33,10 @@ class CoCoGraph(nx.DiGraph):
             if key == 'TP':
                 return
             value = values[0]
-            if value:
-                if value in ALLOWED_VALUES[key.split('_')[0]]:
-                    if key in self.crucial:
-                        crucial_count += 1
-                else:
-                    raise ValueError('%s in new_attr has invalid value' % key)
-        if not crucial_count:
-            raise ValueError('Crucial keys in new_attr have value of [None]')
+            if value and value not in ALLOWED_VALUES[key.split('_')[0]]:
+                raise ValueError('%s in new_attr has invalid value' % key)
+            if not value and key in self.crucial:
+                raise ValueError('Crucial value evaluates to False.')
 
     def add_edge(self, source, target, new_attr):
         """Add edge data to the graph if it's valid.

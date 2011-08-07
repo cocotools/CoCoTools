@@ -85,8 +85,6 @@ class AssertValidAttrConTestCase(TestCase):
         g = self.g
         none_crucial = self.valid_attr
         none_crucial['EC_Target'] = [None]
-        self.assertEqual(g.assert_valid_attr(none_crucial), None)
-        none_crucial['EC_Source'] = [None]
         self.assertRaises(ValueError, g.assert_valid_attr, none_crucial)
 
     def test_invalid_value(self):
