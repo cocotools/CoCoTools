@@ -8,12 +8,12 @@ from mocker import Mocker, IN, ANY
 import cocotools as coco
 
 #------------------------------------------------------------------------------
-# CoCoGraph Tests
+# _CoCoGraph Tests
 #------------------------------------------------------------------------------
 
-@replace('cocotools.graphs.CoCoGraph.assert_valid_attr', lambda s, a: None)
+@replace('cocotools.graphs._CoCoGraph.assert_valid_attr', lambda s, a: None)
 def test_add_edge():
-    g = coco.CoCoGraph()
+    g = coco.graphs._CoCoGraph()
     attr = {'RC': ['I'], 'PDC': ['A'], 'TP': [[]]}
     g.add_edge('A-1', 'B-1', attr)
     nt.assert_equal(g.number_of_edges(), 1)
@@ -24,9 +24,9 @@ def test_add_edge():
     nt.assert_equal(g['A-1']['B-1'], new_attr)
 
     
-@replace('cocotools.graphs.CoCoGraph.assert_valid_attr', lambda s, a: None)
+@replace('cocotools.graphs._CoCoGraph.assert_valid_attr', lambda s, a: None)
 def test_add_edges_from():
-    g = coco.CoCoGraph()
+    g = coco.graphs._CoCoGraph()
     g.add_edges_from([('A', 'B', {'Test': ['1']}),
                       ('A', 'B', {'Test': ['1']})])
     nt.assert_equal(g.number_of_edges(), 1)

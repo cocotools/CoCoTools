@@ -5,7 +5,7 @@ import networkx as nx
 from cocotools.utils import ALLOWED_VALUES
 
 
-class CoCoGraph(nx.DiGraph):
+class _CoCoGraph(nx.DiGraph):
 
     def assert_valid_attr(self, attr):
         """Raise ValueError if attr is invalid.
@@ -60,10 +60,10 @@ class CoCoGraph(nx.DiGraph):
             self.add_edge(source, target, new_attr)
 
 
-class EndGraph(CoCoGraph):
+class EndGraph(_CoCoGraph):
 
     def __init__(self):
-        CoCoGraph.__init__(self)
+        _CoCoGraph.__init__(self)
         self.keys = ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 
                      'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
                      'Degree', 'PDC_Density')
@@ -85,7 +85,7 @@ class EndGraph(CoCoGraph):
 
 
                     
-class ConGraph(CoCoGraph):
+class ConGraph(_CoCoGraph):
 
     def __init__(self):
         EndGraph.__init__(self)
@@ -128,10 +128,10 @@ class ConGraph(CoCoGraph):
         return best_ecs
 
 
-class MapGraph(CoCoGraph):
+class MapGraph(_CoCoGraph):
 
     def __init__(self):
-        CoCoGraph.__init__(self)
+        _CoCoGraph.__init__(self)
         self.keys = ('RC', 'PDC', 'TP')
         self.crucial = ('RC',)
     
