@@ -5,6 +5,10 @@ import networkx as nx
 from cocotools.utils import ALLOWED_VALUES
 
 
+class ECError(Exception):
+    pass
+
+
 class _CoCoGraph(nx.DiGraph):
 
     def assert_valid_attr(self, attr):
@@ -115,7 +119,8 @@ class ConGraph(_CoCoGraph):
         The solution is to keep EC pairs intact, the strategy adopted
         here.  In the event of a contradiction between pairs, the
         following steps are taken: (Only when one step cannot be
-        completed due to a tie does processing move to the next step.)
+        completed due to a tie does processing move to the next step,
+        with just the tied ECs.)
 
         1) Return the pair with the lowest mean PDC.
 
@@ -126,7 +131,7 @@ class ConGraph(_CoCoGraph):
         3) Return the pair with the most points, giving two points for
            each C or N, one for each P, and zero for each X.
 
-        4) Repeat step two.
+        4) If no EC is N, return (X, X).
 
         5) Raise ECError so the edge can be handled manually.
         """
@@ -137,23 +142,32 @@ class ConGraph(_CoCoGraph):
         pdc_bunches = zip(attr['PDC_Site_Source'], attr['PDC_Site_Target'],
                           attr['PDC_EC_Source'], attr['PDC_EC_Target'])
         ranks = [sum(pdc_bunch) / 4 for pdc_bunch in pdc_bunches]
-        best_ecs = _resolve_ec_contradiction(ecs, ranks)
-        if best_ecs:
-            return best_ecs
+        ecs = [ecs[i] for i, rank in enumerate(ranks) if rank == min(ranks)]
+        if len(set(ecs)) == 1:
+            return ecs[0]
+        s_ecs, t_ecs = zip(*ecs)
+        if len(set(s_ecs)) == 1 and 'N' not in t_ecs:
+            return s_ecs[0], 'X'
+        if len(set(t_ecs)) == 1 and 'N' not in s_ecs:
+            return 'X', t_ecs[0]
+        if 'N' not in s_ecs and 'N' not in t_ecs:
+            return 'X', 'X'
         scores = []
         for pair in ecs:
             score = 0
             for ec in pair:
-                # Score it like golf.  'X' is par.
                 if ec in ('C', 'N'):
-                    score -= 2
+                    score += 2
                 elif ec == 'P':
-                    score -= 1
+                    score += 1
             scores.append(score)
-        best_ecs = _resolve_ec_contradiction(ecs, scores)
-        if best_ecs:
-            return best_ecs
-        raise ECError('Unresolvable tie for (%s, %s)' % (source, target))
+        ecs = [ecs[i] for i, s in enumerate(scores) if s == max(scores)]
+        if len(set(ecs)) == 1:
+            return ecs[0]
+        s_ecs, t_ecs = zip(*ecs)        
+        if 'N' not in s_ecs and 'N' not in t_ecs:
+            return 'X', 'X'
+        raise ECError('Unresolvable tie for (%s, %s).' % (source, target))
                 
 
 class MapGraph(_CoCoGraph):
@@ -282,20 +296,4 @@ class MapGraph(_CoCoGraph):
                             attr = {'TP': [tp], 'RC': [rc_res], 'PDC': [None]}
                             g.add_edge(p, s, attr)
         return g
-
-#------------------------------------------------------------------------------
-# Support Functions
-#------------------------------------------------------------------------------
-
-def _resolve_ec_contradiction(ecs, values):
-    ecs = [ecs[i] for i, value in enumerate(values) if s == min(values)]
-    if len(set(ecs)) == 1:
-        return ecs[0]
-    s_ecs, t_ecs = zip(*ecs)
-    if len(set(s_ecs)) == 1 and 'N' not in t_ecs:
-        return s_ecs[0], 'X'
-    if len(set(t_ecs)) == 1 and 'N' not in s_ecs:
-        return 'X', t_ecs[0]
-    if 'N' not in s_ecs and 'N' not in t_ecs:
-        return 'X', 'X'
 

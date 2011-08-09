@@ -115,12 +115,65 @@ class AssertValidAttrMapTestCase(TestCase):
 # ConGraph Tests
 #------------------------------------------------------------------------------
 
-def test_best_ecs():
-    best_ecs = coco.ConGraph.best_ecs.im_func
-    g = nx.DiGraph()
-    # No contradiction.
-    g.add_edge('A', 'B', {'EC_Source': [None, None], 'EC_Target': ['X', None]})
-    nt.assert_equal(best_ecs(g, 'A', 'B'), [None, 'X'])
+class BestECsTestCase(TestCase):
+
+    def setUp(self):
+        g = nx.DiGraph()
+        a = coco.utils.PDC('A')
+        g.add_edge('A', 'B', {'EC_Source': ['P', 'P', 'P'],
+                              'EC_Target': ['C', 'C', 'C'],
+                              'PDC_EC_Source': [a, a, a],
+                              'PDC_EC_Target': [a, a, a],
+                              'PDC_Site_Source': [a, a, a],
+                              'PDC_Site_Target': [a, a, a]})
+        self.attr = g['A']['B']
+        self.best_ecs = coco.ConGraph.best_ecs.im_func
+        self.args = (g, 'A', 'B')
+        
+    def test_no_contradiction(self):
+        self.assertEqual(self.best_ecs(*self.args), ('P', 'C'))
+
+    def test_step1(self):
+        # Insert contradiction: (P, C) vs. (N, C).
+        self.attr['EC_Source'][1] = 'N'
+        # Make (N, C) less precise.
+        self.attr['PDC_EC_Source'][1] = coco.utils.PDC('B')
+        self.assertEqual(self.best_ecs(*self.args), ('P', 'C'))
+
+    def test_step2a(self):
+        # Insert contradiction: (P, C) vs. (P, P).
+        self.attr['EC_Target'][1] = 'P'
+        # All s_ecs are the same, and no t_ec is N.
+        self.assertEqual(self.best_ecs(*self.args), ('P', 'X'))
+
+    def test_step2b(self):
+        # Insert contradiction: (P, C) vs. (C, C).
+        self.attr['EC_Source'][1] = 'C'
+        # All t_ecs are the same, and no s_ec is N.
+        self.assertEqual(self.best_ecs(*self.args), ('X', 'C'))
+
+    def test_step2c(self):
+        # Insert contradiction: (P, C) vs. (C, P).
+        self.attr['EC_Source'][1] = 'C'
+        self.attr['EC_Target'][1] = 'P'
+        # No EC is N.
+        self.assertEqual(self.best_ecs(*self.args), ('X', 'X'))
+
+    def test_step3(self):
+        # Insert contradiction: (P, C) vs. (N, C).
+        self.attr['EC_Source'][1] = 'N'
+        self.assertEqual(self.best_ecs(*self.args), ('N', 'C'))
+
+    def test_step4(self):
+        # Insert contradiction: (C, P) vs. (P, C) vs. (N, X).
+        self.attr['EC_Source'] = ['C', 'P', 'N']
+        self.attr['EC_Target'] = ['P', 'C', 'X']
+        self.assertEqual(self.best_ecs(*self.args), ('X', 'X'))
+
+    def test_step5(self):
+        # Insert contradiction: (P, C) vs. (P, N)
+        self.attr['EC_Target'][1] = 'N'
+        self.assertRaises(coco.ECError, self.best_ecs, *self.args)
     
 #------------------------------------------------------------------------------
 # MapGraph Tests
