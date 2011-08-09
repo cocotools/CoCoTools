@@ -9,6 +9,10 @@ class ECError(Exception):
     pass
 
 
+class RCError(Exception):
+    pass
+
+
 class _CoCoGraph(nx.DiGraph):
 
     def assert_valid_attr(self, attr):
@@ -167,7 +171,7 @@ class ConGraph(_CoCoGraph):
         s_ecs, t_ecs = zip(*ecs)        
         if 'N' not in s_ecs and 'N' not in t_ecs:
             return 'X', 'X'
-        raise ECError('Unresolvable tie for (%s, %s).' % (source, target))
+        raise ECError('Unresolvable conflict for (%s, %s).' % (source, target))
                 
 
 class MapGraph(_CoCoGraph):
@@ -195,44 +199,16 @@ class MapGraph(_CoCoGraph):
             bits[i] = shortest
         return bits[0] + [node] + bits[1]
 
-    def best_rc(self, p, s):
-        
-        # Each edge has a list of RCs and a list of PDCs.  The index
-        # of the most precise PDC is the same as that of the RC to
-        # which it refers.  Call that index best_i.  To return the
-        # most precise RC, this value must be found.
-
-        # Each PDC will be compared to the most precise one seen so
-        # far; this comparison will be accomplished by reference to
-        # the latter's index in the PDC hierarchy.  Call this index
-        # best_seen_rank, and start it at 18 (one beyond the last in
-        # the hierarchy).
-
-        best_seen_rank = 18
-        edge_attr = self[p][s]
-        pdcs = edge_attr['PDC']
-        rcs = edge_attr['RC']
-        for i, pdc in enumerate(pdcs):
-            try:
-                current_rank = ALLOWED_VALUES['PDC'].index(pdc)
-            except ValueError:
-                continue
-            if current_rank < best_seen_rank:
-                best_seen_rank = current_rank
-                best_i = i
-            elif current_rank == best_seen_rank and rcs[i] != rcs[best_i]:
-                best_i = (best_i, i)
-        try:
-            if len(best_i) > 1:
-                raise ValueError('Conflicting RCs for (%s, %s)' % (p, s))
-        except UnboundLocalError:
-            # If best_i hasn't been set, there are no PDCs for this edge
-            # and any RC is as good as any other.  Return the first one.
-            return edge_attr['RC'][0]
-        except TypeError:
-            # If best_i has no len(), it's an int, indicating a single
-            # best.
-            return rcs[best_i]
+    def best_rc(self, source, target):
+        attr = self[source][target]
+        rcs = attr['RC']
+        if len(set(rcs)) == 1:
+            return rcs[0]
+        ranks = [pdc.rank for pdc in attr['PDC']]
+        rcs = [rcs[i] for i, rank in enumerate(ranks) if rank == min(ranks)]
+        if len(set(rcs)) == 1:
+            return rcs[0]
+        raise RCError('Conflict for (%s, %s).' % (source, target))
 
     def path_code(self, p, tp, s):
         best_rc = self.best_rc

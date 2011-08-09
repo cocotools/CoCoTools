@@ -204,11 +204,13 @@ class TestMapGraph(TestCase):
 
     def test_best_rc(self):
         g = nx.DiGraph()
-        e = (('A-1', 'B-1', {'RC': ['O', 'I'], 'PDC': ['A', 'A']}),
-             ('B-1', 'C-1', {'RC': ['I', 'S', 'I'], 'PDC': ['H', 'H', 'A']}))
+        a = coco.utils.PDC('A')
+        h = coco.utils.PDC('H')
+        e = (('A-1', 'B-1', {'RC': ['O', 'I'], 'PDC': [a, a]}),
+             ('B-1', 'C-1', {'RC': ['I', 'S', 'I'], 'PDC': [h, h, a]}))
         g.add_edges_from(e)
         best_rc = coco.MapGraph.best_rc.im_func
-        self.assertRaises(ValueError, best_rc, g, 'A-1', 'B-1')
+        self.assertRaises(coco.RCError, best_rc, g, 'A-1', 'B-1')
         self.assertEqual(best_rc(g, 'B-1', 'C-1'), 'I')
 
     def test_tp(self):
