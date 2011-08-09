@@ -91,42 +91,70 @@ class ConGraph(_CoCoGraph):
         EndGraph.__init__(self)
 
     def best_ecs(self, source, target):
-        """Return the most precise ECs available for the edge.
+        """Return the most precise EC pair for (source, target).
 
         Notes
         -----
-        Precision matters only when a node has contradictory ECs.  In
-        this case, two PDCs are available to assist a choice: a PDC for
-        the EC and a PDC for the node.  The PDC for the EC is given
-        priority here, but if this produces a tie, processing proceeds
-        through the following steps until a difference is found.
+        For an edge with contradictory ECs, returning the most precise
+        source EC and the most precise target EC without regard for
+        whether they were drawn from the same literature statement would
+        invite errors.  An example illustrates this:
 
-        1) If none of the tied ECs is N, choose X.
+        Say in one study (using a retrograde tracer) region A is
+        injected (EC=C) and no dye is found in region B (EC=N).  In
+        another study (using an anterograde tracer) region B is
+        injected (EC=C), and no dye is found in region A (EC=N).
 
-        2) Among those tied, choose the EC associated with the higher
-           node-PDC.
+        The correct conclusion to make from these complementary studies
+        is that B does not project to A.  However, were the most precise
+        ECs to be C for A (from study one) and C for B (from study two),
+        optimization of the ECs irrespective of the statements to which
+        they belong would incorrectly affirm a connection between the
+        regions.
+        
+        The solution is to keep EC pairs intact, the strategy adopted
+        here.  In the event of a contradiction between pairs, the
+        following steps are taken: (Only when one step cannot be
+        completed due to a tie does processing move to the next step.)
 
-        3) Choose the majority EC among those tied, counting P and C as
-           X.
+        1) Return the pair with the lowest mean PDC.
 
-        4) Choose the majority EC among all the ECs for the node, again
-           counting P and C as X.
+        2) If ECs differ for just one node, and none is N, return X for
+           that node.  If ECs differ for both nodes and none is N,
+           return (X, X).
 
-        If these steps are insufficient, ECError is raised so the
-        edge can be handled manually.
+        3) Return the pair with the most points, giving two points for
+           each C or N, one for each P, and zero for each X.
+
+        4) Repeat step two.
+
+        5) Raise ECError so the edge can be handled manually.
         """
-        edge_attr = self[source][target]
-        best_ecs = []
-        for node in ('Source', 'Target'):
-            ecs = edge_attr['EC_%s' % node]
-            unique_ecs = set(ecs) - set([None])
-            if len(unique_ecs) <= 1:
-                try:
-                    best_ecs.append(unique_ecs.pop())
-                except KeyError:
-                    best_ecs.append(None)
-        return best_ecs
-
+        attr = self[source][target]
+        ecs = zip(attr['EC_Source'], attr['EC_Target'])
+        if len(set(ecs)) == 1:
+            return ecs[0]
+        pdc_bunches = zip(attr['PDC_Site_Source'], attr['PDC_Site_Target'],
+                          attr['PDC_EC_Source'], attr['PDC_EC_Target'])
+        ranks = [sum(pdc_bunch) / 4 for pdc_bunch in pdc_bunches]
+        best_ecs = _resolve_ec_contradiction(ecs, ranks)
+        if best_ecs:
+            return best_ecs
+        scores = []
+        for pair in ecs:
+            score = 0
+            for ec in pair:
+                # Score it like golf.  'X' is par.
+                if ec in ('C', 'N'):
+                    score -= 2
+                elif ec == 'P':
+                    score -= 1
+            scores.append(score)
+        best_ecs = _resolve_ec_contradiction(ecs, scores)
+        if best_ecs:
+            return best_ecs
+        raise ECError('Unresolvable tie for (%s, %s)' % (source, target))
+                
 
 class MapGraph(_CoCoGraph):
 
@@ -254,3 +282,20 @@ class MapGraph(_CoCoGraph):
                             attr = {'TP': [tp], 'RC': [rc_res], 'PDC': [None]}
                             g.add_edge(p, s, attr)
         return g
+
+#------------------------------------------------------------------------------
+# Support Functions
+#------------------------------------------------------------------------------
+
+def _resolve_ec_contradiction(ecs, values):
+    ecs = [ecs[i] for i, value in enumerate(values) if s == min(values)]
+    if len(set(ecs)) == 1:
+        return ecs[0]
+    s_ecs, t_ecs = zip(*ecs)
+    if len(set(s_ecs)) == 1 and 'N' not in t_ecs:
+        return s_ecs[0], 'X'
+    if len(set(t_ecs)) == 1 and 'N' not in s_ecs:
+        return 'X', t_ecs[0]
+    if 'N' not in s_ecs and 'N' not in t_ecs:
+        return 'X', 'X'
+

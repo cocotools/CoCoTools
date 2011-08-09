@@ -20,11 +20,14 @@ class PDC(object):
         if pdc not in ALLOWED_VALUES['PDC']:
             raise ValueError('pdc not in allowed values.')
         self.pdc = pdc
+        self.rank = ALLOWED_VALUES['PDC'].index(pdc)
 
-    def __cmp__(self, other):
-        pdc_hierarchy = ALLOWED_VALUES['PDC']
-        return pdc_hierarchy.index(other.pdc) - pdc_hierarchy.index(self.pdc)
+    def __add__(self, other):
+        return float(self.rank + other.rank)
 
+    def __radd__(self, other):
+        return float(self.rank + other)
+    
 
 class CoCoLite(object):
 

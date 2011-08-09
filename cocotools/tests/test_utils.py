@@ -20,13 +20,8 @@ def test_PDC():
     nt.assert_raises(ValueError, utils.PDC, 'X')
     pdc1 = utils.PDC('A')
     pdc2 = utils.PDC(None)
-    nt.assert_true(pdc1 > pdc2)
-    nt.assert_true(pdc2 < pdc1)
-    nt.assert_false(pdc1 < pdc2)
-    nt.assert_false(pdc2 > pdc1)
-    nt.assert_not_equal(pdc1, pdc2)
-    pdc3 = utils.PDC('A')
-    nt.assert_equal(pdc1, pdc3)
+    pdc3 = utils.PDC('B')
+    nt.assert_equal(sum((pdc1, pdc2, pdc3)), 26.0)
 
 #------------------------------------------------------------------------------
 # Test query_cocomac
