@@ -9,4 +9,6 @@ Performing Mapping query for CP94
 []
 
 >>> pfc_map = coco.MapGraph()
+>>> pfc_map.add_edges_from(ebunch)
+
 

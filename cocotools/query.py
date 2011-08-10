@@ -76,13 +76,14 @@ def _scrub_element(e, attr_tag):
     try:
         datum = datum_e.text
     except AttributeError:
-        return None
+        datum = None
     else:
         datum = datum.upper()
-        if datum in utils.ALLOWED_VALUES[attr_tag.split('_')[0]]:
-            return datum
-        else:
-            return None
+        if datum not in utils.ALLOWED_VALUES[attr_tag.split('_')[0]]:
+            datum = None
+    if 'PDC' in attr_tag:
+        return utils.PDC(datum)
+    return datum
 
 
 def _element2edge(prim_e, search_type):
@@ -113,10 +114,7 @@ def _element2edge(prim_e, search_type):
                 site_e = prim_e.find('%s%sSite' % (P, specifier))
                 datum = _scrub_element(site_e, attr_tag)
                 key = '_'.join((attr_tag, specifier))
-                if 'PDC' not in attr_tag:
-                    edge_attr[key] = datum
-                else:
-                    edge_attr[key] = utils.PDC(datum)
+                edge_attr[key] = datum
             else:
                 datum = _scrub_element(prim_e, attr_tag)
                 edge_attr[attr_tag] = datum

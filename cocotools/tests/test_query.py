@@ -12,11 +12,15 @@ import nose.tools as nt
 import cocotools.query as cocoquery
 
 
+def mock_pdc(pdc):
+    return 'x%sx' % pdc
+
+
+@replace('cocotools.utils.PDC', mock_pdc)
 class ScrubElementTestCase(TestCase):
 
     def setUp(self):
         with open('cocotools/tests/sample_con.xml') as xml:
-            # Switch a value to something incorrect.
             tree = etree.parse(xml)
         self.prim_e = tree.find('%sIntegratedPrimaryProjection' % cocoquery.P)
         self.assertTrue(etree.iselement(self.prim_e))
@@ -33,19 +37,15 @@ class ScrubElementTestCase(TestCase):
         self.assertEqual(cocoquery._scrub_element(self.prim_e, 'XX'), None)
 
     def test_bad_attr_value(self):
-        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'PDC_EC'), None)
+        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'PDC_EC'),
+                         'xNonex')
 
 
 def mock__scrub_element(e, attr_tag):
     return 'X'
 
 
-def pdc(pdc):
-    return pdc
-
-
 @replace('cocotools.query._scrub_element', mock__scrub_element)
-@replace('cocotools.utils.PDC', pdc)
 def test__element2edge():
     element2edge = cocoquery._element2edge
     # Mapping
