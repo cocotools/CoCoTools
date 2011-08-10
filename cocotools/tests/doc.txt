@@ -12,3 +12,18 @@ Performing Mapping query for CP94
 >>> pfc_map.add_edges_from(ebunch)
 
 >>> pfc_map_plus = pfc_map.deduce_edges()
+
+>>> con_bmaps = ['PP99', 'PP02', 'CP95b']
+>>> ebunch, failures = coco.multi_map_ebunch('Connectivity', con_bmaps)
+... # doctest: +NORMALIZE_WHITESPACE
+Performing Connectivity query for PP99
+Performing Connectivity query for PP02
+Performing Connectivity query for CP95b
+
+>>> failures
+[]
+
+>>> pfc_con = coco.ConGraph()
+>>> pfc_con.add_edges_from(ebunch)
+
+>>> result = coco.EndGraph()

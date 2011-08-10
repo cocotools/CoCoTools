@@ -107,7 +107,7 @@ class EndGraph(_CoCoGraph):
 class ConGraph(_CoCoGraph):
 
     def __init__(self):
-        EndGraph.__init__(self)
+        EndGraph.__init__.im_func(self)
 
 
 class MapGraph(_CoCoGraph):
