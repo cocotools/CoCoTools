@@ -118,30 +118,11 @@ class MapGraph(_CoCoGraph):
         self.crucial = ('RC',)
         self.attr_comparators = _pdcs, _tp_len
 
-    def tp(self, p, node, s):
-        """Return the shortest path from p, through node, to s.
-
-        Returns
-        -------
-        list
-          Of nodes, not including p (start point) and s (end point).
-        """
-        bits = {}
-        for i, edge in enumerate([(p, node), (node, s)]):
-            tps = self[edge[0]][edge[1]]['TP']
-            shortest = tps[0]
-            for tp in tps:
-                if len(tp) < len(shortest):
-                    shortest = tp
-            bits[i] = shortest
-        return bits[0] + [node] + bits[1]
-
-    def path_code(self, p, tp, s):
-        best_rc = self.best_rc
+    def tpc(self, p, tp, s):
         middle = ''
         for i in range(len(tp) - 1):
-            middle += best_rc(tp[i], tp[i + 1])
-        return best_rc(p, tp[0]) + middle + best_rc(tp[-1], s)
+            middle += self[tp[i]][tp[i + 1]]['RC']
+        return self[p][tp[0]]['RC'] + middle + self[tp[-1]][s]['RC']
 
     def rc_res(self, tpc):
         """Return RC corresponding to TPC.
@@ -192,8 +173,8 @@ class MapGraph(_CoCoGraph):
             for p in self.predecessors(node):
                 for s in self.successors(node):
                     if p.split('-')[0] != s.split('-')[0]:
-                        tp = self.tp(p, node, s)
-                        tpc = self.path_code(p, tp, s)
+                        tp = self[p][node]['TP'] + [node] + self[node][s]['TP']
+                        tpc = self.tpc(p, tp, s)
                         rc_res = self.rc_res(tpc)
                         if rc_res:
                             attr = {'TP': tp, 'RC': rc_res, 'PDC': PDC(None)}

@@ -3,7 +3,7 @@ from testfixtures import replace
 
 import networkx as nx
 import nose.tools as nt
-from mocker import Mocker, IN, MockerTestCase
+from mocker import MockerTestCase
 
 import cocotools as coco
 
@@ -141,38 +141,19 @@ class AssertValidAttrTestCase(TestCase):
 # MapGraph Tests
 #------------------------------------------------------------------------------
 
-class TestMapGraph(TestCase):
+def test_rc_res():
+    rc_res = coco.MapGraph.rc_res.im_func
+    nt.assert_equal(rc_res(None, 'IIISSSIII'), 'S')
+    nt.assert_false(rc_res(None, 'LOSL'))
+    nt.assert_false(rc_res(None, 'LOS'))
 
-    def test_rc_res(self):
-        rc_res = coco.MapGraph.rc_res.im_func
-        self.assertEqual(rc_res(None, 'IIISSSIII'), 'S')
-        self.assertFalse(rc_res(None, 'LOSL'))
-        self.assertFalse(rc_res(None, 'LOS'))
-
-    def test_path_code(self):
-        mocker = Mocker()
-        g = mocker.mock()
-        g.best_rc(IN(['A', 'B']), IN(['B', 'C']))
-        mocker.result('I')
-        mocker.count(2)
-        g.best_rc('X', 'A')
-        mocker.result('S')
-        g.best_rc('C', 'Y')
-        mocker.result('L')
-        mocker.replay()
-        path_code = coco.MapGraph.path_code.im_func
-        self.assertEqual(path_code(g, 'X', ['A', 'B', 'C'], 'Y'), 'SIIL')
-        mocker.restore()
-        mocker.verify()
-
-    def test_tp(self):
-        g = nx.DiGraph()
-        ebunch = (('A-1', 'B-1', {'TP': [['G-1'], []]}),
-                  ('B-1', 'C-1', {'TP': [['D-1'], ['E-1', 'F-1']]}))
-        g.add_edges_from(ebunch)
-        self.assertEqual(coco.MapGraph.tp.im_func(g, 'A-1', 'B-1', 'C-1'),
-                         ['B-1', 'D-1'])
-
+def test_tpc():
+    g = nx.DiGraph()
+    g.add_edges_from((('X', 'A', {'RC': 'S'}),
+                      ('A', 'B', {'RC': 'I'}),
+                      ('B', 'Y', {'RC': 'L'})))
+    tpc = coco.MapGraph.tpc.im_func
+    nt.assert_equal(tpc(g, 'X', ['A', 'B'], 'Y'), 'SIL')
 
 #------------------------------------------------------------------------------
 # attr_comparator Function Tests
