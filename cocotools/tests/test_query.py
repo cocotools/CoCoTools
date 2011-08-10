@@ -22,20 +22,18 @@ class ScrubElementTestCase(TestCase):
         self.assertTrue(etree.iselement(self.prim_e))
 
     def test_from_prim(self):
-        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'Degree'),
-                         ['0'])
+        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'Degree'), '0')
 
     def test_from_site(self):
         site_e = self.prim_e.find('%sSourceSite' % cocoquery.P)
         self.assertTrue(etree.iselement(site_e))
-        self.assertEqual(cocoquery._scrub_element(site_e, 'EC'), ['N'])
+        self.assertEqual(cocoquery._scrub_element(site_e, 'EC'), 'N')
 
     def test_missing_text(self):
-        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'XX'), [None])
+        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'XX'), None)
 
     def test_bad_attr_value(self):
-        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'PDC_EC'),
-                        [None])
+        self.assertEqual(cocoquery._scrub_element(self.prim_e, 'PDC_EC'), None)
 
 
 def mock__scrub_element(e, attr_tag):
@@ -54,7 +52,7 @@ def test__element2edge():
     with open('cocotools/tests/sample_map.xml') as xml:
         prim_e = etree.parse(xml).find('%sPrimaryRelation' % cocoquery.P)
     nt.assert_true(etree.iselement(prim_e))
-    edge = ('B05-19', 'PP99-19', {'RC': 'X', 'PDC': 'X', 'TP': [[]]})
+    edge = ('B05-19', 'PP99-19', {'RC': 'X', 'PDC': 'X', 'TP': []})
     nt.assert_equal(element2edge(prim_e, 'Mapping'), edge)
     # Connectivity
     with open('cocotools/tests/sample_con.xml') as xml:

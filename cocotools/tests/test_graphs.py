@@ -3,7 +3,7 @@ from testfixtures import replace
 
 import networkx as nx
 import nose.tools as nt
-from mocker import Mocker, IN, ANY
+from mocker import Mocker, IN, MockerTestCase
 
 import cocotools as coco
 
@@ -11,169 +11,131 @@ import cocotools as coco
 # _CoCoGraph Tests
 #------------------------------------------------------------------------------
 
-@replace('cocotools.graphs._CoCoGraph.assert_valid_attr', lambda s, a: None)
+def mock_assert_valid(self, new_attr):
+    pass
+
+
+def mock_best_attr(self, old_attr, new_attr):
+    return old_attr
+
+
+@replace('cocotools.graphs._CoCoGraph.assert_valid_attr', mock_assert_valid)
+@replace('cocotools.graphs._CoCoGraph.best_attr', mock_best_attr)
 def test_add_edge():
     g = coco.graphs._CoCoGraph()
-    attr = {'RC': ['I'], 'PDC': ['A'], 'TP': [[]]}
-    g.add_edge('A-1', 'B-1', attr)
+    g.add_edge('A', 'B', {'Test': 1})
     nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A-1']['B-1'], attr)
-    g.add_edge('A-1', 'B-1', attr)
+    nt.assert_equal(g['A']['B'], {'Test': 1})
+    g.add_edge('A', 'B', {'Test': 2})
     nt.assert_equal(g.number_of_edges(), 1)
-    new_attr = {'RC': ['I', 'I'], 'PDC': ['A', 'A'], 'TP': [[], []]}
-    nt.assert_equal(g['A-1']['B-1'], new_attr)
+    nt.assert_equal(g['A']['B'], {'Test': 1})
 
-    
-@replace('cocotools.graphs._CoCoGraph.assert_valid_attr', lambda s, a: None)
+
+@replace('cocotools.graphs._CoCoGraph.assert_valid_attr', mock_assert_valid)
+@replace('cocotools.graphs._CoCoGraph.best_attr', mock_best_attr)
 def test_add_edges_from():
     g = coco.graphs._CoCoGraph()
-    g.add_edges_from([('A', 'B', {'Test': ['1']}),
-                      ('A', 'B', {'Test': ['1']})])
+    edge1 = ('A', 'B', {'Test': 1})
+    edge2 = ('A', 'B', {'Test': 2})
+    g.add_edges_from((edge1, edge2))
     nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A']['B'], {'Test': ['1', '1']})
-    g.add_edges_from([('A', 'B', {'Test': ['2']}),
-                      ('C', 'D', {'Test': ['1']})])
-    nt.assert_equal(g.number_of_edges(), 2)
-    nt.assert_equal(g['A']['B'], {'Test': ['1', '1', '2']})
-    nt.assert_equal(g['C']['D'], {'Test': ['1']})
-    
+    nt.assert_equal(g['A']['B'], {'Test': 1})
+    g = coco.graphs._CoCoGraph()
+    g.add_edges_from((edge2, edge1))
+    nt.assert_equal(g.number_of_edges(), 1)
+    nt.assert_equal(g['A']['B'], {'Test': 2})
 
-class AssertValidAttrConTestCase(TestCase):
+
+class BestAttrTestCase(MockerTestCase):
 
     def setUp(self):
-        self.g = coco.EndGraph()
-        self.valid_attr = {'PDC_Site_Source': ['A'],
-                           'EC_Source': ['P'],
-                           'PDC_EC_Source': ['A'],
-                           'PDC_Site_Target': ['A'],
-                           'EC_Target': ['X'],
-                           'PDC_EC_Target': ['A'],
-                           'Degree': ['X'],
-                           'PDC_Density': ['A']}
-
-    def test_valid(self):
-        self.assertEqual(self.g.assert_valid_attr(self.valid_attr), None)
-    
-    def test_missing_key(self):
-        g = self.g
-        missing_crucial = self.valid_attr.copy()
-        missing_crucial.pop('EC_Source')
-        self.assertRaises(ValueError, g.assert_valid_attr, missing_crucial)
-        missing_noncrucial = self.valid_attr
-        self.assertTrue(missing_noncrucial.has_key('EC_Source'))
-        missing_noncrucial.pop('PDC_Site_Source')
-        self.assertRaises(ValueError, g.assert_valid_attr, missing_noncrucial)
-
-    def test_invalid_value_group(self):
-        g = self.g
-        nonlist_present = self.valid_attr.copy()
-        nonlist_present['Degree'] = 'X'
-        self.assertRaises(ValueError, g.assert_valid_attr, nonlist_present)
-        multiple_entries = self.valid_attr
-        multiple_entries['EC_Target'] = ['X', 'P']
-        self.assertRaises(ValueError, g.assert_valid_attr, multiple_entries)
-
-    def test_None_noncrucial(self):
-        valid_attr = self.valid_attr
-        none_noncrucial = valid_attr.copy()
-        for key in valid_attr:
-            if key.split('_')[0] != 'EC':
-                none_noncrucial[key] = [None]
-        self.assertEqual(self.g.assert_valid_attr(none_noncrucial), None)
+        self.best_attr = coco.graphs._CoCoGraph.best_attr.im_func
+        self.old = {'Test': 1}
+        self.new = {'Test': 2}
         
+    def test_old_lt_new1(self):
+        mock_g = self.mocker.mock()
+        mock_g.attr_comparators
+        self.mocker.result((lambda o, n: (0, 1), None))
+        self.mocker.replay()
+        self.assertEqual(self.best_attr(mock_g, self.old, self.new), self.old)
+
+    def test_old_gt_new1(self):
+        mock_g = self.mocker.mock()
+        mock_g.attr_comparators
+        self.mocker.result((lambda o, n: (1, 0), None))
+        self.mocker.replay()
+        self.assertEqual(self.best_attr(mock_g, self.old, self.new), self.new)
+
+    def test_old_lt_new2(self):
+        mock_g = self.mocker.mock()
+        mock_g.attr_comparators
+        self.mocker.result((lambda o, n: (0, 0), lambda o, n: (0, 1)))
+        self.mocker.replay()
+        self.assertEqual(self.best_attr(mock_g, self.old, self.new), self.old)
+
+    def test_old_gt_new2(self):
+        mock_g = self.mocker.mock()
+        mock_g.attr_comparators
+        self.mocker.result((lambda o, n: (0, 0), lambda o, n: (1, 0)))
+        self.mocker.replay()
+        self.assertEqual(self.best_attr(mock_g, self.old, self.new), self.new)
+
+    def test_no_diff(self):
+        mock_g = self.mocker.mock()
+        mock_g.attr_comparators
+        self.mocker.result((lambda o, n: (0, 0), lambda o, n: (0, 0)))
+        self.mocker.replay()
+        self.assertEqual(self.best_attr(mock_g, self.old, self.new), self.old)
+
+
+class AssertValidAttrTestCase(TestCase):
+
+    def setUp(self):
+        self.assert_valid = coco.graphs._CoCoGraph.assert_valid_attr.im_func
+        def mock_g():
+            pass
+        self.g = mock_g
+        self.g.keys = ('EC', 'PDC', 'TP')
+        self.g.crucial = ('EC',)
+
+    def test_missing_key(self):
+        attr = {'EC': 'X', 'PDC': coco.utils.PDC(None)}
+        self.assertRaises(KeyError, self.assert_valid, self.g, attr)
+
+    def test_tp_not_list(self):
+        attr = {'EC': 'X', 'PDC': coco.utils.PDC(None), 'TP': 'B'}
+        self.assertRaises(AssertionError, self.assert_valid, self.g, attr)
+
+    def test_pdc_invalid(self):
+        attr = {'EC': 'X', 'PDC': 'A', 'TP': []}
+        self.assertRaises(AssertionError, self.assert_valid, self.g, attr)
+        attr = {'EC': 'X', 'PDC': None, 'TP': []}
+        self.assertRaises(AssertionError, self.assert_valid, self.g, attr)
+
+    def test_other_invalid(self):
+        attr = {'TP': [], 'EC': 'x', 'PDC': coco.utils.PDC(None)}
+        self.assertRaises(ValueError, self.assert_valid, self.g, attr)
+
     def test_None_crucial(self):
-        g = self.g
-        none_crucial = self.valid_attr
-        none_crucial['EC_Target'] = [None]
-        self.assertRaises(ValueError, g.assert_valid_attr, none_crucial)
-
-    def test_invalid_value(self):
-        g = self.g
-        valid_attr = self.valid_attr
-        invalid_crucial = valid_attr.copy()
-        invalid_crucial['EC_Target'] = ['x']
-        self.assertRaises(ValueError, g.assert_valid_attr, invalid_crucial)
-        invalid_noncrucial = valid_attr
-        invalid_noncrucial['PDC_Density'] = ['a']
-        self.assertRaises(ValueError, g.assert_valid_attr, invalid_noncrucial)
-
-
-class AssertValidAttrMapTestCase(TestCase):
+        attr = {'EC': None, 'PDC': coco.utils.PDC(None), 'TP': []}
+        self.assertRaises(ValueError, self.assert_valid, self.g, attr)
 
     def test_valid(self):
-        g = coco.MapGraph()
-        valid_attr = {'RC': ['I'], 'PDC': ['C'], 'TP': [[]]}
-        self.assertEqual(g.assert_valid_attr(valid_attr), None)
-
+        attr = {'EC': 'X', 'PDC': coco.utils.PDC(None), 'TP': ['B']}
+        self.assertEqual(self.assert_valid(self.g, attr), None)
+    
 #------------------------------------------------------------------------------
 # EndGraph Tests
 #------------------------------------------------------------------------------
 
-
+        
 
 #------------------------------------------------------------------------------
 # ConGraph Tests
 #------------------------------------------------------------------------------
 
-class BestECsTestCase(TestCase):
-
-    def setUp(self):
-        g = nx.DiGraph()
-        a = coco.utils.PDC('A')
-        g.add_edge('A', 'B', {'EC_Source': ['P', 'P', 'P'],
-                              'EC_Target': ['C', 'C', 'C'],
-                              'PDC_EC_Source': [a, a, a],
-                              'PDC_EC_Target': [a, a, a],
-                              'PDC_Site_Source': [a, a, a],
-                              'PDC_Site_Target': [a, a, a]})
-        self.attr = g['A']['B']
-        self.best_ecs = coco.ConGraph.best_ecs.im_func
-        self.args = (g, 'A', 'B')
-        
-    def test_no_contradiction(self):
-        self.assertEqual(self.best_ecs(*self.args), ('P', 'C'))
-
-    def test_step1(self):
-        # Insert contradiction: (P, C) vs. (N, C).
-        self.attr['EC_Source'][1] = 'N'
-        # Make (N, C) less precise.
-        self.attr['PDC_EC_Source'][1] = coco.utils.PDC('B')
-        self.assertEqual(self.best_ecs(*self.args), ('P', 'C'))
-
-    def test_step2a(self):
-        # Insert contradiction: (P, C) vs. (P, P).
-        self.attr['EC_Target'][1] = 'P'
-        # All s_ecs are the same, and no t_ec is N.
-        self.assertEqual(self.best_ecs(*self.args), ('P', 'X'))
-
-    def test_step2b(self):
-        # Insert contradiction: (P, C) vs. (C, C).
-        self.attr['EC_Source'][1] = 'C'
-        # All t_ecs are the same, and no s_ec is N.
-        self.assertEqual(self.best_ecs(*self.args), ('X', 'C'))
-
-    def test_step2c(self):
-        # Insert contradiction: (P, C) vs. (C, P).
-        self.attr['EC_Source'][1] = 'C'
-        self.attr['EC_Target'][1] = 'P'
-        # No EC is N.
-        self.assertEqual(self.best_ecs(*self.args), ('X', 'X'))
-
-    def test_step3(self):
-        # Insert contradiction: (P, C) vs. (N, C).
-        self.attr['EC_Source'][1] = 'N'
-        self.assertEqual(self.best_ecs(*self.args), ('N', 'C'))
-
-    def test_step4(self):
-        # Insert contradiction: (C, P) vs. (P, C) vs. (N, X).
-        self.attr['EC_Source'] = ['C', 'P', 'N']
-        self.attr['EC_Target'] = ['P', 'C', 'X']
-        self.assertEqual(self.best_ecs(*self.args), ('X', 'X'))
-
-    def test_step5(self):
-        # Insert contradiction: (P, C) vs. (P, N)
-        self.attr['EC_Target'][1] = 'N'
-        self.assertRaises(coco.ECError, self.best_ecs, *self.args)
+    
     
 #------------------------------------------------------------------------------
 # MapGraph Tests
@@ -185,6 +147,7 @@ class TestMapGraph(TestCase):
         rc_res = coco.MapGraph.rc_res.im_func
         self.assertEqual(rc_res(None, 'IIISSSIII'), 'S')
         self.assertFalse(rc_res(None, 'LOSL'))
+        self.assertFalse(rc_res(None, 'LOS'))
 
     def test_path_code(self):
         mocker = Mocker()
@@ -202,17 +165,6 @@ class TestMapGraph(TestCase):
         mocker.restore()
         mocker.verify()
 
-    def test_best_rc(self):
-        g = nx.DiGraph()
-        a = coco.utils.PDC('A')
-        h = coco.utils.PDC('H')
-        e = (('A-1', 'B-1', {'RC': ['O', 'I'], 'PDC': [a, a]}),
-             ('B-1', 'C-1', {'RC': ['I', 'S', 'I'], 'PDC': [h, h, a]}))
-        g.add_edges_from(e)
-        best_rc = coco.MapGraph.best_rc.im_func
-        self.assertRaises(coco.RCError, best_rc, g, 'A-1', 'B-1')
-        self.assertEqual(best_rc(g, 'B-1', 'C-1'), 'I')
-
     def test_tp(self):
         g = nx.DiGraph()
         ebunch = (('A-1', 'B-1', {'TP': [['G-1'], []]}),
@@ -220,3 +172,39 @@ class TestMapGraph(TestCase):
         g.add_edges_from(ebunch)
         self.assertEqual(coco.MapGraph.tp.im_func(g, 'A-1', 'B-1', 'C-1'),
                          ['B-1', 'D-1'])
+
+
+#------------------------------------------------------------------------------
+# attr_comparator Function Tests
+#------------------------------------------------------------------------------
+
+def test__mean_pdcs():
+    old_attr = {'PDC_Site_Source': coco.utils.PDC('A'),
+                'PDC_Site_Target': coco.utils.PDC(None),
+                'PDC_EC_Source': coco.utils.PDC('H'),
+                'PDC_EC_Target': coco.utils.PDC('J')}
+    new_attr = {'PDC_Site_Source': coco.utils.PDC('C'),
+                'PDC_Site_Target': coco.utils.PDC('Q'),
+                'PDC_EC_Source': coco.utils.PDC('R'),
+                'PDC_EC_Target': coco.utils.PDC('D')}
+    nt.assert_equal(coco.graphs._mean_pdcs(old_attr, new_attr), [6.5, 9.5])
+
+
+def test__ec_points():
+    old_attr = {'EC_Source': 'C', 'EC_Target': 'X'}
+    new_attr = {'EC_Source': 'P', 'EC_Target': 'N'}
+    nt.assert_equal(coco.graphs._ec_points(old_attr, new_attr), [-2, -3])
+
+
+def test__pdcs():
+    a = coco.utils.PDC('A')
+    none = coco.utils.PDC(None)
+    old_attr = {'PDC': a}
+    new_attr = {'PDC': none}
+    nt.assert_equal(coco.graphs._pdcs(old_attr, new_attr), (a, none))
+
+
+def test__tp_len():
+    old_attr = {'TP': ['A', 'B', 'C']}
+    new_attr = {'TP': []}
+    nt.assert_equal(coco.graphs._tp_len(old_attr, new_attr), (3, 0))

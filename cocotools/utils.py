@@ -27,6 +27,9 @@ class PDC(object):
 
     def __radd__(self, other):
         return float(self.rank + other)
+
+    def __cmp__(self, other):
+        return self.rank - other.rank
     
 
 class CoCoLite(object):

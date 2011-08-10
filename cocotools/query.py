@@ -76,13 +76,13 @@ def _scrub_element(e, attr_tag):
     try:
         datum = datum_e.text
     except AttributeError:
-        return [None]
+        return None
     else:
         datum = datum.upper()
         if datum in utils.ALLOWED_VALUES[attr_tag.split('_')[0]]:
-            return [datum]
+            return datum
         else:
-            return [None]
+            return None
 
 
 def _element2edge(prim_e, search_type):
@@ -121,7 +121,7 @@ def _element2edge(prim_e, search_type):
                 datum = _scrub_element(prim_e, attr_tag)
                 edge_attr[attr_tag] = datum
     if search_type == 'Mapping':
-        edge_attr['TP'] = [[]]
+        edge_attr['TP'] = []
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text, site_ids[1].text, edge_attr
 

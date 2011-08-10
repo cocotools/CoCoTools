@@ -22,6 +22,7 @@ def test_PDC():
     pdc2 = utils.PDC(None)
     pdc3 = utils.PDC('B')
     nt.assert_equal(sum((pdc1, pdc2, pdc3)), 26.0)
+    nt.assert_true(pdc1 < pdc3 < pdc2)
 
 #------------------------------------------------------------------------------
 # Test query_cocomac
