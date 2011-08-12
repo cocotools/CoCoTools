@@ -1,4 +1,4 @@
-"""Tests for classes in utils.
+pp"""Tests for classes in utils.
 
 A test for query_cocomac from the query module is also included as CoCoLite
 decorates it.
@@ -11,18 +11,6 @@ import nose.tools as nt
 
 from cocotools import utils
 from cocotools import query_cocomac
-
-#------------------------------------------------------------------------------
-# Test PDC
-#------------------------------------------------------------------------------
-
-def test_PDC():
-    nt.assert_raises(ValueError, utils.PDC, 'X')
-    pdc1 = utils.PDC('A')
-    pdc2 = utils.PDC(None)
-    pdc3 = utils.PDC('B')
-    nt.assert_equal(sum((pdc1, pdc2, pdc3)), 26.0)
-    nt.assert_true(pdc1 < pdc3 < pdc2)
 
 #------------------------------------------------------------------------------
 # Test query_cocomac

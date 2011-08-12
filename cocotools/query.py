@@ -82,7 +82,7 @@ def _scrub_element(e, attr_tag):
         if datum not in utils.ALLOWED_VALUES[attr_tag.split('_')[0]]:
             datum = None
     if 'PDC' in attr_tag:
-        return utils.PDC(datum)
+        return utils.ALLOWED_VALUES['PDC'].index(datum)
     return datum
 
 
