@@ -24,6 +24,11 @@ class _CoCoGraph(nx.DiGraph):
         attr : dict
           Edge attributes.
         """
+        if self.crucial == 'Degree':
+            deg = attr['Degree']
+            ecs = [attr['EC_Source'], attr['EC_Target']]
+            if (deg == '0' and 'N' not in ecs) or (deg != '0' and 'N' in ecs):
+                raise ValueError('Degree contradicts ECs.')
         for key in self.keys:
             value = attr[key]
             if 'PDC' in key:
