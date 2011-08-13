@@ -19,16 +19,13 @@ class _CoCoGraph(nx.DiGraph):
 
         For MapGraphs, the relations assumed by TP must exist.
 
+        For ConGraphs and EndGraphs, Degree cannot contradict ECs.
+
         Parameters
         ----------
         attr : dict
           Edge attributes.
         """
-        if self.crucial == 'Degree':
-            deg = attr['Degree']
-            ecs = [attr['EC_Source'], attr['EC_Target']]
-            if (deg == '0' and 'N' not in ecs) or (deg != '0' and 'N' in ecs):
-                raise ValueError('Degree contradicts ECs.')
         for key in self.keys:
             value = attr[key]
             if 'PDC' in key:
@@ -42,6 +39,12 @@ class _CoCoGraph(nx.DiGraph):
                     for i in range(len(full_tp) - 1):
                         assert self.has_edge(full_tp[i], full_tp[i + 1])
                 continue
+            if key == 'Degree':
+                deg = attr[key]
+                ecs = [attr['EC_Source'], attr['EC_Target']]
+                if (deg == '0' and 'N' not in ecs) or (deg != '0' and 'N'
+                                                       in ecs):
+                    raise ValueError('Degree contradicts ECs.')
             if value and value not in ALLOWED_VALUES[key.split('_')[0]]:
                 raise ValueError('invalid %s: %s' % (key, value))
             if not value and key == self.crucial:
