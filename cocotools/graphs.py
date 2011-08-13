@@ -196,8 +196,7 @@ class MapGraph(_CoCoGraph):
 
     def deduce_edges(self):
         """Deduce new edges based on those in the graph and add them."""
-        nodes = self.nodes_iter()
-        for node in nodes:
+        for node in self.nodes_iter():
             ebunch = []
             for p in self.predecessors(node):
                 for s in self.successors(node):
