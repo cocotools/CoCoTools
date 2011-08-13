@@ -71,6 +71,10 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80',
            'BP82', 'AP34', 'YTHI90', 'PP94', 'L33', 'JCH78']
 
 
+class CoCoError(Exception):
+    pass
+
+
 def _scrub_element(e, attr_tag):
     datum_e = e.find('%s%s' % (P, attr_tag))
     try:
@@ -120,6 +124,11 @@ def _element2edge(prim_e, search_type):
                 edge_attr[attr_tag] = datum
     if search_type == 'Mapping':
         edge_attr['TP'] = []
+    else:
+        deg = edge_attr['Degree']
+        ecs = [edge_attr['EC_Source'], edge_attr['EC_Target']]
+        if (deg == '0' and 'N' not in ecs) or (deg != '0' and 'N' in ecs):
+            raise CoCoError('bad xml')
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text, site_ids[1].text, edge_attr
 
@@ -203,8 +212,14 @@ def single_map_ebunch(search_type, bmap):
     if xml:
         tree = _element_tree(xml)
         ebunch = []
+        count = 0
         for prim in tree.iterfind('%s%s' % (P, SPECS[search_type]['tags'][0])):
-            ebunch.append(_element2edge(prim, search_type))
+            count += 1
+            try:
+                ebunch.append(_element2edge(prim, search_type))
+            except CoCoError:
+                raise CoCoError('Bad Connectivity XML for %s: entry #%d.' %
+                                (bmap, count))
         return ebunch
 
 
