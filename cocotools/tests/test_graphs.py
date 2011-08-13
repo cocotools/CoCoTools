@@ -16,7 +16,7 @@ class AssertValidEdgeTestCase(TestCase):
         self.assert_valid = coco.graphs._CoCoGraph.assert_valid_edge.im_func
         self.g = nx.DiGraph()
         self.g.keys = ('EC', 'PDC', 'TP')
-        self.g.crucial = ('EC',)
+        self.g.crucial = 'EC'
 
     def test_missing_key(self):
         attr = {'EC': 'X', 'PDC': 3}

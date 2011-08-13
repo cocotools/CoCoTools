@@ -14,8 +14,8 @@ class _CoCoGraph(nx.DiGraph):
         """Raise error if attr is invalid.
 
         To be valid, attr must have all keys in self.keys, and its
-        values must be valid or None.  For all keys in self.crucial,
-        values cannot contain None.
+        values must be valid or None.  For self.crucial, the value
+        cannot contain None.
 
         For MapGraphs, the relations assumed by TP must exist.
 
@@ -39,7 +39,7 @@ class _CoCoGraph(nx.DiGraph):
                 continue
             if value and value not in ALLOWED_VALUES[key.split('_')[0]]:
                 raise ValueError('invalid %s: %s' % (key, value))
-            if not value and key in self.crucial:
+            if not value and key == self.crucial:
                 raise ValueError('invalid %s: %s' % (key, value))
 
     def add_edge(self, source, target, new_attr):
@@ -99,7 +99,7 @@ class ConGraph(_CoCoGraph):
         self.keys = ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 
                      'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
                      'Degree', 'PDC_Density')
-        self.crucial = ('EC_Source', 'EC_Target')
+        self.crucial = 'Degree'
         self.attr_comparators = self._mean_pdcs, self._ec_points
 
     def _mean_pdcs(self, source, target, old_attr, new_attr):
@@ -137,7 +137,7 @@ class MapGraph(_CoCoGraph):
     def __init__(self):
         _CoCoGraph.__init__.im_func(self)
         self.keys = ('RC', 'PDC', 'TP')
-        self.crucial = ('RC',)
+        self.crucial = 'RC'
         self.attr_comparators = self._pdcs, self._tp_len, self._tp_pdcs
 
     def _pdcs(self, source, target, old_attr, new_attr):
