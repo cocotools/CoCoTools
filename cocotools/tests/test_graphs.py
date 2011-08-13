@@ -212,7 +212,17 @@ def test_map_add_edge():
     nt.assert_equal(g['A']['B'], {'RC': 'S', 'PDC': 1, 'TP': []})
     nt.assert_equal(g['B']['A'], {'RC': 'different', 'PDC': 'same',
                                   'TP': ['different']})
-    
+
+
+def test_map_add_edge_integration():
+    g = coco.MapGraph()
+    nx_add_edges_from = nx.DiGraph.add_edges_from.im_func
+    nx_add_edges_from(g, (('A', 'C'), ('C', 'D'), ('D', 'B'),
+                          ('B', 'D'), ('D', 'C'), ('C', 'A')))
+    g.add_edge('A', 'B', {'RC': 'I', 'PDC': 18, 'TP': ['C', 'D']})
+    nt.assert_equal(g['A']['B'], {'RC': 'I', 'PDC': 18, 'TP': ['C', 'D']})
+    nt.assert_equal(g['B']['A'], {'RC': 'I', 'PDC': 18, 'TP': ['D', 'C']})
+
 
 @replace('cocotools.graphs._reverse_attr', mock_reverse_attr)
 @replace('cocotools.graphs._CoCoGraph.assert_valid_edge', mock_valid_edge)

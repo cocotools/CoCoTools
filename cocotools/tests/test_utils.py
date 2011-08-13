@@ -1,4 +1,4 @@
-pp"""Tests for classes in utils.
+"""Tests for classes in utils.
 
 A test for query_cocomac from the query module is also included as CoCoLite
 decorates it.

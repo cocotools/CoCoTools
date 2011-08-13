@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import copy
+
 import networkx as nx
 import numpy as np
 
@@ -149,11 +151,10 @@ class MapGraph(_CoCoGraph):
         mean_pdcs = []
         for tp in (old_attr['TP'], new_attr['TP']):
             if tp:
+                full_tp = [source] + tp + [target]
                 pdcs = []
-                for i in range(len(tp) - 1):
-                    pdcs.append(self[tp[i]][tp[i + 1]]['PDC'])
-                pdcs += [self[source][tp[0]]['PDC'],
-                         self[tp[-1]][target]['PDC']]
+                for i in range(len(full_tp) - 1):
+                    pdcs.append(self[full_tp[i]][full_tp[i + 1]]['PDC'])
                 mean_pdcs.append(np.mean(pdcs))
             else:
                 mean_pdcs.append(self[source][target]['PDC'])
@@ -194,8 +195,7 @@ class MapGraph(_CoCoGraph):
             return rc_res
 
     def deduce_edges(self):
-        """Deduce new edges based on those in the graph and add them.
-        """
+        """Deduce new edges based on those in the graph and add them."""
         nodes = self.nodes_iter()
         for node in nodes:
             ebunch = []
@@ -215,6 +215,8 @@ class MapGraph(_CoCoGraph):
 
 def _reverse_attr(attr):
     rc_switch = {'I': 'I', 'S': 'L', 'L': 'S', 'O': 'O', None: None}
-    attr['TP'].reverse()
+    # Need to deep copy to prevent modification of attr.
+    tp = copy.deepcopy(attr['TP'])
+    tp.reverse()
     return {'RC': rc_switch[attr['RC']], 'PDC': attr['PDC'],
-            'TP': attr['TP']}
+            'TP': tp}
