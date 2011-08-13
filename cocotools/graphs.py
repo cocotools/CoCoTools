@@ -40,10 +40,9 @@ class _CoCoGraph(nx.DiGraph):
                         assert self.has_edge(full_tp[i], full_tp[i + 1])
                 continue
             if key == 'Degree':
-                deg = attr[key]
                 ecs = [attr['EC_Source'], attr['EC_Target']]
-                if (deg == '0' and 'N' not in ecs) or (deg != '0' and 'N'
-                                                       in ecs):
+                if (value == '0' and 'N' not in ecs) or (value != '0' and 'N'
+                                                         in ecs):
                     raise ValueError('Degree contradicts ECs.')
             if value and value not in ALLOWED_VALUES[key.split('_')[0]]:
                 raise ValueError('invalid %s: %s' % (key, value))
