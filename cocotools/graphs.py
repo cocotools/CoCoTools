@@ -49,19 +49,6 @@ class _CoCoGraph(nx.DiGraph):
             if not value and key == self.crucial:
                 raise ValueError('invalid %s: %s' % (key, value))
 
-    def add_edge(self, source, target, new_attr):
-        """Add edge data to the graph if it's valid.
-
-        Call self.assert_valid_attr(new_attr) to check validity.
-        """
-        self.assert_valid_edge(source, target, new_attr)
-        add_edge = nx.DiGraph.add_edge.im_func
-        if not self.has_edge(source, target):
-            add_edge(self, source, target, new_attr)
-        else:
-            add_edge(self, source, target,
-                     self.update_attr(source, target, new_attr))
-
     def add_edges_from(self, ebunch):
         """Add a bunch of edge datasets to the graph if they're valid.
 
@@ -108,6 +95,19 @@ class ConGraph(_CoCoGraph):
                      'Degree', 'PDC_Density')
         self.crucial = 'Degree'
         self.attr_comparators = self._mean_pdcs, self._ec_points
+
+    def add_edge(self, source, target, new_attr):
+        """Add edge data to the graph if it's valid.
+
+        Call self.assert_valid_attr(new_attr) to check validity.
+        """
+        self.assert_valid_edge(source, target, new_attr)
+        add_edge = nx.DiGraph.add_edge.im_func
+        if not self.has_edge(source, target):
+            add_edge(self, source, target, new_attr)
+        else:
+            add_edge(self, source, target,
+                     self.update_attr(source, target, new_attr))
 
     def _mean_pdcs(self, source, target, old_attr, new_attr):
         return [np.mean((a['PDC_Site_Source'],
@@ -197,9 +197,9 @@ class MapGraph(_CoCoGraph):
         return mean_pdcs
 
     def add_edge(self, source, target, new_attr):
-        _CoCoGraph.add_edge.im_func(self, source, target, new_attr)
+        ConGraph.add_edge.im_func(self, source, target, new_attr)
         reverse_attr = _reverse_attr(new_attr)
-        _CoCoGraph.add_edge.im_func(self, target, source, reverse_attr)
+        ConGraph.add_edge.im_func(self, target, source, reverse_attr)
 
     def tpc(self, p, tp, s):
         middle = ''
