@@ -126,9 +126,8 @@ class EndGraph(ConGraph):
 
     def __init__(self):
         _CoCoGraph.__init__.im_func(self)
-        self.keys = ('original_source', 'original_target', 'Degree')
-        self.crucial = 'Degree'
-        self.attr_comparators = self._mean_pdcs, self._ec_points
+        self.keys = ('ebunches_for', 'ebunches_against')
+        self.crucial = None
 
     def add_translated_edges(self, mapp, conn, desired_bmap):
         num_edges = conn.number_of_edges()
@@ -137,15 +136,12 @@ class EndGraph(ConGraph):
             ebunch = []
             for new_s, new_t in mapp.translate_edge(s, t, desired_bmap):
                 old_edges = mapp.translate_edge(new_s, new_t, s_map, t_map)
-                new_degree = 'X'
+                attr = {'ebunches_for': (s_map, t_map)}
                 for old_s, old_t in old_edges:
                     if conn[old_s][old_t]['Degree'] != '0':
                         break
                 else:
-                    new_degree = '0'
-                o_sources, o_targets = zip(*old_edges)
-                attr = {'Degree': new_degree, 'original_sources': o_sources,
-                        'original_targets': o_targets}
+                    attr = {'ebunches_against': (s_map, t_map)}
                 ebunch.append((new_s, new_t, attr))
             self.add_edges_from(ebunch)
             print('AT: %d/%d' % (i, num_edges), end='\r')
