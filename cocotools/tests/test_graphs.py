@@ -159,6 +159,43 @@ def test__ec_points():
 # MapGraph Tests
 #------------------------------------------------------------------------------
 
+def test_translate_node():
+    g = nx.DiGraph()
+    g.add_edges_from((('A-1', 'B-1', {'RC': 'S'}),
+                      ('A-4', 'B-2', {'RC': 'O'}),
+                      ('A-4', 'B-3', {'RC': 'O'})))
+    translate_node = coco.MapGraph.translate_node.im_func
+    nt.assert_equal(translate_node(g, 'A-1', 'B'), ['B-1'])
+    nt.assert_equal(translate_node(g, 'A-4', 'B'), ['B-2', 'B-3'])
+
+
+def mock_translate_node(self, node, out_map):
+    if node == 'A-1':
+        return ['B-1']
+    elif node == 'B-1':
+        return ['A-1', 'A-2', 'A-3']
+    elif node == 'B-2':
+        return ['A-4', 'A-5', 'A-6']
+    else:
+        return ['B-2', 'B-3']
+
+    
+@replace('cocotools.MapGraph.translate_node', mock_translate_node)
+def test_translate_edge2():
+    g = coco.MapGraph()
+    nt.assert_equal(g.translate_edge('B-1', 'B-2', 'A', 'A'),
+                    [('A-1', 'A-4'), ('A-1', 'A-5'), ('A-1', 'A-6'),
+                     ('A-2', 'A-4'), ('A-2', 'A-5'), ('A-2', 'A-6'),
+                     ('A-3', 'A-4'), ('A-3', 'A-5'), ('A-3', 'A-6')])
+
+    
+@replace('cocotools.MapGraph.translate_node', mock_translate_node)
+def test_translate_edge1():
+    g = coco.MapGraph()
+    nt.assert_equal(g.translate_edge('A-1', 'A-4', 'B'),
+                    [('B-1', 'B-2'), ('B-1', 'B-3')])
+    
+    
 def test__pdcs():
     old_attr = {'PDC': 0}
     new_attr = {'PDC': 18}

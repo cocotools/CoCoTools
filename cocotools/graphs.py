@@ -124,19 +124,31 @@ class ConGraph(_CoCoGraph):
         
 class EndGraph(ConGraph):
 
-    def add_transformed_edges(self, mapp, conn, desired_bmap):
-        count = 0
-        for source, target in conn.edges():
-            source_ec, target_ec = conn.best_ecs(source, target)
-            new_sources = transform(source, source_ec, desired_bmap)
-            new_targets = transform(target, target_ec, desired_bmap)
-            for new_source in new_sources:
-                for new_target in new_targets:
-                    new_attr = {'EC_Source': new_sources[new_source],
-                                'EC_Target': new_targets[new_target]}
-                    self.add_edge(new_source, new_target, new_attr)
-            count += 1
-            print('AT: %d/%d' % (count, conn.number_of_edges()), end='\r')
+    def __init__(self):
+        _CoCoGraph.__init__.im_func(self)
+        self.keys = ('original_source', 'original_target', 'Degree')
+        self.crucial = 'Degree'
+        self.attr_comparators = self._mean_pdcs, self._ec_points
+
+    def add_translated_edges(self, mapp, conn, desired_bmap):
+        num_edges = conn.number_of_edges()
+        for i, (s, t) in enumerate(conn.edges()):
+            s_map, t_map = s.split('-')[0], t.split('-')[0]
+            ebunch = []
+            for new_s, new_t in mapp.translate_edge(s, t, desired_bmap):
+                old_edges = mapp.translate_edge(new_s, new_t, s_map, t_map)
+                new_degree = 'X'
+                for old_s, old_t in old_edges:
+                    if conn[old_s][old_t]['Degree'] != '0':
+                        break
+                else:
+                    new_degree = '0'
+                o_sources, o_targets = zip(*old_edges)
+                attr = {'Degree': new_degree, 'original_sources': o_sources,
+                        'original_targets': o_targets}
+                ebunch.append((new_s, new_t, attr))
+            self.add_edges_from(ebunch)
+            print('AT: %d/%d' % (i, num_edges), end='\r')
 
     
 class MapGraph(_CoCoGraph):
@@ -146,6 +158,16 @@ class MapGraph(_CoCoGraph):
         self.keys = ('RC', 'PDC', 'TP')
         self.crucial = 'RC'
         self.attr_comparators = self._pdcs, self._tp_len, self._tp_pdcs
+
+    def translate_node(self, node, out_map):
+        return [s for s in self.successors(node) if s.split('-')[0] == out_map]
+
+    def translate_edge(self, source, target, out_bmap1, out_bmap2=None):
+        if not out_bmap2:
+            out_bmap2 = out_bmap1
+        new_sources = self.translate_node(source, out_bmap1)
+        new_targets = self.translate_node(target, out_bmap2)
+        return [(s, t) for s in new_sources for t in new_targets]
 
     def _pdcs(self, source, target, old_attr, new_attr):
         return old_attr['PDC'], new_attr['PDC']
