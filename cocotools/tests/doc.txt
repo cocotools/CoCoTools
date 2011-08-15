@@ -27,3 +27,20 @@ Performing Connectivity query for CP95b
 >>> pfc_con.add_edges_from(ebunch)
 
 >>> result = coco.EndGraph()
+
+>>> result.add_translated_edges(pfc_map, pfc_con, 'W40')
+
+>>> result.edges()[0]
+('W40-11', 'W40-8B')
+
+>>> result['W40-11']['W40-8B']
+{'ebunches_against': [('PP99', 'PP99')]}
+
+>>> [s for s in pfc_map.successors('W40-11') if s.split('-')[0] == 'PP99']
+['PP99-11']
+
+>>> [s for s in pfc_map.successors('W40-8B') if s.split('-')[0] == 'PP99']
+['PP99-8B']
+
+>>> pfc_con['PP99-11']['PP99-8B']['Degree']
+'0'

@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from numpy import mean
-from networkx import DiGraph
+from networkx import DiGraph, NetworkXError
 
 
 class MapGraphError(Exception):
@@ -107,15 +107,20 @@ class MapGraph(DiGraph):
 # Translation Methods
 #------------------------------------------------------------------------------
 
-    def translate_node(self, node, out_map):
-        neighbors = set(self.successors(node) + self.predecessors(node))
+    def _translate_node(self, node, out_map):
+        if node.split('-')[0] == out_map:
+            return [node]
+        try:
+            neighbors = set(self.successors(node) + self.predecessors(node))
+        except NetworkXError:
+            return []
         return [n for n in neighbors if n.split('-')[0] == out_map]
 
-    def translate_edge(self, source, target, out_bmap1, out_bmap2=None):
+    def _translate_edge(self, source, target, out_bmap1, out_bmap2=None):
         if not out_bmap2:
             out_bmap2 = out_bmap1
-        new_sources = self.translate_node(source, out_bmap1)
-        new_targets = self.translate_node(target, out_bmap2)
+        new_sources = self._translate_node(source, out_bmap1)
+        new_targets = self._translate_node(target, out_bmap2)
         return [(s, t) for s in new_sources for t in new_targets]
 
 #------------------------------------------------------------------------------

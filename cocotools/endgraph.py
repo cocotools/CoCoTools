@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from networkx import DiGraph
 
 
@@ -22,18 +20,32 @@ class EndGraph(DiGraph):
 
     def add_translated_edges(self, mapp, conn, desired_bmap):
         num_edges = conn.number_of_edges()
-        for i, (s, t) in enumerate(conn.edges()):
+        conn_edges = conn.edges()
+        while conn_edges:
+            s, t = conn_edges.pop()
             s_map, t_map = s.split('-')[0], t.split('-')[0]
             ebunch = []
-            for new_s, new_t in mapp.translate_edge(s, t, desired_bmap):
-                old_edges = mapp.translate_edge(new_s, new_t, s_map, t_map)
-                attr = {'ebunches_for': [(s_map, t_map)]}
+            for new_s, new_t in mapp._translate_edge(s, t, desired_bmap):
+                old_edges = mapp._translate_edge(new_s, new_t, s_map, t_map)
+                incomplete = False
                 for old_s, old_t in old_edges:
-                    if conn[old_s][old_t]['Degree'] != '0':
+                    try:
+                        degree = conn[old_s][old_t]['Degree']
+                    except KeyError:
+                        incomplete = True
+                        continue
+                    if degree != '0':
+                        attr = {'ebunches_for': [(s_map, t_map)]}
                         break
                 else:
-                    attr = {'ebunches_against': [(s_map, t_map)]}
+                    if incomplete:
+                        attr = {'ebunches_incomplete': [(s_map, t_map)]}
+                    else:
+                        attr = {'ebunches_against': [(s_map, t_map)]}
+                for processed_edge in old_edges:
+                    try:
+                        conn_edges.remove(processed_edge)
+                    except ValueError:
+                        pass
                 ebunch.append((new_s, new_t, attr))
             self.add_edges_from(ebunch)
-            print('AT: %d/%d' % (i, num_edges), end='\r')
-
