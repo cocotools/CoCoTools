@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><CoCoMacExport xmlns="http://www.cocomac.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cocomac.org http://www.cocomac.org/cocomac.xsd">
+<Header>
+<Creator>CoCoMac-Online</Creator>
+<CoCoMacVersion>20</CoCoMacVersion>
+<ExportDate>2011-06-20T13:05:17+01:00</ExportDate>
+<DataType>InterMapRelations_originalData</DataType>
+<Feedback>
+<Query>
+<HttpString>Search=MAPPING&amp;OutputType=XML_BROWSER&amp;SearchString=('YTHI90')[SOURCEMAP]OR('YTHI90')[TARGETMAP]&amp;Details=</HttpString>
+<SearchString>('YTHI90')[SOURCEMAP]OR('YTHI90')[TARGETMAP]</SearchString>
+<SqlString>SELECT  Top 32767  RelationCode, InterMapRelations.ID AS RelationID, BrainSite_A, BrainSite_B, PDC_Relation, ID_Literature, Reference_Text, Reference_Figures, Comments FROM InterMapRelations WHERE  ID_BrainSite_A IN  (SELECT ID FROM BrainMaps_BrainSites WHERE ID_BrainMaps=379)OR ID_BrainSite_B IN  (SELECT ID FROM BrainMaps_BrainSites WHERE ID_BrainMaps=379)</SqlString>
+</Query>
+<Results>74</Results>
+</Feedback>
+<Comments>CocoMac XML Output</Comments>
+</Header>
+<MapData>
+<PrimaryRelation>
+<SourceBrainSite>
+<ID_BrainSite>YTHI90-CA1-SM</ID_BrainSite>
+<SiteClass>Lamina_Ctx</SiteClass>
+<Acronym>CA1-SM</Acronym>
+<FullName>CA1 subfield, stratum moleculare</FullName>
+<DefType>A</DefType>
+</SourceBrainSite>
+<TargetBrainSite>
+<ID_BrainSite>YTHI90-CA1</ID_BrainSite>
+<SiteClass>Area_AlloCtx</SiteClass>
+<Acronym>CA1</Acronym>
+<FullName>CA1 subfield of Ammon`s horn</FullName>
+<DefType>A</DefType>
+</TargetBrainSite>
+<RC>C</RC>
+<Reference>
+<ID_Literature>YTHI90</ID_Literature>
+<TextPageNumber>p. 132</TextPageNumber>
+<FigureNumber>Fig. 13.1</FigureNumber>
+<PDC>A</PDC>
+</Reference>
+</PrimaryRelation>
+</MapData>
+</CoCoMacExport>
