@@ -20,6 +20,12 @@ class ScrubElementTestCase(TestCase):
         self.prim_e = tree.find('%sIntegratedPrimaryProjection' % cocoquery.P)
         self.assertTrue(etree.iselement(self.prim_e))
 
+    def test_rc_is_C(self):
+        with open('cocotools/tests/map_with_C.xml') as xml:
+            tree = etree.parse(xml)
+        prim_e = tree.find('%sPrimaryRelation' % cocoquery.P)
+        self.assertEqual(cocoquery._scrub_element(prim_e, 'RC'), 'I')
+
     def test_from_prim(self):
         self.assertEqual(cocoquery._scrub_element(self.prim_e, 'Degree'), '0')
 

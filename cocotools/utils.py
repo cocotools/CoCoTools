@@ -4,10 +4,11 @@ import sqlite3
 import os
 import errno
 
+
 # The lower the index of a letter in PDC, the higher its precision.
 ALLOWED_VALUES = {'PDC': ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G',
                           'E', 'K', 'I', 'O', 'M', 'P', 'Q', 'R', None),
-                  'RC': ('I', 'S', 'L', 'O', 'SO', 'LO', 'ISLO'),
+                  'RC': ('I', 'S', 'L', 'O', 'E', 'C'),
                   'EC': ('C', 'P', 'X', 'N'),
                   'Degree': ('0', '1', '2', '3', 'X')}
 DBPATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools.sqlite')

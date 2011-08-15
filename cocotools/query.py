@@ -83,6 +83,8 @@ def _scrub_element(e, attr_tag):
             datum = None
     if 'PDC' in attr_tag:
         return utils.ALLOWED_VALUES['PDC'].index(datum)
+    if attr_tag == 'RC' and datum in ('E', 'C'):
+        return 'I'
     return datum
 
 
