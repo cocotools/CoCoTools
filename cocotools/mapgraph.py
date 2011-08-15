@@ -54,7 +54,8 @@ class MapGraph(DiGraph):
         value = attr['PDC']
         assert type(value) in (int, float) and value >= 0 and value <= 18
         value = attr['RC']
-        assert value in ('I', 'S', 'L', 'O')
+        if value not in ('I', 'S', 'L', 'O'):
+            raise MapGraphError('RC is %s' % value)
     
     def _add_edge(self, source, target, new_attr):
         self._assert_valid_edge(source, target, new_attr)
