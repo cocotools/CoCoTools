@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import sqlite3
 import os
 import errno
@@ -41,7 +39,6 @@ CREATE TABLE IF NOT EXISTS cache
         return con
 
     def __call__(self, search_type, bmap):
-        print('Performing %s query for %s' % (search_type, bmap), end='\r')
         try:
             xml = self.select_xml(search_type, bmap)
         except IndexError:

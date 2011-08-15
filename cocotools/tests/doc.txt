@@ -1,9 +1,6 @@
 >>> import cocotools as coco
 
 >>> ebunch, failures = coco.multi_map_ebunch('Mapping', ['PP94', 'CP94'])
-... # doctest: +NORMALIZE_WHITESPACE
-Performing Mapping query for PP94
-Performing Mapping query for CP94
 
 >>> failures
 []
@@ -13,12 +10,8 @@ Performing Mapping query for CP94
 
 >>> pfc_map.deduce_edges()
 
->>> con_bmaps = ['PP99', 'PP02', 'CP95b']
->>> ebunch, failures = coco.multi_map_ebunch('Connectivity', con_bmaps)
-... # doctest: +NORMALIZE_WHITESPACE
-Performing Connectivity query for PP99
-Performing Connectivity query for PP02
-Performing Connectivity query for CP95b
+>>> ebunch, failures = coco.multi_map_ebunch('Connectivity', ['PP99',
+... 'PP02', 'CP95b'])
 
 >>> failures
 []
