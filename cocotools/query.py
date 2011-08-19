@@ -8,12 +8,12 @@ from cocotools import utils
 
 
 P = './/{http://www.cocomac.org}'
-SPECS = {'Mapping': {'data_set': 'PrimRel', 'tags': ('PrimaryRelation',
-                                                     ('RC', 'PDC'))},
+SPECS = {'Mapping': {'data_set': 'PrimRel', 'primtag': 'PrimaryRelation',
+                     'other_tags': ('RC', 'PDC')},
          'Connectivity': {'data_set': 'IntPrimProj',
-                          'tags': ('IntegratedPrimaryProjection',
-                                   ('PDC_Site', 'EC', 'PDC_EC', 'Degree',
-                                    'PDC_Density'))}}
+                          'primtag': 'IntegratedPrimaryProjection',
+                          'other_tags': ('PDC_Site', 'EC', 'PDC_EC', 'Degree',
+                                         'PDC_Density')}}
 ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80', 
            'AF42', 'AF45', 'AHGWU00', 'AI92', 'AIC87', 'AM02', 'AM84', 
            'AP84', 'APA83', 'APPC92', 'ASM94', 'B00', 'B05', 'B09', 'B81',
@@ -106,7 +106,7 @@ def _element2edge(prim_e, search_type):
     edge_attr : dict
     """
     edge_attr = {}
-    for attr_tag in SPECS[search_type]['tags'][1]:
+    for attr_tag in SPECS[search_type]['other_tags']:
         if 'EC' in attr_tag or 'Site' in attr_tag:
             specifiers = ('Source', 'Target')
         else:
@@ -122,6 +122,12 @@ def _element2edge(prim_e, search_type):
                 edge_attr[attr_tag] = datum
     if search_type == 'Mapping':
         edge_attr['TP'] = []
+    else:
+        ec_s, ec_t = edge_attr['EC_Source'], edge_attr['EC_Target']
+        if ec_s == 'N':
+            ec_s = 'N%s' % ec_t.lower()
+        if ec_t == 'N':
+            ec_t = 'N%s' % ec_s.lower()
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text, site_ids[1].text, edge_attr
 
@@ -205,7 +211,7 @@ def single_map_ebunch(search_type, bmap):
     if xml:
         tree = _element_tree(xml)
         ebunch = []
-        for prim in tree.iterfind('%s%s' % (P, SPECS[search_type]['tags'][0])):
+        for prim in tree.iterfind('%s%s' % (P, SPECS[search_type]['primtag'])):
             ebunch.append(_element2edge(prim, search_type))
         return ebunch
 
