@@ -213,6 +213,8 @@ def single_map_ebunch(search_type, bmap):
         ebunch = []
         for prim in tree.iterfind('%s%s' % (P, SPECS[search_type]['primtag'])):
             ebunch.append(_element2edge(prim, search_type))
+        if not ebunch:
+            query_cocomac.remove_entry(search_type, bmap)
         return ebunch
 
 

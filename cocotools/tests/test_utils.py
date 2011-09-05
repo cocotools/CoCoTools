@@ -68,3 +68,15 @@ INSERT INTO cache
 VALUES ('A', 'Mapping', 'entry #2')
 """)
     nt.assert_raises(sqlite3.IntegrityError, db.select_xml, 'Mapping', 'A')
+
+
+@replace('cocotools.utils.DBPATH', ':memory:')
+def test_remove_entry():
+    qc = query_cocomac
+    qc.con.execute("""
+INSERT INTO cache
+VALUES ('A', 'B', 'Blah')
+""")
+    nt.assert_equal(qc.select_xml('B', 'A'), 'Blah')
+    qc.remove_entry('B', 'A')
+    nt.assert_raises(IndexError, qc.select_xml, 'B', 'A')
