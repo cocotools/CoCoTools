@@ -71,4 +71,23 @@ def test_add_translated_edges():
     # Make sure c hasn't been modified.
     nt.assert_equal(c.number_of_edges(), 10)
     
+#------------------------------------------------------------------------------
+# Unit Tests
+#------------------------------------------------------------------------------
+
+def test_add_controversy_scores():
+    g = DiGraph()
+    g.add_edges_from([('A-1', 'A-2', {'ebunches_for': [('B', 'B'), ('C', 'C')],
+                                      'ebunches_against': [('D', 'D')],
+                                      'ebunches_incomplete': [('E', 'E')]}),
+                      ('A-2', 'A-3', {'ebunches_incomplete': [('B', 'B')]})])
+    EndGraph.add_controversy_scores.im_func(g)
+    nt.assert_equal(g.number_of_edges(), 2)
+    nt.assert_equal(g['A-1']['A-2'],
+                    {'ebunches_for': [('B', 'B'), ('C', 'C')],
+                     'ebunches_against': [('D', 'D')],
+                     'ebunches_incomplete': [('E', 'E')],
+                     'score': 1/3.0})
+    nt.assert_equal(g['A-2']['A-3'], {'ebunches_incomplete': [('B', 'B')],
+                                      'score': 0})
     

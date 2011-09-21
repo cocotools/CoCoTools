@@ -49,3 +49,16 @@ class EndGraph(DiGraph):
                         pass
                 ebunch.append((new_s, new_t, attr))
             self.add_edges_from(ebunch)
+
+    def add_controversy_scores(self):
+        for source, target in self.edges_iter():
+            edge_dict = self[source][target]
+            for group in ('for', 'against'):
+                try:
+                    exec '%s_ = len(edge_dict["ebunches_%s"])' % (group, group)
+                except KeyError:
+                    exec '%s_ = 0' % group
+            try:
+                edge_dict['score'] = (for_ - against_) / float(for_ + against_)
+            except ZeroDivisionError:
+                edge_dict['score'] = 0
