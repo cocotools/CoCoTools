@@ -1,4 +1,5 @@
 from numpy import histogram
+from networkx import DiGraph
 
 
 def controversy_hist(e):
@@ -17,3 +18,13 @@ def controversy_hist(e):
     for source, target in e.edges_iter():
         scores.append(e[source][target]['score'])
     return histogram(scores, bins=20)
+
+
+def present_graph(e):
+    present_edges = []
+    for source, target in e.edges_iter():
+        if e[source][target]['score'] > 0:
+            present_edges.append((source, target))
+    p = DiGraph()
+    p.add_edges_from(present_edges)
+    return p
