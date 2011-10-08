@@ -1,12 +1,17 @@
+import sqlite3
+import os
+import errno
 import re
 import urllib
 import urllib2
 import xml.etree.ElementTree as etree
 from cStringIO import StringIO
 
-from cocotools import utils
 
-
+PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
+            'O', 'M', 'P', 'Q', 'R', None)
+DBPATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools.sqlite')
+DBDIR = os.path.dirname(DBPATH)
 P = './/{http://www.cocomac.org}'
 SPECS = {'Mapping': {'data_set': 'PrimRel', 'primtag': 'PrimaryRelation',
                      'other_tags': ('RC', 'PDC')},
@@ -71,6 +76,59 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80',
            'BP82', 'AP34', 'YTHI90', 'PP94', 'L33', 'JCH78']
 
 
+class CoCoLite(object):
+
+    def __init__(self, func):
+        self.func = func
+        self.con = self.setup_connection()
+
+    def setup_connection(self):
+        try:
+            os.mkdir(DBDIR)
+        except OSError, e:
+            if e.errno != errno.EEXIST:
+                raise
+        con = sqlite3.connect(DBPATH)
+        con.text_factory = str
+        with con:
+            con.execute("""
+CREATE TABLE IF NOT EXISTS cache
+(
+    bmap TEXT,
+    type TEXT,
+    xml TEXT UNIQUE
+)
+""")
+        return con
+
+    def __call__(self, search_type, bmap):
+        try:
+            xml = self.select_xml(search_type, bmap)
+        except IndexError:
+            xml = self.func(search_type, bmap)
+            if xml:
+                with self.con as con:
+                    con.execute("""
+INSERT INTO cache
+VALUES (?, ?, ?)
+""", (bmap, search_type, xml))
+        return xml
+
+    def select_xml(self, search_type, bmap):
+        rows = self.con.execute("""
+SELECT xml
+FROM cache
+WHERE bmap = ? AND type = ?
+""", (bmap, search_type)).fetchall()
+        if len(rows) > 1:
+            raise sqlite3.IntegrityError('multiple xml entries for bmap %s' %
+                                         bmap)
+        return rows[0][0]
+
+#------------------------------------------------------------------------------
+# Private Functions
+#------------------------------------------------------------------------------
+    
 def _scrub_element(e, attr_tag):
     datum_e = e.find('%s%s' % (P, attr_tag))
     try:
@@ -79,10 +137,10 @@ def _scrub_element(e, attr_tag):
         datum = None
     else:
         datum = datum.upper()
-        if datum not in utils.ALLOWED_VALUES[attr_tag.split('_')[0]]:
+        if datum == '-':
             datum = None
     if 'PDC' in attr_tag:
-        return utils.ALLOWED_VALUES['PDC'].index(datum)
+        return PDC_HIER.index(datum)
     if attr_tag == 'RC' and datum in ('E', 'C'):
         return 'I'
     return datum
@@ -178,6 +236,9 @@ def _scrub_xml_str(raw):
     else:
         raise ValueError('input does not contain valid xml header')
 
+#------------------------------------------------------------------------------
+# Public Functions
+#------------------------------------------------------------------------------
 
 def url(search_type, bmap):
     search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (bmap, bmap)
@@ -191,7 +252,7 @@ def url(search_type, bmap):
     return 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
 
 
-@utils.CoCoLite
+@CoCoLite
 def query_cocomac(search_type, bmap):
     try:
         xml = urllib2.urlopen(url(search_type, bmap), timeout=120).read()
@@ -218,26 +279,34 @@ def single_map_ebunch(search_type, bmap):
         return ebunch
 
 
-def _format_bmaps(subset):
-    if not subset:
-        return ALLMAPS
-    elif isinstance(subset, str):
-        return [line.strip() for line in open(subset).readlines()]
-    else:
-        return subset
-
-
 def multi_map_ebunch(search_type, subset=False):
     """Construct and return ebunch from data in several XML files.
+
+    Also return the BrainMaps for which queries failed.  Querying a
+    BrainMap for which there is only Mapping data using the Connectivity
+    search type would result in its being a failure.  However, failures
+    can also result from CoCoMac server errors.
+
+    The term ebunch, borrowed from NetworkX, refers to a sequence of
+    graph theory edges.
 
     Returns
     -------
     big_ebunch : list of tuples
+      Each tuple specifies a source and target node and edge attributes.
+    
     failures : list of strings
+      These are the BrainMaps for which no data were acquired.
     """
+    if not subset:
+        bmaps = ALLMAPS
+    elif isinstance(subset, str):
+        bmaps = [line.strip() for line in open(subset).readlines()]
+    else:
+        bmaps = subset
     big_ebunch = []
     failures = []
-    for bmap in _format_bmaps(subset):
+    for bmap in bmaps:
         little_ebunch = single_map_ebunch(search_type, bmap)
         if little_ebunch:
             big_ebunch += little_ebunch
