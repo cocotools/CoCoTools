@@ -14,10 +14,14 @@ class MapGraph(DiGraph):
 # Construction Methods
 #------------------------------------------------------------------------------
 
-    def _tp_pdcs(self, source, target, old_attr, new_attr):
-        """Return mean PDC for relation chain for old_attr, new_attr."""
+    def _tp_pdcs(self, source, target, attr1, attr2=None):
+        """Return mean PDC for relation chain in attr(s)."""
+        if not attr2:
+            tps = (attr1['TP'],)
+        else:
+            tps = (attr1['TP'], attr2['TP'])
         mean_pdcs = []
-        for tp in (old_attr['TP'], new_attr['TP']):
+        for tp in tps:
             if tp:
                 full_tp = [source] + tp + [target]
                 pdcs = []
@@ -27,7 +31,7 @@ class MapGraph(DiGraph):
             else:
                 mean_pdcs.append(self[source][target]['PDC'])
         return mean_pdcs
-
+    
     def _update_attr(self, source, target, new_attr):
         old_attr = self[source][target]
         funcs = (_pdcs, _tp_len, self._tp_pdcs)
@@ -52,7 +56,8 @@ class MapGraph(DiGraph):
                     raise MapGraphError('TP for (%s, %s) assumes (%s, %s).' %
                                         (source, target, i_s, i_t))
         value = attr['PDC']
-        assert type(value) in (int, float) and value >= 0 and value <= 18
+        if not (type(value) in (int, float, float64) and 0 <= value <= 18):
+            raise MapGraphError('PDC is %s, type is %s' % (value, type(value)))
         value = attr['RC']
         if value not in ('I', 'S', 'L', 'O'):
             raise MapGraphError('RC is %s' % value)
@@ -100,7 +105,8 @@ class MapGraph(DiGraph):
                         tp = self[p][node]['TP'] + [node] + self[node][s]['TP']
                         rc_res = _rc_res(self._code(p, tp, s))
                         if rc_res:
-                            attr = {'TP': tp, 'RC': rc_res, 'PDC': 18}
+                            attr = {'TP': tp, 'RC': rc_res,
+                                    'PDC': self._tp_pdcs(p, s, {'TP': tp})[0]}
                             ebunch.append((p, s, attr))
             self.add_edges_from(ebunch)
 
@@ -108,14 +114,49 @@ class MapGraph(DiGraph):
 # Translation Methods
 #------------------------------------------------------------------------------
 
+    def _separate_rcs(self, new_node, original_map):
+        """Return one list for single_steps and one for multi_steps.
+
+        Translate new_node back to original_map.  For each old_node
+        returned from this translation, get its RC with new_node.  RCs
+        of I and L will be used for single-step operations of the
+        algebra of transformation.  RCs of S and O will be used for
+        multi-step operations.
+
+        Notes
+        -----
+        If new_node's map is original_map, new_node is considered
+        identical (i.e., RC='I') to its counterpart in original_map
+        (i.e., itself).
+
+        Returns
+        -------
+        single_steps, multi_steps : lists
+          Lists of (old_node, RC) tuples.
+        """
+        single_steps, multi_steps = [], []
+        for old_node in self._translate_node(new_node, original_map):
+            if old_node == new_node:
+                single_steps.append((old_node, 'I'))
+            else:
+                rc = self[old_node][new_node]['RC']
+                if rc in ('I', 'L'):
+                    single_steps.append((old_node, rc))
+                elif rc in ('S', 'O'):
+                    multi_steps.append((old_node, rc))
+        return single_steps, multi_steps
+            
     def _translate_node(self, node, out_map):
+        """Return list of nodes from out_map coextensive with node."""
         if node.split('-')[0] == out_map:
             return [node]
-        try:
-            neighbors = set(self.successors(node) + self.predecessors(node))
-        except NetworkXError:
-            return []
-        return [n for n in neighbors if n.split('-')[0] == out_map]
+        neighbors = []
+        for method in (self.successors, self.predecessors):
+            try:
+                neighbors += method(node)
+            except NetworkXError:
+                pass
+        return [n for n in set(neighbors) if n.split('-')[0] == out_map]
 
     def _translate_edge(self, source, target, out_bmap1, out_bmap2=None):
         if not out_bmap2:
