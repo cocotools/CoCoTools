@@ -1,4 +1,5 @@
 from networkx import DiGraph
+import numpy as np
 
 
 class EndGraphError(Exception):

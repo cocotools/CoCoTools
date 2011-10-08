@@ -173,15 +173,15 @@ VALUES ('A', 'Mapping', 'entry #2')
     nt.assert_raises(sqlite3.IntegrityError, db.select_xml, 'Mapping', 'A')
 
     
-@replace('cq.DBPATH', ':memory:')
+@replace('cocotools.query.DBPATH', ':memory:')
 def test_remove_entry():
     cq.query_cocomac.con.execute("""
 INSERT INTO cache
 VALUES ('A', 'B', 'Blah')
 """)
-    nt.assert_equal(qc.select_xml('B', 'A'), 'Blah')
+    nt.assert_equal(cq.query_cocomac.select_xml('B', 'A'), 'Blah')
     cq.query_cocomac.remove_entry('B', 'A')
-    nt.assert_raises(IndexError, qc.select_xml, 'B', 'A')
+    nt.assert_raises(IndexError, cq.query_cocomac.select_xml, 'B', 'A')
     
 #------------------------------------------------------------------------------
 # Public Function Unit Tests

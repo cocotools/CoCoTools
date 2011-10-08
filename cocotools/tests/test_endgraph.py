@@ -45,7 +45,7 @@ def test_dan():
                       # Following connection has no mapping info.
                       ('F-1', 'F-2', {'Degree': '2'})])
     e = EndGraph()
-    e.add_translated_edges(m, c, 'B')
+    e.add_translated_edges(m, c, 'B', 'dan')
     nt.assert_equal(e.number_of_edges(), 2)
     nt.assert_equal(e['B-1']['B-2'], {'ebunches_for': [('A', 'A'), ('A', 'E')],
                                       'ebunches_incomplete': [('B', 'A'),
@@ -114,7 +114,7 @@ def test_ort():
                                       'PDC_EC_Target': 5,
                                       'PDC_Density': 18})])
     e = EndGraph()
-    e.add_translated_edges(m, c, 'B')
+    e.add_translated_edges(m, c, 'B', 'ort')
     nt.assert_equal(e.number_of_edges(), 5)
     nt.assert_equal(e['B-1']['B-2'], {'EC_Source': 'P',
                                       'EC_Target': 'P',
@@ -149,7 +149,8 @@ def test_add_edges_from_dan():
     g = EndGraph()
     g.add_edges_from([('A-1', 'A-2', {'ebunches_for': [('B', 'C')]}),
                       ('A-1', 'A-2', {'ebunches_for': [('B', 'B')]}),
-                      ('A-1', 'A-2', {'ebunches_against': [('C', 'C')]})])
+                      ('A-1', 'A-2', {'ebunches_against': [('C', 'C')]})],
+                     'dan')
     nt.assert_equal(g.number_of_edges(), 1)
     nt.assert_equal(g['A-1']['A-2'],
                     {'ebunches_for': [('B', 'C'), ('B', 'B')],
@@ -172,7 +173,8 @@ def test_add_edges_from_ort():
                                       'EC_Target': 'C',
                                       'PDC_Source': 0,
                                       'PDC_Target': 0,
-                                      'original_maps': ('D', 'D')})])
+                                      'original_maps': ('D', 'D')})],
+                     'ort')
     nt.assert_equal(g.number_of_edges(), 1)
     nt.assert_equal(g['A-1']['A-2'], {'EC_Source': 'X',
                                       'EC_Target': 'X',

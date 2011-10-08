@@ -1,4 +1,4 @@
-from numpy import mean
+from numpy import mean, float64
 from networkx import DiGraph
 
 

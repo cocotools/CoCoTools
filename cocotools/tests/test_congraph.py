@@ -42,7 +42,7 @@ def test_add_edges_from():
 
 def test__single_ec_step():
     g = DiGraph()
-    single_ec_step = cg.ORTConGraph._single_ec_step.im_func
+    single_ec_step = cg.ConGraph._single_ec_step.im_func
     nt.assert_equal(single_ec_step(g, 'A-1', 'L', 'A-2', 'Source'), ('U', 18))
     g.add_edge('A-1', 'A-2', {'EC_Source': 'C', 'PDC_EC_Source': 5,
                               'PDC_Site_Source': 10})
@@ -61,7 +61,7 @@ def test__multi_ec_step():
                                       'PDC_Site_Source': 18}),
                       ('A-6', 'A-2', {'EC_Source': 'Nx', 'PDC_EC_Source': 6,
                                       'PDC_Site_Source': 10})])
-    multi_ec_step = cg.ORTConGraph._multi_ec_step.im_func
+    multi_ec_step = cg.ConGraph._multi_ec_step.im_func
     nt.assert_equal(multi_ec_step(g, 'A-1', 'S', 'A-2', 'Source', 'B', 0),
                     ('N', 16))
     nt.assert_equal(multi_ec_step(g, 'A-3', 'O', 'A-2', 'Source', 'N', 16),

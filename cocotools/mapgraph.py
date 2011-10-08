@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from numpy import mean
+from numpy import mean, float64
 from networkx import DiGraph, NetworkXError
 
 
@@ -34,7 +34,7 @@ class MapGraph(DiGraph):
     
     def _update_attr(self, source, target, new_attr):
         old_attr = self[source][target]
-        funcs = (_pdcs, _tp_len, self._tp_pdcs)
+        funcs = (_tp_len, _pdcs, self._tp_pdcs)
         arg_groups = [(old_attr, new_attr)] * 2 + [(source, target, old_attr,
                                                     new_attr)]
         for func, args in zip(funcs, arg_groups):

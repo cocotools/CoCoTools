@@ -158,7 +158,7 @@ def mock_translate_node(self, node, out_map):
     
 @replace('cocotools.MapGraph._translate_node', mock_translate_node)
 def test__separate_rcs():
-    g = mg.ORTMapGraph()
+    g = mg.MapGraph()
     add_edges_from = DiGraph.add_edges_from.im_func
     add_edges_from(g, [('B-1', 'A-1', {'RC': 'I'}),
                        ('B-2', 'A-1', {'RC': 'L'}),
