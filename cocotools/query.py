@@ -125,6 +125,13 @@ WHERE bmap = ? AND type = ?
                                          bmap)
         return rows[0][0]
 
+    def remove_entry(self, search_type, bmap):
+        self.con.execute("""
+DELETE FROM cache
+WHERE bmap = ? AND type = ?
+""", (bmap, search_type))
+        self.con.commit()
+
 #------------------------------------------------------------------------------
 # Private Functions
 #------------------------------------------------------------------------------
