@@ -1,4 +1,5 @@
 from unittest import TestCase
+from testfixtures import replace
 
 import nose.tools as nt
 from mocker import MockerTestCase
@@ -34,45 +35,45 @@ def test_deduce_edges():
     g.deduce_edges()
     nt.assert_equal(g['A-1'],
                     {'B-1': {'RC': 'I', 'PDC': 0, 'TP': []},
-                     'A-2': {'RC': 'S', 'PDC': 18, 'TP': ['B-1']},
+                     'A-2': {'RC': 'S', 'PDC': 9.0, 'TP': ['B-1']},
                      'D-1': {'RC': 'O', 'PDC': 2, 'TP': []},
-                     'C-1': {'RC': 'O', 'PDC': 18, 'TP': ['D-1']},
+                     'C-1': {'RC': 'O', 'PDC': 10.0, 'TP': ['D-1']},
                      'D-2': {'RC': 'O', 'PDC': 6, 'TP': []}
                      })
     nt.assert_equal(g['B-1'],
                     {'A-1': {'RC': 'I', 'PDC': 0, 'TP': []},
                      'A-2': {'RC': 'S', 'PDC': 18, 'TP': []},
-                     'D-1': {'RC': 'O', 'PDC': 18, 'TP': ['A-1']},
-                     'D-2': {'RC': 'O', 'PDC': 18, 'TP': ['A-1']},
-                     'C-1': {'RC': 'O', 'PDC': 18, 'TP': ['A-1', 'D-1']}
+                     'D-1': {'RC': 'O', 'PDC': 1.0, 'TP': ['A-1']},
+                     'D-2': {'RC': 'O', 'PDC': 3.0, 'TP': ['A-1']},
+                     'C-1': {'RC': 'O', 'PDC': 6 + 2/3.0, 'TP': ['A-1', 'D-1']}
                      })
     nt.assert_equal(g['C-1'],
-                    {'A-1': {'RC': 'O', 'PDC': 18, 'TP': ['D-1']},
-                     'A-2': {'RC': 'S', 'PDC': 18, 'TP': ['D-2']},
+                    {'A-1': {'RC': 'O', 'PDC': 10.0, 'TP': ['D-1']},
+                     'A-2': {'RC': 'S', 'PDC': 4.5, 'TP': ['D-2']},
                      'D-1': {'RC': 'I', 'PDC': 18, 'TP': []},
                      'D-2': {'RC': 'S', 'PDC': 1, 'TP': []},
-                     'B-1': {'RC': 'O', 'PDC': 18, 'TP': ['D-1', 'A-1']}
+                     'B-1': {'RC': 'O', 'PDC': 6 + 2/3.0, 'TP': ['D-1', 'A-1']}
                      })
     nt.assert_equal(g['D-1'],
                     {'A-1': {'RC': 'O', 'PDC': 2, 'TP': []},
                      'C-1': {'RC': 'I', 'PDC': 18, 'TP': []},
-                     'D-2': {'RC': 'S', 'PDC': 18, 'TP': ['C-1']},
-                     'B-1': {'RC': 'O', 'PDC': 18, 'TP': ['A-1']},
-                     'A-2': {'RC': 'S', 'PDC': 18, 'TP': ['C-1', 'D-2']}
+                     'D-2': {'RC': 'S', 'PDC': 9.5, 'TP': ['C-1']},
+                     'B-1': {'RC': 'O', 'PDC': 1.0, 'TP': ['A-1']},
+                     'A-2': {'RC': 'S', 'PDC': 9.0, 'TP': ['C-1', 'D-2']}
                      })
     nt.assert_equal(g['A-2'],
-                    {'A-1': {'RC': 'L', 'PDC': 18, 'TP': ['B-1']},
-                     'C-1': {'RC': 'L', 'PDC': 18, 'TP': ['D-2']},
+                    {'A-1': {'RC': 'L', 'PDC': 9.0, 'TP': ['B-1']},
+                     'C-1': {'RC': 'L', 'PDC': 4.5, 'TP': ['D-2']},
                      'D-2': {'RC': 'L', 'PDC': 8, 'TP': []},
                      'B-1': {'RC': 'L', 'PDC': 18, 'TP': []},
-                     'D-1': {'RC': 'L', 'PDC': 18, 'TP': ['D-2', 'C-1']}
+                     'D-1': {'RC': 'L', 'PDC': 9.0, 'TP': ['D-2', 'C-1']}
                      })
     nt.assert_equal(g['D-2'],
                     {'A-1': {'RC': 'O', 'PDC': 6, 'TP': []},
                      'C-1': {'RC': 'L', 'PDC': 1, 'TP': []},
                      'A-2': {'RC': 'S', 'PDC': 8, 'TP': []},
-                     'B-1': {'RC': 'O', 'PDC': 18, 'TP': ['A-1']},
-                     'D-1': {'RC': 'L', 'PDC': 18, 'TP': ['C-1']}
+                     'B-1': {'RC': 'O', 'PDC': 3.0, 'TP': ['A-1']},
+                     'D-1': {'RC': 'L', 'PDC': 9.5, 'TP': ['C-1']}
                      })
 
 #------------------------------------------------------------------------------
@@ -105,6 +106,14 @@ class TP_PDCS_TestCase(TestCase):
         self.assertEqual(self.tp_pdcs(self.g, 'C-1', 'A-1', old_attr,
                                        new_attr),
                           [10, 10])
+
+    def test_no_attr2(self):
+        self.g.add_edges_from((('A-1', 'B-1', {'PDC': 7}),
+                               ('B-1', 'C-1', {'PDC': 11}),
+                               ('C-1', 'D-1', {'PDC': 3})))
+        self.assertEqual(self.tp_pdcs(self.g, 'A-1', 'D-1',
+                                      {'TP': ['B-1', 'C-1']}),
+                         [7])
             
     
 class AssertValidEdgeTestCase(TestCase):
@@ -143,6 +152,23 @@ def test__code():
 # Translation Method Unit Tests
 #------------------------------------------------------------------------------
 
+def mock_translate_node(self, node, out_map):
+    return ['B-1', 'B-2', 'B-3', 'B-4']
+    
+    
+@replace('cocotools.MapGraph._translate_node', mock_translate_node)
+def test__separate_rcs():
+    g = mg.ORTMapGraph()
+    add_edges_from = DiGraph.add_edges_from.im_func
+    add_edges_from(g, [('B-1', 'A-1', {'RC': 'I'}),
+                       ('B-2', 'A-1', {'RC': 'L'}),
+                       ('B-3', 'A-1', {'RC': 'S'}),
+                       ('B-4', 'A-1', {'RC': 'O'})])
+    nt.assert_equal(g._separate_rcs('A-1', 'B'),
+                    ([('B-1', 'I'), ('B-2', 'L')],
+                     [('B-3', 'S'), ('B-4', 'O')]))
+    
+    
 def test_translate_node():
     g = DiGraph()
     g.add_edges_from([('A-1', 'B-1'), ('A-1', 'C-1'), ('A-1', 'B-2')])
