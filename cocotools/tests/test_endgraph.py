@@ -116,31 +116,16 @@ def test_ort():
     e = EndGraph()
     e.add_translated_edges(m, c, 'B', 'ort')
     nt.assert_equal(e.number_of_edges(), 5)
-    nt.assert_equal(e['B-1']['B-2'], {'EC_Source': 'P',
-                                      'EC_Target': 'P',
-                                      'PDC_Source': 3.75,
-                                      'PDC_Target': 9.0,
-                                      'original_maps': ('A', 'A')})
-    nt.assert_equal(e['B-1']['B-3'], {'EC_Source': 'P',
-                                      'EC_Target': 'P',
-                                      'PDC_Source': 3.75,
-                                      'PDC_Target': 9.0,
-                                      'original_maps': ('A', 'A')})
-    nt.assert_equal(e['B-3']['B-4'], {'EC_Source': 'C',
-                                      'EC_Target': 'X',
-                                      'PDC_Source': 7.5,
-                                      'PDC_Target': 7.5,
-                                      'original_maps': ('B', 'B')})
-    nt.assert_equal(e['B-5']['B-2'], {'EC_Source': 'N',
-                                      'EC_Target': 'Up',
-                                      'PDC_Source': 9.0,
-                                      'PDC_Target': 18.0,
-                                      'original_maps': ('B', 'A')})
-    nt.assert_equal(e['B-5']['B-3'], {'EC_Source': 'N',
-                                      'EC_Target': 'Up',
-                                      'PDC_Source': 9.0,
-                                      'PDC_Target': 18.0,
-                                      'original_maps': ('B', 'A')})
+    nt.assert_equal(e['B-1']['B-2'], {'EC_Source': {'A': ['P', 'P']},
+                                      'EC_Target': {'A': ['P', 'N']}})
+    nt.assert_equal(e['B-1']['B-3'], {'EC_Source': {'A': ['P', 'P']},
+                                      'EC_Target': {'A': ['P', 'N']}})
+    nt.assert_equal(e['B-3']['B-4'], {'EC_Source': {'B': ['C']},
+                                      'EC_Target': {'B': ['X']}})
+    nt.assert_equal(e['B-5']['B-2'], {'EC_Source': {'B': ['N']},
+                                      'EC_Target': {'A': ['Up']}})
+    nt.assert_equal(e['B-5']['B-3'], {'EC_Source': {'B': ['N']},
+                                      'EC_Target': {'A': ['Up']}})
     # Make sure c hasn't been modified.
     nt.assert_equal(c.number_of_edges(), 5)
 
@@ -159,28 +144,18 @@ def test_add_edges_from_dan():
 
 def test_add_edges_from_ort():
     g = EndGraph()
-    g.add_edges_from([('A-1', 'A-2', {'EC_Source': 'X',
-                                      'EC_Target': 'X',
-                                      'PDC_Source': 5,
-                                      'PDC_Target': 7,
-                                      'original_maps': ('B', 'B')}),
-                      ('A-1', 'A-2', {'EC_Source': 'X',
-                                      'EC_Target': 'X',
-                                      'PDC_Source': 3.44445,
-                                      'PDC_Target': 7,
-                                      'original_maps': ('C', 'C')}),
-                      ('A-1', 'A-2', {'EC_Source': 'Up',
-                                      'EC_Target': 'C',
-                                      'PDC_Source': 0,
-                                      'PDC_Target': 0,
-                                      'original_maps': ('D', 'D')})],
+    g.add_edges_from([('A-1', 'A-2', {'EC_Source': {'A': ['X']},
+                                      'EC_Target': {'A': ['N']}}),
+                      ('A-1', 'A-2', {'EC_Source': {'C': ['P']},
+                                      'EC_Target': {'C': ['P']}}),
+                      ('A-1', 'A-2', {'EC_Source': {'A': ['C']},
+                                      'EC_Target': {'A': ['C']}})],
                      'ort')
     nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A-1']['A-2'], {'EC_Source': 'X',
-                                      'EC_Target': 'X',
-                                      'PDC_Source': 3.44445,
-                                      'PDC_Target': 7,
-                                      'original_maps': ('C', 'C')})
+    nt.assert_equal(g['A-1']['A-2'], {'EC_Source': {'A': ['X', 'C'],
+                                                    'C': ['P']},
+                                      'EC_Target': {'A': ['N', 'C'],
+                                                    'C': ['P']}})
     
 #------------------------------------------------------------------------------
 # Unit Tests

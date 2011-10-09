@@ -26,8 +26,12 @@ class EndGraph(DiGraph):
                 add_edge(self, source, target, new_attr)
             else:
                 old_attr = self[source][target]
-                add_edge(self, source, target, _update_attr(old_attr,
-                                                            new_attr))
+                for ec in ('EC_Source', 'EC_Target'):
+                    for bmap in new_attr[ec]:
+                        try:
+                            old_attr[ec][bmap] += new_attr[ec][bmap]
+                        except KeyError:
+                            old_attr[ec][bmap] = new_attr[ec][bmap]
         else:
             raise EndGraphError('Invalid method supplied.')
 
@@ -119,11 +123,8 @@ class EndGraph(DiGraph):
                     for s_value in s_values:
                         for t_value in t_values:
                             self.add_edge(new_s, new_t,
-                                          {'EC_Source': s_value[0],
-                                           'EC_Target': t_value[0],
-                                           'PDC_Source': s_value[1],
-                                           'PDC_Target': t_value[1],
-                                           'original_maps': (s_map, t_map)},
+                                          {'EC_Source': {s_map: [s_value[0]]},
+                                           'EC_Target': {t_map: [t_value[0]]}},
                                           'ort')
 
     def add_controversy_scores(self):
@@ -141,58 +142,9 @@ class EndGraph(DiGraph):
 
 
 def _assert_valid_attr(attr):
-    for key in ('EC_Source', 'EC_Target', 'PDC_Source', 'PDC_Target',
-                'original_maps'):
-        value = attr[key]
-        if 'PDC' in key:
-            if not (type(value) in (int, float, np.float64) and
-                    0 <= value <= 18):
-                raise EndGraphError('PDC is %s, type is %s' %
-                                    (value, type(value)))
-        elif 'EC' in key:
-            assert value in ('Up', 'Ux', 'N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X')
-        elif key == 'original_maps':
-            assert isinstance(value, tuple)
-        
-            
-def _update_attr(old_attr, new_attr):
-    for func in (_devalue_u, _value_presence, _mean_pdcs):
-        old_value, new_value = func(old_attr, new_attr)
-        if old_value < new_value:
-            return old_attr
-        if old_value > new_value:
-            return new_attr
-    return old_attr
-
-
-def _devalue_u(old_attr, new_attr):
-    # Score it like golf.
-    points = []
-    for a in (old_attr, new_attr):
-        count = 0
-        for ec in (a['EC_Source'], a['EC_Target']):
-            if ec == 'Up':
-                count += 1
-            elif ec == 'Ux':
-                count += 2
-        points.append(count)
-    return points
-
-
-def _value_presence(old_attr, new_attr):
-    old_ecs = old_attr['EC_Source'], old_attr['EC_Target']
-    if 'N' in old_ecs:
-        old_value = 1
-    else:
-        old_value = 0
-    new_ecs = new_attr['EC_Source'], new_attr['EC_Target']
-    if 'N' in new_ecs:
-        new_value = 1
-    else:
-        new_value = 0
-    return old_value, new_value
-
-
-def _mean_pdcs(old_attr, new_attr):
-    return [np.mean((a['PDC_Source'], a['PDC_Target'])) for a in
-            (old_attr, new_attr)]                
+    for key in ('EC_Source', 'EC_Target'):
+        values = attr[key].values()
+        for value_list in values:
+            for value in value_list:
+                assert value in ('Up', 'Ux', 'N', 'Nc', 'Np', 'Nx', 'C', 'P',
+                                 'X')
