@@ -41,11 +41,11 @@ class EndGraph(DiGraph):
 
     def add_translated_edges(self, mapp, conn, desired_bmap, method='ort'):
         if method == 'dan':
-            self.dan_translate(mapp, conn, desired_bmap)
+            self._dan_translate(mapp, conn, desired_bmap)
         elif method == 'ort':
-            self.ort_translate(mapp, conn, desired_bmap)
+            self._ort_translate(mapp, conn, desired_bmap)
 
-    def dan_translate(self, mapp, conn, desired_bmap):
+    def _dan_translate(self, mapp, conn, desired_bmap):
         num_edges = conn.number_of_edges()
         conn_edges = conn.edges()
         while conn_edges:
@@ -77,7 +77,7 @@ class EndGraph(DiGraph):
                 ebunch.append((new_s, new_t, attr))
             self.add_edges_from(ebunch, 'dan')
 
-    def ort_translate(self, mapp, conn, desired_bmap):
+    def _ort_translate(self, mapp, conn, desired_bmap):
         for s, t in conn.edges_iter():
             s_map = s.split('-')[0]
             # new_sources will have regions from desired_bmap
