@@ -39,7 +39,7 @@ class EndGraph(DiGraph):
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr, method)
 
-    def add_translated_edges(self, mapp, conn, desired_bmap, method):
+    def add_translated_edges(self, mapp, conn, desired_bmap, method='ort'):
         if method == 'dan':
             self.dan_translate(mapp, conn, desired_bmap)
         elif method == 'ort':
