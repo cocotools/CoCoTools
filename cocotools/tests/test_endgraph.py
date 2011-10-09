@@ -146,14 +146,14 @@ def test_add_edges_from_ort():
     g = EndGraph()
     g.add_edges_from([('A-1', 'A-2', {'EC_Source': {'A': ['X']},
                                       'EC_Target': {'A': ['N']}}),
-                      ('A-1', 'A-2', {'EC_Source': {'C': ['P']},
+                      ('A-1', 'A-2', {'EC_Source': {'C': ['U']},
                                       'EC_Target': {'C': ['P']}}),
                       ('A-1', 'A-2', {'EC_Source': {'A': ['C']},
                                       'EC_Target': {'A': ['C']}})],
                      'ort')
     nt.assert_equal(g.number_of_edges(), 1)
     nt.assert_equal(g['A-1']['A-2'], {'EC_Source': {'A': ['X', 'C'],
-                                                    'C': ['P']},
+                                                    'C': ['U']},
                                       'EC_Target': {'A': ['N', 'C'],
                                                     'C': ['P']}})
     
