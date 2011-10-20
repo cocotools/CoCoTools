@@ -5,7 +5,25 @@ from networkx import DiGraph
 import cocotools.stats as cocostats
 
 
-class StatsTestCase(TestCase):
+class FindContradictionsTestCase(TestCase):
+
+    def setUp(self):
+        self.g = DiGraph()
+
+    def test_maps_reverse_source_target(self):
+        self.g.add_edge('A', 'B', {'EC_Source': {'A': ['N'], 'B': ['P']},
+                                   'EC_Target': {'A': ['P'], 'B': ['N']}})
+        self.assertEqual(cocostats.find_contradictions(self.g), [])
+
+    def test_multiple_source_ecs(self):
+        self.g.add_edge('A', 'B', {'EC_Source': {'A': ['N', 'N', 'N'],
+                                                 'B': ['N', 'N'],
+                                                 'C': ['N']},
+                                   'EC_Target': {'A': ['X', 'X', 'P']}})
+        self.assertEqual(cocostats.find_contradictions(self.g), [])        
+        
+
+class DanTestCase(TestCase):
 
     def setUp(self):
         self.g = DiGraph()
