@@ -26,7 +26,9 @@ class EndGraph(DiGraph):
                 raise EndGraphError('Attempted to add edge (%s, %s, %s' %
                                     (source, target, new_attr))
             add_edge = DiGraph.add_edge.im_func
-            if not self.has_edge(source, target):
+            if source == target:
+                return
+            elif not self.has_edge(source, target):
                 add_edge(self, source, target, new_attr)
             else:
                 old_attr = self[source][target]
