@@ -117,17 +117,14 @@ def test_ort():
                                       'PDC_Density': 18})])
     e = coco.EndGraph()
     e.add_translated_edges(m, c, 'B', 'ort')
-    nt.assert_equal(e.number_of_edges(), 5)
+    # Us don't get added.
+    nt.assert_equal(e.number_of_edges(), 3)
     nt.assert_equal(e['B-1']['B-2'], {'EC_Source': {'A': ['P', 'P']},
                                       'EC_Target': {'A': ['P', 'N']}})
     nt.assert_equal(e['B-1']['B-3'], {'EC_Source': {'A': ['P', 'P']},
                                       'EC_Target': {'A': ['P', 'N']}})
     nt.assert_equal(e['B-3']['B-4'], {'EC_Source': {'B': ['C']},
                                       'EC_Target': {'B': ['X']}})
-    nt.assert_equal(e['B-5']['B-2'], {'EC_Source': {'B': ['N']},
-                                      'EC_Target': {'A': ['Up']}})
-    nt.assert_equal(e['B-5']['B-3'], {'EC_Source': {'B': ['N']},
-                                      'EC_Target': {'A': ['Up']}})
     # Make sure c hasn't been modified.
     nt.assert_equal(c.number_of_edges(), 5)
 
@@ -154,10 +151,8 @@ def test_add_edges_from_ort():
                                       'EC_Target': {'A': ['C']}})],
                      'ort')
     nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A-1']['A-2'], {'EC_Source': {'A': ['X', 'C'],
-                                                    'C': ['U']},
-                                      'EC_Target': {'A': ['N', 'C'],
-                                                    'C': ['P']}})
+    nt.assert_equal(g['A-1']['A-2'], {'EC_Source': {'A': ['X', 'C']},
+                                      'EC_Target': {'A': ['N', 'C']}})
     
 #------------------------------------------------------------------------------
 # Unit Tests

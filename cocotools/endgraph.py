@@ -23,8 +23,7 @@ class EndGraph(DiGraph):
             try:
                 _assert_valid_attr(new_attr)
             except EndGraphError:
-                raise EndGraphError('Attempted to add edge (%s, %s, %s' %
-                                    (source, target, new_attr))
+                return
             add_edge = DiGraph.add_edge.im_func
             if source == target:
                 return
@@ -152,6 +151,5 @@ def _assert_valid_attr(attr):
         values = attr[key].values()
         for value_list in values:
             for value in value_list:
-                if value not in ('Up', 'Ux', 'N', 'Nc', 'Np', 'Nx', 'C', 'P',
-                                 'X', 'U'):
+                if value not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
                     raise EndGraphError('Attempted to add EC = %s' % value)
