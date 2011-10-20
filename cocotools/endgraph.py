@@ -84,45 +84,10 @@ class EndGraph(DiGraph):
 
     def _ort_translate(self, mapp, conn, desired_bmap):
         for s, t in conn.edges_iter():
-            s_map = s.split('-')[0]
-            # new_sources will have regions from desired_bmap
-            # coextensive with source as keys and (ec, pdc) tuples as
-            # values.
-            new_sources = {}
-            for new_s in mapp._translate_node(s, desired_bmap):
-                single_steps, multi_steps = mapp._separate_rcs(new_s, s_map)
-                new_sources[new_s] = []
-                for old_s, rc in single_steps:
-                    new_sources[new_s].append(conn._single_ec_step(old_s, rc,
-                                                                   t,
-                                                                   'Source'))
-                if multi_steps:
-                    ec = 'B'
-                    pdc_sum = 0.0
-                    for old_s, rc in multi_steps:
-                        ec, pdc_sum = conn._multi_ec_step(old_s, rc, t,
-                                                          'Source', ec,
-                                                          pdc_sum)
-                    avg_pdc = pdc_sum / (2 * len(multi_steps))
-                    new_sources[new_s].append((ec, avg_pdc))
-            t_map = t.split('-')[0]
-            new_targets = {}
-            for new_t in mapp._translate_node(t, desired_bmap):
-                single_steps, multi_steps = mapp._separate_rcs(new_t, t_map)
-                new_targets[new_t] = []
-                for old_t, rc in single_steps:
-                    new_targets[new_t].append(conn._single_ec_step(s, rc,
-                                                                   old_t,
-                                                                   'Target'))
-                if multi_steps:
-                    ec = 'B'
-                    pdc_sum = 0.0
-                    for old_t, rc in multi_steps:
-                        ec, pdc_sum = conn._multi_ec_step(s, rc, old_t,
-                                                          'Target', ec,
-                                                          pdc_sum)
-                    avg_pdc = pdc_sum / (2 * len(multi_steps))
-                    new_targets[new_t].append((ec, avg_pdc))
+            new_sources = _translate_one_side(mapp, conn, desired_bmap, s,
+                                              'Source', t)
+            new_targets = _translate_one_side(mapp, conn, desired_bmap, t,
+                                              'Target', s)
             for new_s, s_values in new_sources.iteritems():
                 for new_t, t_values in new_targets.iteritems():
                     for s_value in s_values:
@@ -145,6 +110,36 @@ class EndGraph(DiGraph):
             except ZeroDivisionError:
                 edge_dict['score'] = 0
 
+
+def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
+    """Returns dict mapping each new node to a list of (EC, PDC) tuples."""
+    node_map = node.split('-')[0]
+    new_nodes = {}
+    for new_node in mapp._translate_node(node, desired_bmap):
+        single_steps, multi_steps = mapp._separate_rcs(new_node, node_map)
+        new_nodes[new_node] = []
+        for old_node, rc in single_steps:
+            if role == 'Source':
+                new_nodes[new_node].append(conn._single_ec_step(old_node, rc,
+                                                                other, role))
+            else:
+                new_nodes[new_node].append(conn._single_ec_step(other,
+                                                                rc, old_node,
+                                                                role))
+        if multi_steps:
+            ec = 'B'
+            pdc_sum = 0.0
+            for old_node, rc in multi_steps:
+                if role == 'Source':
+                    ec, pdc_sum = conn._multi_ec_step(old_node, rc, other,
+                                                      role, ec, pdc_sum)
+                else:
+                    ec, pdc_sum = conn._multi_ec_step(other, rc, old_node,
+                                                      role, ec, pdc_sum)
+            avg_pdc = pdc_sum / (2 * len(multi_steps))
+            new_nodes[new_node].append((ec, avg_pdc))
+    return new_nodes
+        
 
 def _assert_valid_attr(attr):
     for key in ('EC_Source', 'EC_Target'):
