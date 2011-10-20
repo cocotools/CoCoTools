@@ -118,13 +118,11 @@ def test_ort():
     e = coco.EndGraph()
     e.add_translated_edges(m, c, 'B', 'ort')
     # Us don't get added.
-    nt.assert_equal(e.number_of_edges(), 3)
-    nt.assert_equal(e['B-1']['B-2'], {'EC_Source': {'A': ['P', 'P']},
-                                      'EC_Target': {'A': ['P', 'N']}})
-    nt.assert_equal(e['B-1']['B-3'], {'EC_Source': {'A': ['P', 'P']},
-                                      'EC_Target': {'A': ['P', 'N']}})
-    nt.assert_equal(e['B-3']['B-4'], {'EC_Source': {'B': ['C']},
-                                      'EC_Target': {'B': ['X']}})
+    nt.assert_equal(sorted(e.edges()),
+                    [('B-1', 'B-2'), ('B-1', 'B-3'), ('B-3', 'B-4')])
+    nt.assert_equal(e['B-1']['B-2'], {'EC_Pairs': [('P', 'P'), ('P', 'N')]})
+    nt.assert_equal(e['B-1']['B-3'], {'EC_Pairs': [('P', 'P'), ('P', 'N')]})
+    nt.assert_equal(e['B-3']['B-4'], {'EC_Pairs': [('C', 'X')]})
     # Make sure c hasn't been modified.
     nt.assert_equal(c.number_of_edges(), 5)
 
@@ -143,16 +141,11 @@ def test_add_edges_from_dan():
 
 def test_add_edges_from_ort():
     g = coco.EndGraph()
-    g.add_edges_from([('A-1', 'A-2', {'EC_Source': {'A': ['X']},
-                                      'EC_Target': {'A': ['N']}}),
-                      ('A-1', 'A-2', {'EC_Source': {'C': ['U']},
-                                      'EC_Target': {'C': ['P']}}),
-                      ('A-1', 'A-2', {'EC_Source': {'A': ['C']},
-                                      'EC_Target': {'A': ['C']}})],
-                     'ort')
+    g.add_edges_from([('A-1', 'A-2', {'EC_Pairs': [('X', 'N')]}),
+                      ('A-1', 'A-2', {'EC_Pairs': [('U', 'P')]}),
+                      ('A-1', 'A-2', {'EC_Pairs': [('C', 'C')]})], 'ort')
     nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A-1']['A-2'], {'EC_Source': {'A': ['X', 'C']},
-                                      'EC_Target': {'A': ['N', 'C']}})
+    nt.assert_equal(g['A-1']['A-2'], {'EC_Pairs': [('X', 'N'), ('C', 'C')]})
     
 #------------------------------------------------------------------------------
 # Unit Tests

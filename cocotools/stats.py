@@ -10,11 +10,7 @@ def find_contradictions(e):
     contradictions = []
     for source, target in e.edges_iter():
         present, absent = 0, 0
-        for node in ('Source', 'Target'):
-            exec """%s_ecs = [ec for ecs in e[source][target]['EC_%s']
-for ec in ecs]""" % (node.lower(), node)
-        ec_pairs = zip(source_ecs, target_ecs)
-        for source_ec, target_ec in ec_pairs:
+        for source_ec, target_ec in e[source][target]['EC_Pairs']:
             ns = ('N', 'Nc', 'Np', 'Nx')
             if source_ec in ns or target_ec in ns:
                 absent += 1

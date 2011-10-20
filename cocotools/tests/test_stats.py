@@ -11,17 +11,9 @@ class FindContradictionsTestCase(TestCase):
         self.g = DiGraph()
 
     def test_maps_reverse_source_target(self):
-        self.g.add_edge('A', 'B', {'EC_Source': {'A': ['N'], 'B': ['P']},
-                                   'EC_Target': {'A': ['P'], 'B': ['N']}})
+        self.g.add_edge('A', 'B', {'EC_Pairs': [('N', 'P'), ('P', 'N')]})
         self.assertEqual(cocostats.find_contradictions(self.g), [])
 
-    def test_multiple_source_ecs(self):
-        self.g.add_edge('A', 'B', {'EC_Source': {'A': ['N', 'N', 'N'],
-                                                 'B': ['N', 'N'],
-                                                 'C': ['N']},
-                                   'EC_Target': {'A': ['X', 'X', 'P']}})
-        self.assertEqual(cocostats.find_contradictions(self.g), [])        
-        
 
 class DanTestCase(TestCase):
 

@@ -30,13 +30,7 @@ class EndGraph(DiGraph):
             elif not self.has_edge(source, target):
                 add_edge(self, source, target, new_attr)
             else:
-                old_attr = self[source][target]
-                for ec in ('EC_Source', 'EC_Target'):
-                    for bmap in new_attr[ec]:
-                        try:
-                            old_attr[ec][bmap] += new_attr[ec][bmap]
-                        except KeyError:
-                            old_attr[ec][bmap] = new_attr[ec][bmap]
+                self[source][target]['EC_Pairs'] += new_attr['EC_Pairs']
         else:
             raise EndGraphError('Invalid method supplied.')
 
@@ -93,9 +87,8 @@ class EndGraph(DiGraph):
                     for s_value in s_values:
                         for t_value in t_values:
                             self.add_edge(new_s, new_t,
-                                          {'EC_Source': {s_map: [s_value[0]]},
-                                           'EC_Target': {t_map: [t_value[0]]}},
-                                          'ort')
+                                          {'EC_Pairs': [(s_value[0],
+                                                         t_value[0])]}, 'ort')
 
     def add_controversy_scores(self):
         for source, target in self.edges_iter():
@@ -142,9 +135,8 @@ def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
         
 
 def _assert_valid_attr(attr):
-    for key in ('EC_Source', 'EC_Target'):
-        values = attr[key].values()
-        for value_list in values:
-            for value in value_list:
-                if value not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
-                    raise EndGraphError('Attempted to add EC = %s' % value)
+    """Check that attr has 'EC_Pairs' key and that ECs are valid."""
+    for ec_pair in attr['EC_Pairs']:
+        for ec in ec_pair:
+            if ec not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
+                raise EndGraphError('Attempted to add EC = %s' % ec)
