@@ -1,4 +1,5 @@
 from testfixtures import replace
+from unittest import TestCase
 
 from networkx import DiGraph
 import nose.tools as nt
@@ -117,12 +118,14 @@ def test_ort():
                                       'PDC_Density': 18})])
     e = coco.EndGraph()
     e.add_translated_edges(m, c, 'B', 'ort')
-    # Us don't get added.
     nt.assert_equal(sorted(e.edges()),
                     [('B-1', 'B-2'), ('B-1', 'B-3'), ('B-3', 'B-4')])
-    nt.assert_equal(e['B-1']['B-2'], {'EC_Pairs': [('P', 'P'), ('P', 'N')]})
-    nt.assert_equal(e['B-1']['B-3'], {'EC_Pairs': [('P', 'P'), ('P', 'N')]})
-    nt.assert_equal(e['B-3']['B-4'], {'EC_Pairs': [('C', 'X')]})
+    nt.assert_equal(e['B-1']['B-2'], {'ECs': ('P', 'P'), 'PDC': 6.375,
+                                      'Presence-Absence': 0})
+    nt.assert_equal(e['B-1']['B-3'], {'ECs': ('P', 'P'), 'PDC': 6.375,
+                                      'Presence-Absence': 0})
+    nt.assert_equal(e['B-3']['B-4'], {'ECs': ('C', 'X'), 'PDC': 7.5,
+                                      'Presence-Absence': 1})
     # Make sure c hasn't been modified.
     nt.assert_equal(c.number_of_edges(), 5)
 
@@ -141,16 +144,43 @@ def test_add_edges_from_dan():
 
 def test_add_edges_from_ort():
     g = coco.EndGraph()
-    g.add_edges_from([('A-1', 'A-2', {'EC_Pairs': [('X', 'N')]}),
-                      ('A-1', 'A-2', {'EC_Pairs': [('U', 'P')]}),
-                      ('A-1', 'A-2', {'EC_Pairs': [('C', 'C')]})], 'ort')
+    g.add_edges_from([('A-1', 'A-2', {'ECs': ('X', 'N'), 'PDC': 5,
+                                      'Presence-Absence': -1}),
+                      ('A-1', 'A-2', {'ECs': ('U', 'P'), 'PDC': 9,
+                                      'Presence-Absence': 1}),
+                      ('A-1', 'A-2', {'ECs': ('C', 'C'), 'PDC': 10,
+                                      'Presence-Absence': 1})], 'ort')
     nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A-1']['A-2'], {'EC_Pairs': [('X', 'N'), ('C', 'C')]})
+    nt.assert_equal(g['A-1']['A-2'], {'ECs': ('X', 'N'), 'PDC': 5,
+                                      'Presence-Absence': 0})
     
 #------------------------------------------------------------------------------
 # Unit Tests
 #------------------------------------------------------------------------------
 
+class EvaluateConflictTestCase(TestCase):
+    
+    def test_N_vs_C(self):
+        old = {'ECs': ('N', 'C'), 'PDC': 5, 'Presence-Absence': -4}
+        new = {'ECs': ('C', 'C'), 'PDC': 5, 'Presence-Absence': -4}
+        self.assertEqual(coco.endgraph._evaluate_conflict(old, new, -4),
+                         {'ECs': ('N', 'C'), 'PDC': 5, 'Presence-Absence': -4})
+
+    def test_both_present(self):
+        old = {'ECs': ('P', 'P'), 'PDC': 5, 'Presence-Absence': -4}
+        new = {'ECs': ('C', 'C'), 'PDC': 5, 'Presence-Absence': -4}
+        self.assertEqual(coco.endgraph._evaluate_conflict(old, new, -4),
+                         {'ECs': ('P', 'P'), 'PDC': 5, 'Presence-Absence': -4})
+
+
+@replace('cocotools.endgraph._evaluate_conflict', lambda o, n, s: None)
+def test__update_attr():
+    old = {'ECs': ('N', 'C'), 'PDC': 5, 'Presence-Absence': -5}
+    new = {'ECs': ('C', 'C'), 'PDC': 3, 'Presence-Absence': 1}
+    nt.assert_equal(coco.endgraph._update_attr(old, new),
+                    {'ECs': ('C', 'C'), 'PDC': 3, 'Presence-Absence': -4})
+    
+    
 def test_add_controversy_scores():
     g = DiGraph()
     g.add_edges_from([('A-1', 'A-2', {'ebunches_for': [('B', 'B'), ('C', 'C')],

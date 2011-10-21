@@ -30,7 +30,9 @@ class EndGraph(DiGraph):
             elif not self.has_edge(source, target):
                 add_edge(self, source, target, new_attr)
             else:
-                self[source][target]['EC_Pairs'] += new_attr['EC_Pairs']
+                old_attr = self[source][target]
+                add_edge(self, source, target,
+                         _update_attr(old_attr, new_attr))
         else:
             raise EndGraphError('Invalid method supplied.')
 
@@ -86,9 +88,17 @@ class EndGraph(DiGraph):
                 for new_t, t_values in new_targets.iteritems():
                     for s_value in s_values:
                         for t_value in t_values:
+                            s_ec, t_ec = s_value[0], t_value[0]
+                            ns = ('N', 'Nc', 'Np', 'Nx')
+                            if s_ec in ns or t_ec in ns:
+                                present = -1
+                            else:
+                                present = 1
                             self.add_edge(new_s, new_t,
-                                          {'EC_Pairs': [(s_value[0],
-                                                         t_value[0])]}, 'ort')
+                                          {'ECs': (s_ec, t_ec),
+                                           'PDC': np.mean([s_value[1],
+                                                           t_value[1]]),
+                                           'Presence-Absence': present}, 'ort')
 
     def add_controversy_scores(self):
         for source, target in self.edges_iter():
@@ -102,6 +112,46 @@ class EndGraph(DiGraph):
                 edge_dict['score'] = (for_ - against_) / float(for_ + against_)
             except ZeroDivisionError:
                 edge_dict['score'] = 0
+
+
+def _evaluate_conflict(old_attr, new_attr, updated_score):
+    ns = ('N', 'Nc', 'Np', 'Nx')
+    for age in ('old', 'new'):
+        exec 's_ec, t_ec = %s_attr["ECs"]' % age
+        if s_ec in ns or t_ec in ns:
+            exec '%s_score = -1' % age
+        else:
+            exec '%s_score = 1' % age
+    if old_score == new_score:
+        return old_attr
+    elif updated_score > 0:
+        if old_score > new_score:
+            return old_attr
+        else:
+            return new_attr
+    elif updated_score < 0:
+        if old_score > new_score:
+            return new_attr
+        else:
+            return old_attr
+    else:
+        return old_attr
+
+                
+def _update_attr(old_attr, new_attr):
+
+    updated_score = old_attr['Presence-Absence'] + new_attr['Presence-Absence']
+    new_attr['Presence-Absence'] = updated_score
+    old_attr['Presence-Absence'] = updated_score
+
+    new_pdc = new_attr['PDC']
+    old_pdc = old_attr['PDC']
+    if new_pdc < old_pdc:
+        return new_attr
+    elif old_pdc < new_pdc:
+        return old_attr
+    else:
+        return _evaluate_conflict(old_attr, new_attr, updated_score)
 
 
 def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
@@ -135,8 +185,12 @@ def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
         
 
 def _assert_valid_attr(attr):
-    """Check that attr has 'EC_Pairs' key and that ECs are valid."""
-    for ec_pair in attr['EC_Pairs']:
-        for ec in ec_pair:
-            if ec not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
-                raise EndGraphError('Attempted to add EC = %s' % ec)
+    """Check that attr has valid ECs, PDCs, and Presence-Absence score."""
+    for ec in attr['ECs']:
+        if ec not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
+            raise EndGraphError('Attempted to add EC = %s' % ec)
+    pdc = attr['PDC']
+    if not (type(pdc) in (float, int, np.float64) and 0 <= pdc <= 18):
+        raise EndGraphError('Attempted to add PDC = %s' % pdc)
+    if attr['Presence-Absence'] not in (1, -1):
+        raise EndGraphError('Attempted to add bad Presence-Absence score.')
