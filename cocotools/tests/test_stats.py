@@ -1,18 +1,18 @@
 from unittest import TestCase
 
 from networkx import DiGraph
+import nose.tools as nt
 
 import cocotools.stats as cocostats
 
 
-class FindContradictionsTestCase(TestCase):
-
-    def setUp(self):
-        self.g = DiGraph()
-
-    def test_maps_reverse_source_target(self):
-        self.g.add_edge('A', 'B', {'EC_Pairs': [('N', 'P'), ('P', 'N')]})
-        self.assertEqual(cocostats.find_contradictions(self.g), [])
+def test_binarize_ecs():
+    e = DiGraph()
+    e.add_edges_from([('A', 'B', {'ECs': ('N', 'P')}),
+                      ('C', 'D', {'ECs': ('P', 'X')})])
+    g = cocostats.binarize_ecs(e)
+    nt.assert_equal(g.number_of_edges(), 1)
+    nt.assert_equal(g['C']['D'], {})
 
 
 class DanTestCase(TestCase):

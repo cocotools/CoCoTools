@@ -6,19 +6,14 @@ from networkx import DiGraph
 # Functions Related to ORT Method
 #------------------------------------------------------------------------------
 
-def find_contradictions(e):
-    contradictions = []
+def binarize_ecs(e):
+    g = DiGraph()
     for source, target in e.edges_iter():
-        present, absent = 0, 0
-        for source_ec, target_ec in e[source][target]['EC_Pairs']:
-            ns = ('N', 'Nc', 'Np', 'Nx')
-            if source_ec in ns or target_ec in ns:
-                absent += 1
-            else:
-                present += 1
-        if present and absent:
-            contradictions.append((source, target))
-    return contradictions
+        source_ec, target_ec = e[source][target]['ECs']
+        ns = ('N', 'Nc', 'Np', 'Nx')
+        if source_ec not in ns and target_ec not in ns:
+            g.add_edge(source, target)
+    return g
 
 #------------------------------------------------------------------------------
 # Functions Related to Dan Method
