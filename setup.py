@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+"""Tools for analyzing data from the CoCoMac macaque connectivity database.
+"""
 from distutils.core import setup
 
 setup(name='CoCoTools',
