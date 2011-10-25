@@ -1,6 +1,40 @@
 from numpy import histogram
 from networkx import DiGraph
 
+#------------------------------------------------------------------------------
+# General Functions
+#------------------------------------------------------------------------------
+
+def get_top_ten(method):
+    """Returns top ten nodes in order from best to worst.
+
+    Parameters
+    ----------
+    method : method
+      Graph method that returns a statistic for each node in the graph.
+
+    Notes
+    -----
+    Greater values of the statistic must be better.  Results are
+    undefined for graphs with fewer than 10 nodes.  Ties result in more
+    than 10 nodes being returned.
+    """
+    stat_to_node = {}
+    for node, stat in method():
+        if not stat_to_node.has_key(stat):
+            stat_to_node[stat] = [node]
+        else:
+            stat_to_node[stat].append(node)
+    top_ten = []
+    for stat in reversed(stat_to_node.keys()):
+        nodes = stat_to_node[stat]
+        if len(top_ten) == 10:
+            break
+        elif len(nodes) > 1:
+            top_ten.append(nodes)
+        else:
+            top_ten.append(nodes[0])
+    return top_ten
 
 #------------------------------------------------------------------------------
 # Functions Related to ORT Method

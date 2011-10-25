@@ -6,6 +6,30 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+class TopTenTestCase(TestCase):
+
+    def setUp(self):
+        self.g = DiGraph()
+        self.g.add_edges_from([('A', 'B'), ('C', 'B'), ('D', 'B'), ('E', 'B'),
+                               ('F', 'B'), ('G', 'B'), ('H', 'B'), ('A', 'F'),
+                               ('B', 'F'), ('C', 'F'), ('D', 'F'), ('E', 'F'),
+                               ('G', 'F'), ('A', 'G'), ('B', 'G'), ('C', 'G'),
+                               ('D', 'G'), ('E', 'G'), ('A', 'D'), ('B', 'D'),
+                               ('C', 'D'), ('E', 'D'), ('A', 'C'), ('B', 'C'),
+                               ('D', 'C'), ('B', 'A'), ('C', 'A'), ('A', 'H'),
+                               ('B', 'H'), ('A', 'E'), ('A', 'I'), ('A', 'J')])
+    
+    def test_ten_nodes(self):
+        nt.assert_equal(cocostats.get_top_ten(self.g.in_degree_iter),
+                        ['B', 'F', 'G', 'D', 'C', ['A', 'H'], ['E', 'I', 'J']])
+
+    def test_tie_last(self):
+        self.g.add_edge('A', 'K')
+        nt.assert_equal(cocostats.get_top_ten(self.g.in_degree_iter),
+                        ['B', 'F', 'G', 'D', 'C', ['A', 'H'], ['E', 'I', 'K',
+                         'J']])
+
+
 def test_binarize_ecs():
     e = DiGraph()
     e.add_edges_from([('A', 'B', {'ECs': ('N', 'P')}),
