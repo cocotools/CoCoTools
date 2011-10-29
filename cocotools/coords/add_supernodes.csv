@@ -1,0 +1,19 @@
+gold_standard, incf, cocomac1,cocomac2, color, x, y, z, comment
+
+
+29,add_superset,may be a superset of several existing nodes,,,,,,
+, 29a-c, 29a-c, 7D05FA,2.32,-12.6,23.12,,
+, 29d, 29d, 8705FA,1.85,-11.7,23.4,,
+
+
+
+
+
+ 24/23,add_superset,this is a superset of 2 existing nodes and good match nodes,,,,,,
+, 24/23a, 24/23a, 4B0596,0.92,-8.1,26.3,,
+, 24/23b, 24/23b, 5005C8,0.64,-7.65,28.27,,
+
+
+ ST2,add_superset,"may be a superset of several existing nodes (ST2G,ST2S)",,,,
+, ST2G, ST2G, CD6964,25.16,-2.25,12.14
+, ST2S, ST2S, CD6932,21.34,-1.35,12.99

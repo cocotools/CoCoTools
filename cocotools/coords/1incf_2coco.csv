@@ -1,0 +1,10 @@
+gold_standard, incf, cocomac1,cocomac2, color, x, y, z, comment,consider adding to cocomac,omit from list
+4(F1), 4(F1),4,F1, AA0564,2.88,-10.8,37.84,2 coco : 1 incf,,
+6DC(F2), 6DC(F2),6DC,F2, EB05FA,9.4,-2.7,36.34,2 coco : 1 incf,,
+6DR(F7), 6DR(F7),6DR,F7, F06432,8.19,4.5,36.72,2 coco : 1 incf,,
+6VC(F4), 6VC(F4),6VC,F4, C86496,19.19,-3.15,32.31,2 coco : 1 incf,,
+6VR(F5), 6VR(F5),6VR,F5, C86464,24.6,3.15,20.21,2 coco : 1 incf,,
+MT(V5), MT(V5),V5,MT, B43264,19.1,-26.55,21.24,2 coco : 1 incf,,
+TL(36), TL(36),TL,36, AF5096,14.25,-18,-0.33,2 coco : 1 incf,,
+TEOM, TEOM, TEOM,PITD, 6E50FA,26.93,-23.4,18.52,2 coco : 1 incf,,
+6M, 6M, 6M,6m, F00532,1.76,0.45,34.28,,,
