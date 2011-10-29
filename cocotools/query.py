@@ -169,6 +169,11 @@ def _element2edge(prim_e, search_type):
     source : string
     target : string
     edge_attr : dict
+
+    Notes
+    -----
+    Make BrainSites uppercase to avoid duplicate nodes (differing only
+    in case) being added to graph.
     """
     edge_attr = {}
     for attr_tag in SPECS[search_type]['other_tags']:
@@ -194,7 +199,7 @@ def _element2edge(prim_e, search_type):
         if ec_t == 'N':
             ec_s = 'N%s' % ec_s.lower()
     site_ids = prim_e.findall('%sID_BrainSite' % P)
-    return site_ids[0].text, site_ids[1].text, edge_attr
+    return site_ids[0].text.upper(), site_ids[1].text.upper(), edge_attr
 
 
 def _element_tree(xml_str):
