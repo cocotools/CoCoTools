@@ -6,6 +6,28 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+class CheckForDupsTestCase(TestCase):
+
+    def setUp(self):
+        self.g = DiGraph()
+    
+    def test_dups(self):
+        self.g.add_nodes_from(['A99-Pg', 'B-10', 'A99-pg', 'a99-Pg',
+                               'A99-Pg1'])
+        self.assertEqual(cocostats.check_for_dups(self.g),
+                         ['A99-Pg', 'A99-pg', 'a99-Pg'])
+
+    def test_no_dups(self):
+        self.g.add_nodes_from(['A85-AB', 'A85-Aha', 'A85-CO', 'A85-CTA'])
+        self.assertEqual(cocostats.check_for_dups(self.g), None)
+
+    def test_two_groups_of_dups(self):
+        self.g.add_nodes_from(['D', 'A', 'E', 'a', 'B', 'C', 'F', 'c'])
+        # Note that Python's alphabetical order is A-Za-z.
+        self.assertEqual(cocostats.check_for_dups(self.g),
+                         ['A', 'C', 'a', 'c'])
+
+
 class TopTenTestCase(TestCase):
 
     def setUp(self):

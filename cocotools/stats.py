@@ -5,6 +5,31 @@ from networkx import DiGraph
 # General Functions
 #------------------------------------------------------------------------------
 
+def check_for_dups(g):
+    """Return nodes in g that differ only in case."""
+    # Before iterating through all the nodes, see whether any are
+    # duplicated.
+    nodes = g.nodes()
+    unique_nodes = set([node.lower() for node in nodes])
+    if len(unique_nodes) < len(nodes):
+        dups = []
+        checked = []
+        for node in nodes:
+            lowercase_node = node.lower()
+            if lowercase_node not in checked:
+                checked.append(lowercase_node)
+                continue
+            # Still append to checked to keep indices matched with
+            # nodes.
+            checked.append(lowercase_node)
+            dups.append(node)
+            original_node = nodes[checked.index(lowercase_node)]
+            if original_node not in dups:
+                dups.append(original_node)
+        dups.sort()
+        return dups
+
+
 def get_top_ten(method):
     """Returns top ten nodes in order from best to worst.
 
