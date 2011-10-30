@@ -1,16 +1,32 @@
-"""Improved drawing of directed graphs in NetworkX.
-
-
-Modified from http://groups.google.com/group/networkx-discuss/browse_thread/thread/170624d22c4b0ee6?pli=1 
-
-Author: Stefan van der Walt.
-"""
-
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, Circle
 import numpy as np
+import networkx as nx
+
+
+def degree_histogram(g, file_name, title=None):
+    """Show and save degree histogram.
+
+    Modified from networkx.lanl.gov/examples/drawing/degree_histogram.html.
+
+    Author: Aric Hagberg
+    """
+    degree_sequence = sorted(nx.degree(g).values(), reverse=True)
+    plt.plot(degree_sequence, 'b-', marker='o')
+    if title:
+        plt.title(title)
+    plt.savefig(file_name)
+    plt.show()
+
 
 def draw_network(G,pos,sg=None,node_color=None,cmap=None):
+    """Improved drawing of directed graphs in NetworkX.
+
+    Modified from http://groups.google.com/group/networkx-discuss/
+    browse_thread/thread/170624d22c4b0ee6?pli=1.
+
+    Author: Stefan van der Walt.
+    """
     f = plt.figure()
     ax = f.gca()
 
