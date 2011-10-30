@@ -6,6 +6,7 @@ import urllib
 import urllib2
 import xml.etree.ElementTree as etree
 from cStringIO import StringIO
+from socket import timeout
 
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
@@ -268,7 +269,7 @@ def url(search_type, bmap):
 def query_cocomac(search_type, bmap):
     try:
         xml = urllib2.urlopen(url(search_type, bmap), timeout=120).read()
-    except urllib2.URLError:
+    except (urllib2.URLError, timeout):
         return
     return _scrub_xml_str(xml)
 
