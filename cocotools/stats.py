@@ -5,6 +5,16 @@ from networkx import DiGraph
 # General Functions
 #------------------------------------------------------------------------------
 
+def compute_graph_of_unknowns(e):
+    u = DiGraph()
+    nodes = e.nodes()
+    for source in nodes:
+        for target in nodes:
+            if source != target and not e.has_edge(source, target):
+                u.add_edge(source, target)
+    return u
+    
+
 def check_for_dups(g):
     """Return nodes in g that differ only in case."""
     # Before iterating through all the nodes, see whether any are

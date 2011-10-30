@@ -6,6 +6,15 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+def test_compute_graph_of_unknowns():
+    g = DiGraph()
+    g.add_edges_from([('A', 'B'), ('C', 'D'), ('B', 'D'), ('D', 'A'),
+                      ('B', 'C')])
+    u = cocostats.compute_graph_of_unknowns(g)
+    nt.assert_equal(u.edges(), [('A', 'C'), ('A', 'D'), ('C', 'A'), ('C', 'B'), 
+                                ('B', 'A'), ('D', 'C'), ('D', 'B')])
+
+
 class CheckForDupsTestCase(TestCase):
 
     def setUp(self):
