@@ -19,7 +19,8 @@ def get_coord_dict(g, coord_file, dim='XY'):
 
     dim : string
       Desired two dimensions from coord_file.  Must be formatted as two
-      capitalized letters (e.g., 'XY').
+      capitalized letters (e.g., 'XY').  X = left-right, Y =
+      posterior-anterior, Z = inferior-superior.
     """
     coord_dict = {}
     file_extension = splitext(coord_file)[1]
