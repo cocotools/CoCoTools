@@ -6,6 +6,18 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+def test_merge_nodes():
+    g = DiGraph()
+    g.add_edges_from([('A1', 'A2'), ('A1', 'B'), ('A1', 'C'), ('A2', 'D'),
+                      ('A2', 'C'), ('A2', 'E'), ('C', 'A2'), ('E', 'A1')])
+    g2 = cocostats.merge_nodes(g, 'A', ['A1', 'A2'])
+    nt.assert_equal(g2.number_of_nodes(), 5)
+    nt.assert_equal(g2.edges(), [('A', 'C'), ('A', 'B'), ('A', 'E'),
+                                 ('A', 'D'), ('C', 'A'), ('E', 'A')])
+    nt.assert_equal(g.number_of_nodes(), 6)
+    nt.assert_equal(g.number_of_edges(), 8)
+
+
 def test_compute_graph_of_unknowns():
     g = DiGraph()
     g.add_edges_from([('A', 'B'), ('C', 'D'), ('B', 'D'), ('D', 'A'),

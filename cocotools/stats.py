@@ -1,9 +1,29 @@
+import copy
+
 from numpy import histogram
 from networkx import DiGraph
 
 #------------------------------------------------------------------------------
 # General Functions
 #------------------------------------------------------------------------------
+
+def merge_nodes(g, new_name, nodes):
+    g2 = copy.deepcopy(g)
+    predecessors, successors = set(), set()
+    for node in nodes:
+        for neighbor_type in ('predecessors', 'successors'):
+            exec 'neighbors = g2.%s(node)' % neighbor_type
+            for neighbor in neighbors:
+                exec '%s.add(neighbor)' % neighbor_type
+        g2.remove_node(node)
+    for p in predecessors:
+        if g2.has_node(p):
+            g2.add_edge(p, new_name)
+    for s in successors:
+        if g2.has_node(s):
+            g2.add_edge(new_name, s)
+    return g2
+
 
 def compute_graph_of_unknowns(e):
     u = DiGraph()
