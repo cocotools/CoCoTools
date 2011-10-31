@@ -1,9 +1,64 @@
+import copy
+
 from numpy import histogram
 from networkx import DiGraph
 
 #------------------------------------------------------------------------------
 # General Functions
 #------------------------------------------------------------------------------
+
+def merge_nodes(g, new_name, nodes):
+    g2 = copy.deepcopy(g)
+    predecessors, successors = set(), set()
+    for node in nodes:
+        for neighbor_type in ('predecessors', 'successors'):
+            exec 'neighbors = g2.%s(node)' % neighbor_type
+            for neighbor in neighbors:
+                exec '%s.add(neighbor)' % neighbor_type
+        g2.remove_node(node)
+    for p in predecessors:
+        if g2.has_node(p):
+            g2.add_edge(p, new_name)
+    for s in successors:
+        if g2.has_node(s):
+            g2.add_edge(new_name, s)
+    return g2
+
+
+def compute_graph_of_unknowns(e):
+    u = DiGraph()
+    nodes = e.nodes()
+    for source in nodes:
+        for target in nodes:
+            if source != target and not e.has_edge(source, target):
+                u.add_edge(source, target)
+    return u
+    
+
+def check_for_dups(g):
+    """Return nodes in g that differ only in case."""
+    # Before iterating through all the nodes, see whether any are
+    # duplicated.
+    nodes = g.nodes()
+    unique_nodes = set([node.lower() for node in nodes])
+    if len(unique_nodes) < len(nodes):
+        dups = []
+        checked = []
+        for node in nodes:
+            lowercase_node = node.lower()
+            if lowercase_node not in checked:
+                checked.append(lowercase_node)
+                continue
+            # Still append to checked to keep indices matched with
+            # nodes.
+            checked.append(lowercase_node)
+            dups.append(node)
+            original_node = nodes[checked.index(lowercase_node)]
+            if original_node not in dups:
+                dups.append(original_node)
+        dups.sort()
+        return dups
+
 
 def get_top_ten(method):
     """Returns top ten nodes in order from best to worst.

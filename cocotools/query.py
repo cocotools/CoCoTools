@@ -6,6 +6,7 @@ import urllib
 import urllib2
 import xml.etree.ElementTree as etree
 from cStringIO import StringIO
+from socket import timeout
 
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
@@ -169,6 +170,11 @@ def _element2edge(prim_e, search_type):
     source : string
     target : string
     edge_attr : dict
+
+    Notes
+    -----
+    Make BrainSites uppercase to avoid duplicate nodes (differing only
+    in case) being added to graph.
     """
     edge_attr = {}
     for attr_tag in SPECS[search_type]['other_tags']:
@@ -194,7 +200,7 @@ def _element2edge(prim_e, search_type):
         if ec_t == 'N':
             ec_s = 'N%s' % ec_s.lower()
     site_ids = prim_e.findall('%sID_BrainSite' % P)
-    return site_ids[0].text, site_ids[1].text, edge_attr
+    return site_ids[0].text.upper(), site_ids[1].text.upper(), edge_attr
 
 
 def _element_tree(xml_str):
@@ -263,7 +269,7 @@ def url(search_type, bmap):
 def query_cocomac(search_type, bmap):
     try:
         xml = urllib2.urlopen(url(search_type, bmap), timeout=120).read()
-    except urllib2.URLError:
+    except (urllib2.URLError, timeout):
         return
     return _scrub_xml_str(xml)
 

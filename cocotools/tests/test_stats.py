@@ -6,6 +6,49 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+def test_merge_nodes():
+    g = DiGraph()
+    g.add_edges_from([('A1', 'A2'), ('A1', 'B'), ('A1', 'C'), ('A2', 'D'),
+                      ('A2', 'C'), ('A2', 'E'), ('C', 'A2'), ('E', 'A1')])
+    g2 = cocostats.merge_nodes(g, 'A', ['A1', 'A2'])
+    nt.assert_equal(g2.number_of_nodes(), 5)
+    nt.assert_equal(g2.edges(), [('A', 'C'), ('A', 'B'), ('A', 'E'),
+                                 ('A', 'D'), ('C', 'A'), ('E', 'A')])
+    nt.assert_equal(g.number_of_nodes(), 6)
+    nt.assert_equal(g.number_of_edges(), 8)
+
+
+def test_compute_graph_of_unknowns():
+    g = DiGraph()
+    g.add_edges_from([('A', 'B'), ('C', 'D'), ('B', 'D'), ('D', 'A'),
+                      ('B', 'C')])
+    u = cocostats.compute_graph_of_unknowns(g)
+    nt.assert_equal(u.edges(), [('A', 'C'), ('A', 'D'), ('C', 'A'), ('C', 'B'), 
+                                ('B', 'A'), ('D', 'C'), ('D', 'B')])
+
+
+class CheckForDupsTestCase(TestCase):
+
+    def setUp(self):
+        self.g = DiGraph()
+    
+    def test_dups(self):
+        self.g.add_nodes_from(['A99-Pg', 'B-10', 'A99-pg', 'a99-Pg',
+                               'A99-Pg1'])
+        self.assertEqual(cocostats.check_for_dups(self.g),
+                         ['A99-Pg', 'A99-pg', 'a99-Pg'])
+
+    def test_no_dups(self):
+        self.g.add_nodes_from(['A85-AB', 'A85-Aha', 'A85-CO', 'A85-CTA'])
+        self.assertEqual(cocostats.check_for_dups(self.g), None)
+
+    def test_two_groups_of_dups(self):
+        self.g.add_nodes_from(['D', 'A', 'E', 'a', 'B', 'C', 'F', 'c'])
+        # Note that Python's alphabetical order is A-Za-z.
+        self.assertEqual(cocostats.check_for_dups(self.g),
+                         ['A', 'C', 'a', 'c'])
+
+
 class TopTenTestCase(TestCase):
 
     def setUp(self):
