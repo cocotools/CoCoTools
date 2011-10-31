@@ -1,4 +1,4 @@
-gold_standard, incf, cocomac, color, x, y, z,comments
+label, incf, cocomac, color, x, y, z,comments
 1,1,1, 2D6E64,20.31,-10.8,32.68,
 11,11,11, 0A05FA,6.42,12.6,20.49,
 13a, 13a, 13a, 2305FA,7.17,9.45,19.27,
@@ -41,7 +41,7 @@ EI, EI, EI, 6E1996,10.06,-8.1,-0.42
 ELR, ELR, ELR,691964,12.11,-3.15,2.67
 ER, ER, ER, 737DC8,10.62,-4.05,2.02
 FST, FST, FST, 1E1EC8,22.73,-23.4,16.74
-GI, GI, GI,7.31E+34,19.01,-11.7,19.08
+GI, GI, GI,731E32,19.01,-11.7,19.08
 La, La, La, 2828FA,13.97,-6.75,5.77
 MST, MST, MST, 5A32C8,14.81,-27.9,31.75
 Me, Me, Me, DC2D96,8.1,-5.85,8.67
