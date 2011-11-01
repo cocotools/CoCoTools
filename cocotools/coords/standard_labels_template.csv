@@ -1,4 +1,4 @@
-gold_standard, incf, cocomac, color, x, y, z, comment
+label,incf,cocomac,color,x,y,z,comments
 , 10D, , FF0064, 2.97, 19.8, 29.49, 
 , 10M, , 006496, 1.66, 19.8, 26.68, 
 , 11L, , 0F0532, 10.52, 14.4, 21.52, 
