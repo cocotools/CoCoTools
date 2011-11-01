@@ -76,7 +76,6 @@ def degree_histogram(g, file_name, title=None):
 
 
 
-<<<<<<< HEAD
 def draw_network(G, pos, node_color=None, ax=None,
                  radius=1, fontsize=16, line_alpha=0.25,
                  only_nodes = None):
