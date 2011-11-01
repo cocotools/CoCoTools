@@ -21,10 +21,10 @@ pht00_rhesus.tsv: raw coordinates from the INCF Scalable Brain Atlas
 alphabetically for easier reading.  Format is tab-separated, unlike the
 other files in this directory, which are comma-separated.
 
-gold_standard_template.csv: This is the template from which to start
+standard_labels_template.csv: This is the template from which to start
 the integration of the labels from INCF and CoCoMac.
 
-gold_standard_rsb.csv: This is just what you'd expect; it has all the
+standard_labels.csv: This is just what you'd expect; it has all the
 appropriate columns filled in and should be good to go: there are 97
 entries. Check out the comments for some supernodes I arbitrarily
 assigned to a subnode's coordinates (e.g. CoCoMac's 10 I assigned to
