@@ -6,6 +6,19 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+def test_find_hierarchy():
+    m = DiGraph()
+    m.add_edges_from([('A', 'B', {'RC': 'I'}), ('B', 'A', {'RC': 'I'}),
+                      ('C', 'D', {'RC': 'S'}), ('D', 'C', {'RC': 'L'}),
+                      ('E', 'F', {'RC': 'O'}), ('F', 'E', {'RC': 'O'}),
+                      ('G', 'D', {'RC': 'S'}), ('D', 'G', {'RC': 'L'})])
+    e = DiGraph()
+    e.add_nodes_from(['A', 'C', 'D', 'E', 'F', 'G'])
+    nt.assert_equal(cocostats.find_hierarchy(e, m),
+                    set([('C', 'S', 'D'), ('D', 'L', 'C'), ('E', 'O', 'F'),
+                         ('F', 'O', 'E'), ('G', 'S', 'D'), ('D', 'L', 'G')]))
+
+
 def test_merge_nodes():
     g = DiGraph()
     g.add_edges_from([('A1', 'A2'), ('A1', 'B'), ('A1', 'C'), ('A2', 'D'),

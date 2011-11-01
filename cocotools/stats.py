@@ -7,6 +7,19 @@ from networkx import DiGraph
 # General Functions
 #------------------------------------------------------------------------------
 
+def find_hierarchy(end_g, map_g):
+    hierarchy = set()
+    if end_g.name:
+        end_nodes = ['%s-%s' % (end_g.name, node) for node in end_g.nodes()]
+    else:
+        end_nodes = end_g.nodes()
+    for source in end_nodes:
+        for target in end_nodes:
+            if map_g.has_edge(source, target):
+                hierarchy.add((source, map_g[source][target]['RC'], target))
+    return hierarchy
+
+
 def merge_nodes(g, new_name, nodes):
     g2 = copy.deepcopy(g)
     predecessors, successors = set(), set()
