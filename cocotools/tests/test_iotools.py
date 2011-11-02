@@ -2,7 +2,7 @@ from networkx import DiGraph
 import nose.tools as nt
 import numpy as np
 
-from cocotools.nxdraw import get_coord_dict
+from cocotools.iotools import get_coord_dict
 
 
 def test_get_coord_dict():
