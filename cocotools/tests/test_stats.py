@@ -1,18 +1,25 @@
 from unittest import TestCase
 
-from networkx import DiGraph
+import networkx as nx
 import nose.tools as nt
 
 import cocotools.stats as cocostats
 
 
+def test_average_path_length():
+    g = nx.DiGraph()
+    g.add_edges_from([('A', 'B'), ('A', 'D'), ('B', 'C'), ('B', 'D'),
+                      ('C', 'A'), ('C', 'B'), ('D', 'A'), ('D', 'C')])
+    nt.assert_equal(nx.average_shortest_path_length(g), 4/3.0)
+
+
 def test_find_hierarchy():
-    m = DiGraph()
+    m = nx.DiGraph()
     m.add_edges_from([('A', 'B', {'RC': 'I'}), ('B', 'A', {'RC': 'I'}),
                       ('C', 'D', {'RC': 'S'}), ('D', 'C', {'RC': 'L'}),
                       ('E', 'F', {'RC': 'O'}), ('F', 'E', {'RC': 'O'}),
                       ('G', 'D', {'RC': 'S'}), ('D', 'G', {'RC': 'L'})])
-    e = DiGraph()
+    e = nx.DiGraph()
     e.add_nodes_from(['A', 'C', 'D', 'E', 'F', 'G'])
     nt.assert_equal(cocostats.find_hierarchy(e, m),
                     set([('C', 'S', 'D'), ('D', 'L', 'C'), ('E', 'O', 'F'),
@@ -20,7 +27,7 @@ def test_find_hierarchy():
 
 
 def test_merge_nodes():
-    g = DiGraph()
+    g = nx.DiGraph()
     g.add_edges_from([('A1', 'A2'), ('A1', 'B'), ('A1', 'C'), ('A2', 'D'),
                       ('A2', 'C'), ('A2', 'E'), ('C', 'A2'), ('E', 'A1')])
     g2 = cocostats.merge_nodes(g, 'A', ['A1', 'A2'])
@@ -32,7 +39,7 @@ def test_merge_nodes():
 
 
 def test_compute_graph_of_unknowns():
-    g = DiGraph()
+    g = nx.DiGraph()
     g.add_edges_from([('A', 'B'), ('C', 'D'), ('B', 'D'), ('D', 'A'),
                       ('B', 'C')])
     u = cocostats.compute_graph_of_unknowns(g)
@@ -43,7 +50,7 @@ def test_compute_graph_of_unknowns():
 class CheckForDupsTestCase(TestCase):
 
     def setUp(self):
-        self.g = DiGraph()
+        self.g = nx.DiGraph()
     
     def test_dups(self):
         self.g.add_nodes_from(['A99-Pg', 'B-10', 'A99-pg', 'a99-Pg',
@@ -65,7 +72,7 @@ class CheckForDupsTestCase(TestCase):
 class TopTenTestCase(TestCase):
 
     def setUp(self):
-        self.g = DiGraph()
+        self.g = nx.DiGraph()
         self.g.add_edges_from([('A', 'B'), ('C', 'B'), ('D', 'B'), ('E', 'B'),
                                ('F', 'B'), ('G', 'B'), ('H', 'B'), ('A', 'F'),
                                ('B', 'F'), ('C', 'F'), ('D', 'F'), ('E', 'F'),
@@ -87,7 +94,7 @@ class TopTenTestCase(TestCase):
 
 
 def test_binarize_ecs():
-    e = DiGraph()
+    e = nx.DiGraph()
     e.add_edges_from([('A', 'B', {'ECs': ('N', 'P')}),
                       ('C', 'D', {'ECs': ('P', 'X')})])
     g = cocostats.binarize_ecs(e)
@@ -98,7 +105,7 @@ def test_binarize_ecs():
 class DanTestCase(TestCase):
 
     def setUp(self):
-        self.g = DiGraph()
+        self.g = nx.DiGraph()
         self.g.add_edges_from([('A', 'B', {'score': 1}),
                                ('B', 'C', {'score': -1}),
                                ('C', 'D', {'score': 0}),
