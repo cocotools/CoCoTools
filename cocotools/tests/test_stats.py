@@ -26,16 +26,26 @@ def test_find_hierarchy():
                          ('F', 'O', 'E'), ('G', 'S', 'D'), ('D', 'L', 'G')]))
 
 
-def test_merge_nodes():
-    g = nx.DiGraph()
-    g.add_edges_from([('A1', 'A2'), ('A1', 'B'), ('A1', 'C'), ('A2', 'D'),
-                      ('A2', 'C'), ('A2', 'E'), ('C', 'A2'), ('E', 'A1')])
-    g2 = cocostats.merge_nodes(g, 'A', ['A1', 'A2'])
-    nt.assert_equal(g2.number_of_nodes(), 5)
-    nt.assert_equal(g2.edges(), [('A', 'C'), ('A', 'B'), ('A', 'E'),
-                                 ('A', 'D'), ('C', 'A'), ('E', 'A')])
-    nt.assert_equal(g.number_of_nodes(), 6)
-    nt.assert_equal(g.number_of_edges(), 8)
+class MergeNodesTestCase(TestCase):
+
+    def test_basic_functionality(self):
+        g = nx.DiGraph()
+        g.add_edges_from([('A1', 'A2'), ('A1', 'B'), ('A1', 'C'), ('A2', 'D'),
+                          ('A2', 'C'), ('A2', 'E'), ('C', 'A2'), ('E', 'A1'),
+                          ('A', 'A1')])
+        g2 = cocostats.merge_nodes(g, 'A', ['A1', 'A2', 'A'])
+        nt.assert_equal(g2.number_of_nodes(), 5)
+        nt.assert_equal(g2.edges(), [('A', 'C'), ('A', 'B'), ('A', 'E'),
+                                     ('A', 'D'), ('C', 'A'), ('E', 'A')])
+        # Make sure original graph has not been altered.
+        self.assertEqual(g.number_of_nodes(), 7)
+        self.assertEqual(g.number_of_edges(), 9)
+
+    def test_no_self_loops(self):
+        g = nx.DiGraph()
+        g.add_edges_from([('LIPI', 'POAI'), ('POAI', 'LIPI')])
+        g2 = cocostats.merge_nodes(g, 'POAI', ['POAI', 'LIPI'])
+        self.assertEqual(g2.number_of_edges(), 0)
 
 
 def test_compute_graph_of_unknowns():
