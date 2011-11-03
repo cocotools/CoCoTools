@@ -1,11 +1,18 @@
 import copy
 
-from numpy import histogram
-from networkx import DiGraph
+import numpy as np
+import scipy.io
+import networkx as nx
 
 #------------------------------------------------------------------------------
 # General Functions
 #------------------------------------------------------------------------------
+
+def write_A_to_mat(g, path):
+    """Write adjacency matrix (A) of g as a .mat file."""
+    A = nx.adjacency_matrix(g)
+    scipy.io.savemat(path, mdict={'A': A})
+
 
 def find_hierarchy(end_g, map_g):
     hierarchy = set()
@@ -39,7 +46,7 @@ def merge_nodes(g, new_name, nodes):
 
 
 def compute_graph_of_unknowns(e):
-    u = DiGraph()
+    u = nx.DiGraph()
     nodes = e.nodes()
     for source in nodes:
         for target in nodes:
@@ -109,7 +116,7 @@ def get_top_ten(method):
 #------------------------------------------------------------------------------
 
 def binarize_ecs(e):
-    g = DiGraph()
+    g = nx.DiGraph()
     for source, target in e.edges_iter():
         source_ec, target_ec = e[source][target]['ECs']
         ns = ('N', 'Nc', 'Np', 'Nx')
@@ -136,7 +143,7 @@ def controversy_hist(e):
     scores = []
     for source, target in e.edges_iter():
         scores.append(e[source][target]['score'])
-    return histogram(scores, bins=20)
+    return np.histogram(scores, bins=20)
 
 
 def present_graph(e):
@@ -144,6 +151,6 @@ def present_graph(e):
     for source, target in e.edges_iter():
         if e[source][target]['score'] > 0:
             present_edges.append((source, target))
-    p = DiGraph()
+    p = nx.DiGraph()
     p.add_edges_from(present_edges)
     return p
