@@ -218,7 +218,7 @@ def infomap(basepath, n_iter=10, seed=123456):
     """
     netfile = basepath + '.net'
     mapfile = basepath + '.map'
-    cmd = ['infomap', str(seed), netfile, n_iter]
+    cmd = ['infomap', str(seed), netfile, str(n_iter)]
     #print '$', ' '.join(cmd)  # dbg
     check_call(cmd)  # this will raise if the infomap cmd isn't found
     return load_infomap(mapfile)
