@@ -89,6 +89,7 @@ def write_pajek(G, path, encoding='UTF-8'):
 
     Examples
     --------
+    >>> import networkx as nx
     >>> G=nx.path_graph(4)
     >>> nx.write_pajek(G, "test.net")
 
