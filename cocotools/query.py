@@ -275,11 +275,16 @@ def query_cocomac(search_type, bmap):
 
 
 def single_map_ebunch(search_type, bmap):
-    """Construct and return ebunch from data in one XML file.
+    """Construct and return ebunch from data for one BrainMap.
 
     Returns
     -------
     ebunch : list of tuples
+
+    Notes
+    -----
+    Integrated primary projections are returned for Connectivity queries,
+    and primary relations are returned for Mapping queries.
     """
     xml = query_cocomac(search_type, bmap)
     if xml:
@@ -293,15 +298,19 @@ def single_map_ebunch(search_type, bmap):
 
 
 def multi_map_ebunch(search_type, subset=False):
-    """Construct and return ebunch from data in several XML files.
+    """Construct and return ebunch from data for several BrainMaps.
 
-    Also return the BrainMaps for which queries failed.  Querying a
-    BrainMap for which there is only Mapping data using the Connectivity
-    search type would result in its being a failure.  However, failures
-    can also result from CoCoMac server errors.
+    Also return the BrainMaps for which queries failed.
 
-    The term ebunch, borrowed from NetworkX, refers to a sequence of
-    graph theory edges.
+    Parameters
+    ----------
+    search_type : string
+      'Mapping' or 'Connectivity'
+
+    subset : sequence or string (optional)
+      Subset of BrainMaps to query.  Default is to query all BrainMaps in
+      CoCoMac.  If a string is supplied, it must be the name of a text
+      file with one BrainMap per line.  
 
     Returns
     -------
@@ -310,6 +319,18 @@ def multi_map_ebunch(search_type, subset=False):
     
     failures : list of strings
       These are the BrainMaps for which no data were acquired.
+
+    Notes
+    -----
+    Querying a BrainMap for which there is only Mapping data using the
+    Connectivity search type would result in its being a failure.
+    However, failures can also result from CoCoMac server errors.
+
+    The term ebunch, borrowed from NetworkX, refers to a sequence of
+    graph theory edges.
+    
+    Integrated primary projections are returned for Connectivity queries,
+    and primary relations are returned for Mapping queries.
     """
     if not subset:
         bmaps = ALLMAPS
