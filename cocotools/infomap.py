@@ -143,7 +143,7 @@ def load_links(g, map):
 def get_state(line, state):
     """Compute the next state based on the current line content.
     """
-    if line.startswith('#') or line.isspace() or \
+    if not line or line.startswith('#') or line.isspace() or \
        line.startswith('*Directed'): 
         state = 'top'
     elif line.startswith('*Modules'):
