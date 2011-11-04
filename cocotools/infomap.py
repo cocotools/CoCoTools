@@ -16,8 +16,9 @@ http://www.tp.umu.se/~rosvall/code.html
 #-----------------------------------------------------------------------------
 
 # Stdlib
-import os
 import re
+
+from subprocess import check_call
 
 # Third-party
 import networkx as nx
@@ -217,9 +218,9 @@ def infomap(basepath, n_iter=10, seed=123456):
     """
     netfile = basepath + '.net'
     mapfile = basepath + '.map'
-    cmd = 'infomap %s %s %s' % (seed, netfile, n_iter)
-    print '$$', cmd
-    os.system(cmd)
+    cmd = ['infomap', str(seed), netfile, n_iter]
+    #print '$', ' '.join(cmd)  # dbg
+    check_call(cmd)  # this will raise if the infomap cmd isn't found
     return load_infomap(mapfile)
 
 
