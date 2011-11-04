@@ -4,26 +4,10 @@ Modified from http://groups.google.com/group/networkx-discuss/browse_thread/thre
 
 Author: Stefan van der Walt.
 """
-import csv
-from os.path import splitext
-
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, Circle
 import numpy as np
 import networkx as nx
-
-
-def degree_histogram(g, title=None):
-    """Show and save degree histogram.
-
-    Modified from networkx.lanl.gov/examples/drawing/degree_histogram.html.
-
-    Author of original: Aric Hagberg
-    """
-    degree_sequence = sorted(nx.degree(g).values(), reverse=True)
-    plt.plot(degree_sequence, 'b-', marker='o')
-    if title:
-        plt.title(title)
 
 
 def draw_network(G, pos, node_color=None, ax=None,
