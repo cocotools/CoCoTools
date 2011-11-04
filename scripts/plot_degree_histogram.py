@@ -2,8 +2,6 @@ import pickle
 
 import matplotlib.pyplot as plt
 
-from cocotools import get_degree_histogram, plot_degree_histogram
-
 
 with open('results/graphs/end4.pck') as f:
     end4 = pickle.load(f)
@@ -11,8 +9,9 @@ with open('results/graphs/end4.pck') as f:
 # Clear figure in case of multiple runs during the same session.
 plt.clf()
 degree_dict = end4.degree()
-plt.hist(degree_dict.values(), 20)
+bins = 8
+plt.hist(degree_dict.values(), bins)
 plt.ylabel('Frequency')
 plt.xlabel('Degree')
-plt.savefig('results/figures/end4_degree.png')
-plt.show()
+plt.savefig('results/figures/end4_degree_%d.pdf' % bins)
+#plt.show()
