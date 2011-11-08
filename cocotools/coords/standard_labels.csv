@@ -1,4 +1,4 @@
-label,incf,end4,color,x,y,z,comments,frontal
+label,incf,cocomac,color,x,y,z,comments,frontal
 1,1,1,2D6E64,20.31,-10.8,32.68,,
 2,2,2,2D0564,27.03,-11.25,25.27,,
 10,10D,10,FF0064,2.97,19.8,29.49,"there seems to be no plain '10' in incf,so I am gonna make incf's 10D the standard 10 for display purposes",1
@@ -59,7 +59,7 @@ ELC,ELC,ELC,641932,12.48,-7.65,0.8,
 ELR,ELR,ELR,691964,12.11,-3.15,2.67,
 ER,ER,ER,737DC8,10.62,-4.05,2.02,
 FST,FST,FST,1E1EC8,22.73,-23.4,16.74,
-GI,GI,GI,7.31E+34,19.01,-11.7,19.08,
+GI,GI,GI,731E32,19.01,-11.7,19.08,
 IPA, IPa,IPA, F0A096,19.47,-9.9,5.67,
 La,La,LA,2828FA,13.97,-6.75,5.77,
 Me,Me,ME,DC2D96,8.1,-5.85,8.67,
@@ -106,7 +106,7 @@ TF,TF,TF,9B50C8,19.85,-14.4,-1.55,
 TH,TH,TH,AA5064,9.96,-18.9,3.99,
 THO,THO,THO,AAB464,8.66,-20.7,9.14,
 TL(36), TL(36),TL(36), AF5096,14.25,-18,-0.33,2 coco : 1 incf
-TLO(36O),TLO(36O),TLO(36O),55532,15.84,-22.05,3.89,different naming convention
+TLO(36O),TLO(36O),TLO(36O),055532,15.84,-22.05,3.89,different naming convention
 TLR(36R),TLR(36R),TLR(36R),CD64C8,15,-11.25,-2.86,different naming convention
 TPO,TPO,TPO,CD69C8,21.99,-10.35,9.05,
 TPPro,TPPro,TPPRO,CD50C8,19.19,0,10.18,
