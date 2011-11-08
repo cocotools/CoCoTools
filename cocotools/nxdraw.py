@@ -39,6 +39,11 @@ def draw_network(G, pos, node_color=None, ax=None,
     only_nodes = set(only_nodes) if not isinstance(only_nodes, set) else \
                  only_nodes
 
+    # Find the set of all the nodes connected to the ones we want to highlight
+    connected = set()
+    for n in only_nodes:
+        connected.update(G.predecessors(n) + G.successors(n))
+
     # Walk and draw nodes
     for n in G:
         if node_color is None:
@@ -50,19 +55,25 @@ def draw_network(G, pos, node_color=None, ax=None,
         #else:
         #    color = cmap(node_color[n])
 
+        # Selectively de-highlight nodes not being shown
         if n in only_nodes:
+            t_alpha = 1.0
             n_alpha = node_alpha
             zorder = 2.2
+        elif n in connected:
+            t_alpha = n_alpha = 0.6*node_alpha
+            zorder = 2.0
         else:
-            n_alpha = node_alpha/6.0
+            t_alpha = n_alpha = 0.15*node_alpha
             zorder = 1.8
+
         c = Circle(pos[n],radius=radius,
                    alpha=n_alpha,
                    color=color,ec='k')
         x, y = pos[n]
         t = plt.text(x, y, n, horizontalalignment='center',
                      verticalalignment='center', color='k', fontsize=fontsize,
-                     weight='bold')
+                     weight='bold', alpha=t_alpha)
         t.set_zorder(zorder+0.1)
         c = ax.add_patch(c)
         c.set_zorder(zorder)
