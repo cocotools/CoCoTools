@@ -8,6 +8,39 @@ import networkx as nx
 # General Functions
 #------------------------------------------------------------------------------
 
+def _compute_directed_closeness(path_lengths, node, num_nodes, all_nodes,
+                                direction):
+    lengths = 0.0
+    for other in all_nodes:
+        if node == other:
+            continue
+        if direction == 'in':
+            try:
+                lengths += path_lengths[other][node]
+            except KeyError:
+                return
+        elif direction == 'out':
+            try:
+                lengths += path_lengths[node][other]
+            except KeyError:
+                return
+        else:
+            raise ValueError('invalid direction')
+    return lengths / (num_nodes - 1)
+
+
+def directed_closeness(g, direction='in'):
+    path_lengths = nx.shortest_path_length(g)
+    all_nodes = g.nodes()
+    num_nodes = g.number_of_nodes()
+    closeness = {}
+    for node in all_nodes:
+        closeness[node] = _compute_directed_closeness(path_lengths, node,
+                                                      num_nodes, all_nodes,
+                                                      direction)
+    return closeness
+        
+
 def write_A_to_mat(g, path):
     """Write adjacency matrix (A) of g as a .mat file."""
     A = nx.adjacency_matrix(g)
@@ -80,35 +113,42 @@ def check_for_dups(g):
         return dups
 
 
-def get_top_ten(method):
+def get_top_ten(measures, better='greater'):
     """Returns top ten nodes in order from best to worst.
 
     Parameters
     ----------
-    method : method
-      Graph method that returns a statistic for each node in the graph.
+    measures : dict
+      Mapping of nodes to values for a particular measure.
+
+    better : string
+      Complete this sentence using the word "greater" or "smaller": The
+      nodes with the better scores in this dict are the ones with the
+      _____ values.
 
     Notes
     -----
-    Greater values of the statistic must be better.  Results are
-    undefined for graphs with fewer than 10 nodes.  Ties result in more
-    than 10 nodes being returned.
+    Nodes corresponding to 10 distinct scores (or as many as there are in
+    the graph if there are fewer than 10) are returned; ties are placed in
+    brackets.
     """
-    stat_to_node = {}
-    for node, stat in method():
-        if not stat_to_node.has_key(stat):
-            stat_to_node[stat] = [node]
-        else:
-            stat_to_node[stat].append(node)
     top_ten = []
-    for stat in reversed(stat_to_node.keys()):
-        nodes = stat_to_node[stat]
-        if len(top_ten) == 10:
-            break
-        elif len(nodes) > 1:
-            top_ten.append(nodes)
+    best_to_worst = sorted(set(measures.values()))
+    if better == 'greater':
+        best_to_worst.reverse()
+    while len(top_ten) < 10:
+        try:
+            next_best_score = best_to_worst.pop(0)
+        except IndexError:
+            return top_ten
+        next_best_nodes = []
+        for key, value in measures.iteritems():
+            if value == next_best_score:
+                next_best_nodes.append(key)
+        if len(next_best_nodes) == 1:
+            top_ten.append(next_best_nodes[0])
         else:
-            top_ten.append(nodes[0])
+            top_ten.append(next_best_nodes)
     return top_ten
 
 #------------------------------------------------------------------------------

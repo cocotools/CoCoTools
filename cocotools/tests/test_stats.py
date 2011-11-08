@@ -79,7 +79,7 @@ class CheckForDupsTestCase(TestCase):
                          ['A', 'C', 'a', 'c'])
 
 
-class TopTenTestCase(TestCase):
+class GraphStatsTestCase(TestCase):
 
     def setUp(self):
         self.g = nx.DiGraph()
@@ -92,17 +92,29 @@ class TopTenTestCase(TestCase):
                                ('D', 'C'), ('B', 'A'), ('C', 'A'), ('A', 'H'),
                                ('B', 'H'), ('A', 'E'), ('A', 'I'), ('A', 'J')])
     
-    def test_ten_nodes(self):
-        nt.assert_equal(cocostats.get_top_ten(self.g.in_degree_iter),
+    def test_top_ten(self):
+        nt.assert_equal(cocostats.get_top_ten(self.g.in_degree()),
                         ['B', 'F', 'G', 'D', 'C', ['A', 'H'], ['E', 'I', 'J']])
 
-    def test_tie_last(self):
+    def test_top_ten_tie(self):
         self.g.add_edge('A', 'K')
-        nt.assert_equal(cocostats.get_top_ten(self.g.in_degree_iter),
+        nt.assert_equal(cocostats.get_top_ten(self.g.in_degree()),
                         ['B', 'F', 'G', 'D', 'C', ['A', 'H'], ['E', 'I', 'K',
                          'J']])
 
+    def test_in_closeness_unconnected(self):
+        desired = {'A': None, 'B': None, 'C': None, 'D': None, 'E': None,
+                   'F': None, 'G': None, 'H': None, 'I': None, 'J': None}
+        self.assertEqual(cocostats.directed_closeness(self.g), desired)
 
+    def test_in_closeness(self):
+        self.g.add_edges_from([('I', 'J'), ('J', 'A')])
+        desired = {'A': 15/9.0, 'B': 12/9.0, 'C': 16/9.0, 'D': 15/9.0,
+                   'E': 22/9.0, 'F': 13/9.0, 'G': 14/9.0, 'H': 17/9.0,
+                   'I': 22/9.0, 'J': 21/9.0}
+        self.assertEqual(cocostats.directed_closeness(self.g), desired)
+
+        
 def test_binarize_ecs():
     e = nx.DiGraph()
     e.add_edges_from([('A', 'B', {'ECs': ('N', 'P')}),
