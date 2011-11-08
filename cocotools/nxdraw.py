@@ -45,11 +45,11 @@ def draw_network(G, pos, node_color=None, ax=None,
         connected.update(G.predecessors(n) + G.successors(n))
 
     # Walk and draw nodes
-    for n in G:
+    for i, n in enumerate(G.nodes()):
         if node_color is None:
             color = (0, 0, 0)
         else:
-            color = node_color[n]
+            color = node_color[i]
         #if node_color is None or cmap is None:
         #    color = (0,0,0)
         #else:
