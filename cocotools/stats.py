@@ -70,10 +70,10 @@ def merge_nodes(g, new_name, nodes):
                 exec '%s.add(neighbor)' % neighbor_type
         g2.remove_node(node)
     for p in predecessors:
-        if g2.has_node(p):
+        if g2.has_node(p) and p != new_name:
             g2.add_edge(p, new_name)
     for s in successors:
-        if g2.has_node(s):
+        if g2.has_node(s) and s != new_name:
             g2.add_edge(new_name, s)
     return g2
 

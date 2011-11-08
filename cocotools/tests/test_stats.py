@@ -43,9 +43,11 @@ class MergeNodesTestCase(TestCase):
 
     def test_no_self_loops(self):
         g = nx.DiGraph()
-        g.add_edges_from([('LIPI', 'POAI'), ('POAI', 'LIPI')])
-        g2 = cocostats.merge_nodes(g, 'POAI', ['POAI', 'LIPI'])
-        self.assertEqual(g2.number_of_edges(), 0)
+        g.add_edges_from([('A', 'POAI'), ('POAI', 'A'), ('LIPI', 'POAI'),
+                          ('POAI', 'LIPI'), ('POAI', 'B'), ('B', 'POAI'),
+                          ('C', 'POAI'), ('POAI', 'C'), ('LIPI', 'A')])
+        g2 = cocostats.merge_nodes(g, 'LIPI', ['POAI', 'LIPI'])
+        self.assertEqual(g2.selfloop_edges(), [])
 
 
 def test_compute_graph_of_unknowns():
