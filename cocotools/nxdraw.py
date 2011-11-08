@@ -30,10 +30,11 @@ def draw_network(G, pos, node_color=None, ax=None,
       for each node in G.
     """
     if ax is None:
-        ax = f.gca()
+        f, ax = plt.subplots()
 
     if only_nodes is None:
         only_nodes = set(G.nodes())
+        
 
     only_nodes = set(only_nodes) if not isinstance(only_nodes, set) else \
                  only_nodes
@@ -49,15 +50,22 @@ def draw_network(G, pos, node_color=None, ax=None,
         #else:
         #    color = cmap(node_color[n])
 
+        if n in only_nodes:
+            n_alpha = node_alpha
+            zorder = 2.2
+        else:
+            n_alpha = node_alpha/6.0
+            zorder = 1.8
         c = Circle(pos[n],radius=radius,
-                   alpha=node_alpha,
+                   alpha=n_alpha,
                    color=color,ec='k')
         x, y = pos[n]
-        plt.text(x, y, n, horizontalalignment='center',
-                 verticalalignment='center', color='k', fontsize=fontsize,
-                 weight='bold')
+        t = plt.text(x, y, n, horizontalalignment='center',
+                     verticalalignment='center', color='k', fontsize=fontsize,
+                     weight='bold')
+        t.set_zorder(zorder+0.1)
         c = ax.add_patch(c)
-        c.set_zorder(2)
+        c.set_zorder(zorder)
         G.node[n]['patch']=c
         x,y=pos[n]
 
