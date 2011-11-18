@@ -133,7 +133,7 @@ def test_scrub_xml_str():
         nt.assert_equal(scrub_xml_str(text), valid)
 
 #------------------------------------------------------------------------------
-# CoCoLite and query_cocomac Tests
+# _CoCoLite and query_cocomac Tests
 #------------------------------------------------------------------------------
 
 @replace('cocotools.query.url', mock_url)
@@ -148,8 +148,8 @@ def test_query_cocomac():
     
     
 @replace('cocotools.query.DBPATH', ':memory:')
-def test_CoCoLite():
-    db = cq.CoCoLite(mock_func)
+def test__CoCoLite():
+    db = cq._CoCoLite(mock_func)
     # Test that mock_func works as expected.
     nt.assert_equal(db.func(None, None), None)
     nt.assert_equal(db.func('Mapping', 'A'), 'xml Mapping A xml')
@@ -162,7 +162,7 @@ def test_CoCoLite():
     # Test selection with __call__, mocking select_xml.
     with Replacer() as r:
         mock_select_xml = lambda self, s, b: 'stuff'
-        r.replace('cocotools.query.CoCoLite.select_xml', mock_select_xml)
+        r.replace('cocotools.query._CoCoLite.select_xml', mock_select_xml)
         nt.assert_equal(db('Mapping', 'A'), 'stuff')
     # Test selection when cache has multiple matching entries
     # (select_xml).

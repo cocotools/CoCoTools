@@ -77,7 +77,7 @@ ALLMAPS = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80',
            'BP82', 'AP34', 'YTHI90', 'PP94', 'L33', 'JCH78']
 
 
-class CoCoLite(object):
+class _CoCoLite(object):
 
     def __init__(self, func):
         self.func = func
@@ -254,6 +254,21 @@ def _scrub_xml_str(raw):
 #------------------------------------------------------------------------------
 
 def url(search_type, bmap):
+    """Return CoCoMac URL corresponding to XML query results.
+
+    Parameters
+    ----------
+    search_type : string
+      'Mapping' or 'Connectivity'
+
+    bmap : string
+      Name of a BrainMap in CoCoMac.
+
+    Returns
+    -------
+    string
+      URL corresponding to query results.
+    """
     search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (bmap, bmap)
     query_dict = dict(user='teamcoco',
                       password='teamcoco',
@@ -265,8 +280,27 @@ def url(search_type, bmap):
     return 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
 
 
-@CoCoLite
+@_CoCoLite
 def query_cocomac(search_type, bmap):
+    """Return XML corresponding to a CoCoMac query.
+
+    XML is returned as a string.  The local SQLite database is queried
+    first; only if the data file is not present there is the CoCoMac
+    website consulted.
+
+    Parameters
+    ----------
+    search_type : string
+      'Mapping' or 'Connectivity'
+
+    bmap : string
+      Name of a BrainMap in CoCoMac.
+
+    Returns
+    -------
+    string
+      XML containing query results.
+    """
     try:
         xml = urllib2.urlopen(url(search_type, bmap), timeout=120).read()
     except (urllib2.URLError, timeout):
@@ -276,6 +310,14 @@ def query_cocomac(search_type, bmap):
 
 def single_map_ebunch(search_type, bmap):
     """Construct and return ebunch from data for one BrainMap.
+
+    Parameters
+    ----------
+    search_type : string
+      'Mapping' or 'Connectivity'
+
+    bmap : string
+      Name of a BrainMap in CoCoMac.
 
     Returns
     -------
@@ -324,7 +366,7 @@ def multi_map_ebunch(search_type, subset=False):
     -----
     Querying a BrainMap for which there is only Mapping data using the
     Connectivity search type would result in its being a failure.
-    However, failures can also result from CoCoMac server errors.
+    Failures can also result from CoCoMac server errors.
 
     The term ebunch, borrowed from NetworkX, refers to a sequence of
     graph theory edges.
