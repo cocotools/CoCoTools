@@ -68,6 +68,8 @@ class ConGraph(DiGraph):
     def _single_ec_step(self, s, rc, t, node_label):
         """Perform single-step operation of algebra of transformation.
 
+        Called by _translate_one_side.
+
         Returns
         -------
         EC, mean PDC : tuple
@@ -90,6 +92,7 @@ class ConGraph(DiGraph):
                       edge_dict['PDC_Site_%s' % node_label]]))
 
     def _multi_ec_step(self, s, rc, t, node_label, ec, pdc_sum):
+        """Called by _translate_one_side."""
         process_ec = {'B': {'S': {'Np': 'Up',
                                   'Nx': 'Up',
                                   'Nc': 'N',
@@ -226,6 +229,7 @@ class ConGraph(DiGraph):
             
             
 def _update_attr(old_attr, new_attr):
+    """Called by add_edge."""
     for func in (_mean_pdcs, _ec_points):
         old_value, new_value = func(old_attr, new_attr)
         if old_value < new_value:
@@ -236,6 +240,7 @@ def _update_attr(old_attr, new_attr):
 
             
 def _assert_valid_attr(attr):
+    """Called by add_edge."""
     for key in ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 'Degree',
                 'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
                 'PDC_Density'):
@@ -253,6 +258,7 @@ def _assert_valid_attr(attr):
     
             
 def _mean_pdcs(old_attr, new_attr):
+    """Called by _update_attr."""
     return [mean((a['PDC_Site_Source'],
                   a['PDC_Site_Target'],
                   a['PDC_EC_Source'],
@@ -260,6 +266,7 @@ def _mean_pdcs(old_attr, new_attr):
                   a['PDC_Density'])) for a in (old_attr, new_attr)]
 
 def _ec_points(old_attr, new_attr):
+    """Called by _update_attr."""
     # Score it like golf.
     points = {'C': -4, 'N': -4, 'Nc': -4, 'P': -3, 'X': -2, 'Np': -1, 'Nx': 0}
     return [sum((points[a['EC_Source']],
