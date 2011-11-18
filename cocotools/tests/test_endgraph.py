@@ -116,22 +116,6 @@ def test__update_attr():
                     {'ECs': ('C', 'C'), 'PDC': 3, 'Presence-Absence': -4})
     
     
-def test_add_controversy_scores():
-    g = DiGraph()
-    g.add_edges_from([('A-1', 'A-2', {'ebunches_for': [('B', 'B'), ('C', 'C')],
-                                      'ebunches_against': [('D', 'D')],
-                                      'ebunches_incomplete': [('E', 'E')]}),
-                      ('A-2', 'A-3', {'ebunches_incomplete': [('B', 'B')]})])
-    coco.EndGraph.add_controversy_scores.im_func(g)
-    nt.assert_equal(g.number_of_edges(), 2)
-    nt.assert_equal(g['A-1']['A-2'],
-                    {'ebunches_for': [('B', 'B'), ('C', 'C')],
-                     'ebunches_against': [('D', 'D')],
-                     'ebunches_incomplete': [('E', 'E')],
-                     'score': 1/3.0})
-    nt.assert_equal(g['A-2']['A-3'], {'ebunches_incomplete': [('B', 'B')],
-                                      'score': 0})
-    
 @replace('cocotools.endgraph._assert_valid_attr', lambda attr: True)
 def test_add_edge():
     g = DiGraph()

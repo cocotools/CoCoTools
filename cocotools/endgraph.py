@@ -8,7 +8,39 @@ class EndGraphError(Exception):
 
 class EndGraph(DiGraph):
 
+    """Subclass of the NetworkX DiGraph designed to hold post-ORT data.
+
+    This graph should contain nodes from a particular BrainMap (whose name
+    is held in self.name), and edges representing translated anatomical
+    connections.
+    
+    The DiGraph methods add_edge and add_edges_from have been overridden,
+    to enforce that edges have valid attributes with the highest likelihood
+    of correctness referring to their extension codes (ECs), precision
+    description codes (PDCs), and presence-absence score.  The presence-
+    absence score is the number of original BrainMaps in which the edge
+    was reported absent substracted from the number in which the edge was
+    reported present.
+    """
+    
     def add_edge(self, source, target, new_attr):
+        """Add an edge from source to target if it is new and valid.
+
+        For the edge to be valid, new_attr must contain map/value pairs for
+        ECs, PDCs, and the presence-absence score.
+
+        If an edge from source to target is already present, the set of
+        attributes with the lower PDC is kept.  Ties are resolved using the
+        presence-absence score.
+
+        Parameters
+        ----------
+        source, target : strings
+          Nodes.
+
+        new_attr : dict
+          Dictionary of edge attributes.
+        """
         try:
             _assert_valid_attr(new_attr)
         except EndGraphError:
@@ -23,10 +55,38 @@ class EndGraph(DiGraph):
             add_edge(self, source, target, _update_attr(old_attr, new_attr))
 
     def add_edges_from(self, ebunch):
+        """Add the edges in ebunch if they are new and valid.
+
+        The docstring for add_edge explains what is meant by valid and how
+        attributes for the same source and target are updated.
+
+        Parameters
+        ----------
+        ebunch : container of edges
+          Edges must be provided as (source, target, new_attr) tuples; they
+          are added using add_edge.
+        """
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
 
     def add_translated_edges(self, mapp, conn, desired_bmap):
+        """Perform the ORT algebra of transformation.
+
+        Using spatial relationships in mapp, translate the anatomical
+        connections in conn into the nomenclature of desired_bmap.
+
+        Parameters
+        ----------
+        mapp : MapGraph
+          Graph of spatial relationships between BrainSites from various
+          BrainMaps.
+
+        conn : ConGraph
+          Graph of anatomical connections between BrainSites.
+
+        desired_bmap : string
+          Name of BrainMap to which translation will be performed.
+        """
         for s, t in conn.edges_iter():
             new_sources = _translate_one_side(mapp, conn, desired_bmap, s,
                                               'Source', t)
@@ -48,21 +108,9 @@ class EndGraph(DiGraph):
                                                            t_value[1]]),
                                            'Presence-Absence': present})
 
-    def add_controversy_scores(self):
-        for source, target in self.edges_iter():
-            edge_dict = self[source][target]
-            for group in ('for', 'against'):
-                try:
-                    exec '%s_ = len(edge_dict["ebunches_%s"])' % (group, group)
-                except KeyError:
-                    exec '%s_ = 0' % group
-            try:
-                edge_dict['score'] = (for_ - against_) / float(for_ + against_)
-            except ZeroDivisionError:
-                edge_dict['score'] = 0
-
 
 def _evaluate_conflict(old_attr, new_attr, updated_score):
+    """Called by _update_attr."""
     ns = ('N', 'Nc', 'Np', 'Nx')
     for age in ('old', 'new'):
         exec 's_ec, t_ec = %s_attr["ECs"]' % age
@@ -88,6 +136,8 @@ def _evaluate_conflict(old_attr, new_attr, updated_score):
                 
 def _update_attr(old_attr, new_attr):
 
+    """Called by add_edge."""
+
     updated_score = old_attr['Presence-Absence'] + new_attr['Presence-Absence']
     new_attr['Presence-Absence'] = updated_score
     old_attr['Presence-Absence'] = updated_score
@@ -103,7 +153,10 @@ def _update_attr(old_attr, new_attr):
 
 
 def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
-    """Returns dict mapping each new node to a list of (EC, PDC) tuples."""
+    """Returns dict mapping each new node to a list of (EC, PDC) tuples.
+
+    Called by add_translated_edges.
+    """
     node_map = node.split('-')[0]
     new_nodes = {}
     for new_node in mapp._translate_node(node, desired_bmap):
@@ -133,7 +186,10 @@ def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
         
 
 def _assert_valid_attr(attr):
-    """Check that attr has valid ECs, PDCs, and Presence-Absence score."""
+    """Check that attr has valid ECs, PDCs, and presence-absence score.
+
+    Called by add_edge.
+    """
     for ec in attr['ECs']:
         if ec not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
             raise EndGraphError('Attempted to add EC = %s' % ec)
