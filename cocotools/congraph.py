@@ -8,11 +8,36 @@ class ConGraphError(Exception):
 
 class ConGraph(DiGraph):
 
+    """Subclass of the NetworkX DiGraph designed to hold Connectivity data.
+
+    The DiGraph methods add_edge and add_edges_from have been overridden,
+    to enforce that edges have valid attributes with the highest likelihood
+    of correctness referring to their extension codes (ECs), precision
+    description codes (PDCs), and degree.
+    """
+
 #------------------------------------------------------------------------------
 # Construction Methods
 #------------------------------------------------------------------------------
     
     def add_edge(self, source, target, new_attr):
+        """Add an edge from source to target if it is new and valid.
+
+        For the edge to be valid, new_attr must contain map/value pairs for
+        ECs, degree, and PDCs for the nodes, ECs, and PDCs.
+
+        If an edge from source to target is already present, the set of
+        attributes with the lower PDC is kept.  Ties are resolved using the
+        following EC preferences: C, N, Nc > P > X > Np > Nx.
+
+        Parameters
+        ----------
+        source, target : strings
+          Nodes.
+
+        new_attr : dict
+          Dictionary of edge attributes.
+        """
         _assert_valid_attr(new_attr)
         add_edge = DiGraph.add_edge.im_func
         if not self.has_edge(source, target):
@@ -22,6 +47,17 @@ class ConGraph(DiGraph):
             add_edge(self, source, target, _update_attr(old_attr, new_attr))
 
     def add_edges_from(self, ebunch):
+        """Add the edges in ebunch if they are new and valid.
+
+        The docstring for add_edge explains what is meant by valid and how
+        attributes for the same source and target are updated.
+
+        Parameters
+        ----------
+        ebunch : container of edges
+          Edges must be provided as (source, target, new_attr) tuples; they
+          are added using add_edge.
+        """
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
 
