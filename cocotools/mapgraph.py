@@ -72,15 +72,42 @@ class MapGraph(DiGraph):
                      self._update_attr(source, target, new_attr))
 
     def add_edge(self, source, target, new_attr):
+        """Add an edge from source to target if it is new and valid.
+
+        For the edge to be valid, new_attr must have as keys 'TP' (mapping
+        to a list of nodes each of which has an edge to the next), 'PDC'
+        (mapping to a float between 0 and 18, inclusive), and 'RC' (mapping
+        to a valid relation code).
+
+        If an edge from source to target is already present, the set of
+        attributes with the shortest transformation path (TP) is kept.
+        Ties are resolved by choosing the set with the lower precision
+        description code (PDC), and failing that, the lower mean PDC of
+        the edges in the TP.
+
+        Parameters
+        ----------
+        source, target : strings
+          Nodes.
+
+        new_attr : dict
+          Dictionary of edge attributes.
+        """
         self._add_edge(source, target, new_attr)
         reverse_attr = _reverse_attr(new_attr)
         self._add_edge(target, source, reverse_attr)
 
     def add_edges_from(self, ebunch):
-        """Add a bunch of edge datasets to the graph if they're valid.
+        """Add the edges in ebunch if they are new and valid.
 
-        Overriding DiGraph's method of the same name in this way is
-        necessary.
+        The docstring for add_edge explains what is meant by valid and how
+        attributes for the same source and target are updated.
+
+        Parameters
+        ----------
+        ebunch : container of edges
+          Edges must be provided as (source, target, new_attr) tuples; they
+          are added using add_edge.
         """
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
@@ -96,7 +123,16 @@ class MapGraph(DiGraph):
         return self[p][tp[0]]['RC'] + middle + self[tp[-1]][s]['RC']
 
     def deduce_edges(self):
-        """Deduce new edges based on those in the graph and add them."""
+        """Deduce new edges based on those in the graph and add them.
+
+        This implementation is faithful to the algorithm described in
+        Stephan et al. (2000) with two exceptions:
+
+        (1) Kotter and Wanke's (2005) adjustment to the determination of
+        single relation codes for deduced edges is incorporated.
+
+        (2) Edges are allowed between regions in the same BrainMap.
+        """
         for node in self.nodes_iter():
             ebunch = []
             for p in self.predecessors(node):
