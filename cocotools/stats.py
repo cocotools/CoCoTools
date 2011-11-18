@@ -4,9 +4,6 @@ import numpy as np
 import scipy.io
 import networkx as nx
 
-#------------------------------------------------------------------------------
-# General Functions
-#------------------------------------------------------------------------------
 
 def _compute_directed_closeness(path_lengths, node, num_nodes, all_nodes,
                                 direction):
@@ -30,6 +27,20 @@ def _compute_directed_closeness(path_lengths, node, num_nodes, all_nodes,
 
 
 def directed_closeness(g, direction='in'):
+    """Calculate in- or out-closeness for nodes in g.
+
+    Parameters
+    ----------
+    g : NetworkX DiGraph
+
+    direction : string (optional)
+      'in' or 'out'.
+
+    Returns
+    -------
+    closeness : dict
+      Dict mapping nodes to their in- or out-closeness value.
+    """
     path_lengths = nx.shortest_path_length(g)
     all_nodes = g.nodes()
     num_nodes = g.number_of_nodes()
@@ -41,77 +52,35 @@ def directed_closeness(g, direction='in'):
     return closeness
         
 
-def write_A_to_mat(g, path):
-    """Write adjacency matrix (A) of g as a .mat file."""
-    A = nx.adjacency_matrix(g)
-    scipy.io.savemat(path, mdict={'A': A})
+def compute_graph_of_unknowns(end):
+    """Return the inverse of end.
 
+    Because end contains known-absent and known-present edges, the
+    returned graph will contain only those edges whose existence is
+    unknown.
 
-def find_hierarchy(end_g, map_g):
-    hierarchy = set()
-    if end_g.name:
-        end_nodes = ['%s-%s' % (end_g.name, node) for node in end_g.nodes()]
-    else:
-        end_nodes = end_g.nodes()
-    for source in end_nodes:
-        for target in end_nodes:
-            if map_g.has_edge(source, target):
-                hierarchy.add((source, map_g[source][target]['RC'], target))
-    return hierarchy
+    Parameters
+    ----------
+    end : EndGraph
+      EndGraph after translated edges have been added.
 
+    Returns
+    -------
+    g : NetworkX DiGraph
+      Graph with edges not in EndGraph.
 
-def merge_nodes(g, new_name, nodes):
-    g2 = copy.deepcopy(g)
-    predecessors, successors = set(), set()
-    for node in nodes:
-        for neighbor_type in ('predecessors', 'successors'):
-            exec 'neighbors = g2.%s(node)' % neighbor_type
-            for neighbor in neighbors:
-                exec '%s.add(neighbor)' % neighbor_type
-        g2.remove_node(node)
-    for p in predecessors:
-        if g2.has_node(p) and p != new_name:
-            g2.add_edge(p, new_name)
-    for s in successors:
-        if g2.has_node(s) and s != new_name:
-            g2.add_edge(new_name, s)
-    return g2
-
-
-def compute_graph_of_unknowns(e):
+    Notes
+    -----
+    end is not modified by this function; a new graph is returned.
+    """
     u = nx.DiGraph()
-    nodes = e.nodes()
+    nodes = end.nodes()
     for source in nodes:
         for target in nodes:
-            if source != target and not e.has_edge(source, target):
+            if source != target and not end.has_edge(source, target):
                 u.add_edge(source, target)
     return u
     
-
-def check_for_dups(g):
-    """Return nodes in g that differ only in case."""
-    # Before iterating through all the nodes, see whether any are
-    # duplicated.
-    nodes = g.nodes()
-    unique_nodes = set([node.lower() for node in nodes])
-    if len(unique_nodes) < len(nodes):
-        dups = []
-        checked = []
-        for node in nodes:
-            lowercase_node = node.lower()
-            if lowercase_node not in checked:
-                checked.append(lowercase_node)
-                continue
-            # Still append to checked to keep indices matched with
-            # nodes.
-            checked.append(lowercase_node)
-            dups.append(node)
-            original_node = nodes[checked.index(lowercase_node)]
-            if original_node not in dups:
-                dups.append(original_node)
-        dups.sort()
-        return dups
-
 
 def get_top_ten(measures, better='greater'):
     """Returns top ten nodes in order from best to worst.
@@ -125,6 +94,11 @@ def get_top_ten(measures, better='greater'):
       Complete this sentence using the word "greater" or "smaller": The
       nodes with the better scores in this dict are the ones with the
       _____ values.
+
+    Returns
+    -------
+    top_ten : list
+      The top ten nodes.
 
     Notes
     -----
@@ -151,46 +125,27 @@ def get_top_ten(measures, better='greater'):
             top_ten.append(next_best_nodes)
     return top_ten
 
-#------------------------------------------------------------------------------
-# Functions Related to ORT Method
-#------------------------------------------------------------------------------
 
-def binarize_ecs(e):
+def strip_absent_edges(end):
+    """Return graph with known-absent edges removed.
+
+    Do not modify the graph passed as input; return a new graph.
+
+    Parameters
+    ----------
+    end : EndGraph
+      EndGraph after translated edges have been added.
+
+    Returns
+    -------
+    g : NetworkX DiGraph
+      Graph with those edges in EndGraph known to be present.  Edge
+      attributes are not transferred to this graph.
+    """
     g = nx.DiGraph()
-    for source, target in e.edges_iter():
-        source_ec, target_ec = e[source][target]['ECs']
+    for source, target in end.edges_iter():
+        source_ec, target_ec = end[source][target]['ECs']
         ns = ('N', 'Nc', 'Np', 'Nx')
         if source_ec not in ns and target_ec not in ns:
             g.add_edge(source, target)
     return g
-
-#------------------------------------------------------------------------------
-# Functions Related to Dan Method
-#------------------------------------------------------------------------------
-
-def controversy_hist(e):
-    """Get histogram data for controversy scores in e.
-
-    Returns
-    -------
-    freq : numpy.array
-      Number of occurrences of values within each bin.
-
-    bin_edges : numpy.array
-      Values for each bin edge.  Length is one greater than that of
-      freq.
-    """
-    scores = []
-    for source, target in e.edges_iter():
-        scores.append(e[source][target]['score'])
-    return np.histogram(scores, bins=20)
-
-
-def present_graph(e):
-    present_edges = []
-    for source, target in e.edges_iter():
-        if e[source][target]['score'] > 0:
-            present_edges.append((source, target))
-    p = nx.DiGraph()
-    p.add_edges_from(present_edges)
-    return p
