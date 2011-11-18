@@ -8,77 +8,25 @@ class EndGraphError(Exception):
 
 class EndGraph(DiGraph):
 
-    def add_edge(self, source, target, new_attr, method):
-        if method == 'dan':
-            add_edge = DiGraph.add_edge.im_func
-            if not self.has_edge(source, target):
-                add_edge(self, source, target, new_attr)
-            else:
-                for key, value in new_attr.iteritems():
-                    try:
-                        self[source][target][key] += value
-                    except KeyError:
-                        self[source][target][key] = value
-        elif method == 'ort':
-            try:
-                _assert_valid_attr(new_attr)
-            except EndGraphError:
-                return
-            add_edge = DiGraph.add_edge.im_func
-            if source == target:
-                return
-            elif not self.has_edge(source, target):
-                add_edge(self, source, target, new_attr)
-            else:
-                old_attr = self[source][target]
-                add_edge(self, source, target,
-                         _update_attr(old_attr, new_attr))
+    def add_edge(self, source, target, new_attr):
+        try:
+            _assert_valid_attr(new_attr)
+        except EndGraphError:
+            return
+        add_edge = DiGraph.add_edge.im_func
+        if source == target:
+            return
+        elif not self.has_edge(source, target):
+            add_edge(self, source, target, new_attr)
         else:
-            raise EndGraphError('Invalid method supplied.')
+            old_attr = self[source][target]
+            add_edge(self, source, target, _update_attr(old_attr, new_attr))
 
-    def add_edges_from(self, ebunch, method):
+    def add_edges_from(self, ebunch):
         for (source, target, new_attr) in ebunch:
-            self.add_edge(source, target, new_attr, method)
+            self.add_edge(source, target, new_attr)
 
-    def add_translated_edges(self, mapp, conn, desired_bmap, method='ort'):
-        if method == 'dan':
-            self._dan_translate(mapp, conn, desired_bmap)
-        elif method == 'ort':
-            self._ort_translate(mapp, conn, desired_bmap)
-
-    def _dan_translate(self, mapp, conn, desired_bmap):
-        num_edges = conn.number_of_edges()
-        conn_edges = conn.edges()
-        while conn_edges:
-            s, t = conn_edges.pop()
-            s_map, t_map = s.split('-')[0], t.split('-')[0]
-            ebunch = []
-            for new_s, new_t in mapp._translate_edge(s, t, desired_bmap):
-                old_edges = mapp._translate_edge(new_s, new_t, s_map, t_map)
-                incomplete = False
-                for old_s, old_t in old_edges:
-                    try:
-                        degree = conn[old_s][old_t]['Degree']
-                    except KeyError:
-                        incomplete = True
-                        continue
-                    if degree != '0':
-                        attr = {'ebunches_for': [(s_map, t_map)]}
-                        break
-                else:
-                    if incomplete:
-                        attr = {'ebunches_incomplete': [(s_map, t_map)]}
-                    else:
-                        attr = {'ebunches_against': [(s_map, t_map)]}
-                for processed_edge in old_edges:
-                    try:
-                        conn_edges.remove(processed_edge)
-                    except ValueError:
-                        pass
-                ebunch.append((new_s, new_t, attr))
-            self.add_edges_from(ebunch, 'dan')
-
-    def _ort_translate(self, mapp, conn, desired_bmap):
+    def add_translated_edges(self, mapp, conn, desired_bmap):
         for s, t in conn.edges_iter():
             new_sources = _translate_one_side(mapp, conn, desired_bmap, s,
                                               'Source', t)
@@ -98,7 +46,7 @@ class EndGraph(DiGraph):
                                           {'ECs': (s_ec, t_ec),
                                            'PDC': np.mean([s_value[1],
                                                            t_value[1]]),
-                                           'Presence-Absence': present}, 'ort')
+                                           'Presence-Absence': present})
 
     def add_controversy_scores(self):
         for source, target in self.edges_iter():
