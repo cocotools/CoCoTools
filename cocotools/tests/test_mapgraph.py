@@ -175,32 +175,6 @@ def test_translate_node():
     translate_node = mg.MapGraph._translate_node.im_func
     nt.assert_equal(translate_node(g, 'A-1', 'B'), ['B-2', 'B-1'])
 
-
-class TranslateEdgeTestCase(MockerTestCase):
-
-    def setUp(self):
-        self.translate = mg.MapGraph._translate_edge.im_func
-
-    def test_two_maps(self):
-        g = self.mocker.mock()
-        g._translate_node('A-1', 'B')
-        self.mocker.result(['B-1', 'B-2'])
-        g._translate_node('A-2', 'C')
-        self.mocker.result(['C-1'])
-        self.mocker.replay()
-        self.assertEqual(self.translate(g, 'A-1', 'A-2', 'B', 'C'),
-                         [('B-1', 'C-1'), ('B-2', 'C-1')])
-
-    def test_one_map(self):
-        g = self.mocker.mock()
-        g._translate_node('A-1', 'B')
-        self.mocker.result(['B-1'])
-        g._translate_node('A-2', 'B')
-        self.mocker.result(['B-2', 'B-3'])
-        self.mocker.replay()
-        self.assertEqual(self.translate(g, 'A-1', 'A-2', 'B'),
-                         [('B-1', 'B-2'), ('B-1', 'B-3')])
-    
 #------------------------------------------------------------------------------
 # Support Function Unit Tests
 #------------------------------------------------------------------------------

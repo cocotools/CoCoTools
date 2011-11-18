@@ -27,7 +27,10 @@ class MapGraph(DiGraph):
 #------------------------------------------------------------------------------
 
     def _tp_pdcs(self, source, target, attr1, attr2=None):
-        """Return mean PDC for relation chain in attr(s)."""
+        """Return mean PDC for relation chain in attr(s).
+
+        Called by _update_attr and deduce_edges.
+        """
         if not attr2:
             tps = (attr1['TP'],)
         else:
@@ -45,6 +48,7 @@ class MapGraph(DiGraph):
         return mean_pdcs
     
     def _update_attr(self, source, target, new_attr):
+        """Called by _add_edge."""
         old_attr = self[source][target]
         funcs = (_tp_len, _pdcs, self._tp_pdcs)
         arg_groups = [(old_attr, new_attr)] * 2 + [(source, target, old_attr,
@@ -58,6 +62,7 @@ class MapGraph(DiGraph):
         return old_attr
 
     def _assert_valid_edge(self, source, target, attr):
+        """Called by _add_edge."""
         value = attr['TP']
         assert isinstance(value, list)
         if value:
@@ -75,6 +80,7 @@ class MapGraph(DiGraph):
             raise MapGraphError('RC is %s' % value)
     
     def _add_edge(self, source, target, new_attr):
+        """Called by add_edge."""
         self._assert_valid_edge(source, target, new_attr)
         add_edge = DiGraph.add_edge.im_func
         if not self.has_edge(source, target):
@@ -129,6 +135,7 @@ class MapGraph(DiGraph):
 #------------------------------------------------------------------------------
 
     def _code(self, p, tp, s):
+        """Called by deduce_edges"""
         middle = ''
         for i in range(len(tp) - 1):
             middle += self[tp[i]][tp[i + 1]]['RC']
@@ -171,16 +178,18 @@ class MapGraph(DiGraph):
         algebra of transformation.  RCs of S and O will be used for
         multi-step operations.
 
+        Returns
+        -------
+        single_steps, multi_steps : lists
+          Lists of (old_node, RC) tuples.
+
         Notes
         -----
         If new_node's map is original_map, new_node is considered
         identical (i.e., RC='I') to its counterpart in original_map
         (i.e., itself).
 
-        Returns
-        -------
-        single_steps, multi_steps : lists
-          Lists of (old_node, RC) tuples.
+        Called by _translate_one_side.
         """
         single_steps, multi_steps = [], []
         for old_node in self._translate_node(new_node, original_map):
@@ -195,7 +204,10 @@ class MapGraph(DiGraph):
         return single_steps, multi_steps
             
     def _translate_node(self, node, out_map):
-        """Return list of nodes from out_map coextensive with node."""
+        """Return list of nodes from out_map coextensive with node.
+
+        Called by _translate_one_side.
+        """
         if node.split('-')[0] == out_map:
             return [node]
         neighbors = []
@@ -206,22 +218,17 @@ class MapGraph(DiGraph):
                 pass
         return [n for n in set(neighbors) if n.split('-')[0] == out_map]
 
-    def _translate_edge(self, source, target, out_bmap1, out_bmap2=None):
-        if not out_bmap2:
-            out_bmap2 = out_bmap1
-        new_sources = self._translate_node(source, out_bmap1)
-        new_targets = self._translate_node(target, out_bmap2)
-        return [(s, t) for s in new_sources for t in new_targets]
-
 #------------------------------------------------------------------------------
 # Support Functions
 #------------------------------------------------------------------------------
 
 def _pdcs(old_attr, new_attr):
+    """Called by _update_attr."""
     return old_attr['PDC'], new_attr['PDC']
 
 
 def _tp_len(old_attr, new_attr):
+    """Called by _update_attr."""
     return len(old_attr['TP']), len(new_attr['TP'])
 
 
@@ -229,6 +236,8 @@ def _rc_res(tpc):
     """Return RC corresponding to TP code.
 
     Return False if RC = D or len(RC) > 1.
+
+    Called by deduce_edges.
     """
     map_step = {'I': {'I': 'I', 'S': 'S', 'L': 'L', 'O': 'O'},
                 'S': {'I': 'S', 'S': 'S'},
@@ -250,6 +259,7 @@ def _rc_res(tpc):
 
         
 def _reverse_attr(attr):
+    """Called by add_edge."""
     rc_switch = {'I': 'I', 'S': 'L', 'L': 'S', 'O': 'O', None: None}
     # Need to deep copy to prevent modification of attr.
     tp = deepcopy(attr['TP'])
