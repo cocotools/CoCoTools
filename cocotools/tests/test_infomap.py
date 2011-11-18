@@ -26,6 +26,6 @@ def test_state():
                        )
     for state, lines in transitions.items():
         for line in lines:
-            new_state = infomap.get_state(line, None)
+            new_state = infomap._get_state(line, None)
             nt.assert_equals(new_state, state)
         

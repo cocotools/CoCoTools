@@ -30,12 +30,14 @@ from pajek import write_pajek
 # Functions
 #-----------------------------------------------------------------------------
 
-def load_modules(g, map):
+def _load_modules(g, map):
     """Add modules to an open graph.
 
     Iterates the input map file adding modules as nodes to the graph as it
     finds them, and stops (returning the new state) when it detects the data
     stops describing modules.
+
+    Called by _load_infomap.
 
     Parameters
     ----------
@@ -53,7 +55,7 @@ def load_modules(g, map):
                    r'(?P<x>[\d.]+)\s*$')
     state = 'modules'
     for line in map:
-        state = get_state(line, state)
+        state = _get_state(line, state)
         if state != 'modules':
             return state
         m = r.match(line)
@@ -71,12 +73,14 @@ def load_modules(g, map):
                                 nodes = []))
     return 'top'
 
-def load_nodes(g, map):
+def _load_nodes(g, map):
     """Add nodes to an open graph.
 
     Iterates the input map file adding nodes to the graph as it finds them, and
     stops (returning the new state) when it detects the data stops describing
     modules.
+
+    Called by _load_infomap.
 
     Parameters
     ----------
@@ -94,7 +98,7 @@ def load_nodes(g, map):
                    r'\s+(?P<ss>[\d.]+)\s*$')
     state = 'nodes'
     for line in map:
-        state = get_state(line, state)
+        state = _get_state(line, state)
         if state != 'nodes':
             return state
         m = r.match(line)
@@ -107,12 +111,14 @@ def load_nodes(g, map):
     return 'top'
 
 
-def load_links(g, map):
+def _load_links(g, map):
     """Add links to an open graph.
 
     Iterates the input map file adding links to the graph as it finds them, and
     stops (returning the new state) when it detects the data stops describing
     modules.
+
+    Called by _load_infomap.
 
     Parameters
     ----------
@@ -129,7 +135,7 @@ def load_links(g, map):
     r = re.compile(r'^(?P<mod1>\d+)\s+(?P<mod2>\d+)\s+(?P<ss>[\d.]+)\s*$')
     state = 'links'
     for line in map:
-        state = get_state(line, state)
+        state = _get_state(line, state)
         if state != 'links':
             return state
         m = r.match(line)
@@ -141,8 +147,10 @@ def load_links(g, map):
     return 'top'
     
     
-def get_state(line, state):
+def _get_state(line, state):
     """Compute the next state based on the current line content.
+
+    Called by _load_infomap, _load_links, _load_nodes, and _load_modules.
     """
     if not line or line.startswith('#') or line.isspace() or \
        line.startswith('*Directed'): 
@@ -157,11 +165,13 @@ def get_state(line, state):
     return state
 
 
-def load_infomap(mapfile):
+def _load_infomap(mapfile):
     """Construct a DiGraph from an infomap .map partition file.
 
     The resulting graph contains at each node (module), all the data about the
     nodes in the original graph that belong to that module.
+
+    Called by _infomap.
 
     Parameters
     ----------
@@ -173,9 +183,9 @@ def load_infomap(mapfile):
     -------
     g : networkx DiGraph
     """
-    loaders = dict(modules=load_modules,
-                   nodes=load_nodes,
-                   links=load_links,
+    loaders = dict(modules=_load_modules,
+                   nodes=_load_nodes,
+                   links=_load_links,
                    top=lambda *x: 'top')
     
     g = nx.DiGraph()
@@ -191,18 +201,20 @@ def load_infomap(mapfile):
                 # approach with manually calling .next() here.
                 if state == 'top':
                     line = map.next()
-                    state = get_state(line, state)
+                    state = _get_state(line, state)
                 state = loaders[state](g, map)
         except StopIteration:
             pass
     return g
 
 
-def infomap(basepath, n_iter=10, seed=123456):
+def _infomap(basepath, n_iter=10, seed=123456):
     """Create an InfoMap graph given a path.
 
     This calls the binary `infomap` program, which must be available in your
     $PATH for execution.
+
+    Called by nx2infomap.
 
     Parameters
     ----------
@@ -221,7 +233,7 @@ def infomap(basepath, n_iter=10, seed=123456):
     cmd = ['infomap', str(seed), netfile, str(n_iter)]
     #print '$', ' '.join(cmd)  # dbg
     check_call(cmd)  # this will raise if the infomap cmd isn't found
-    return load_infomap(mapfile)
+    return _load_infomap(mapfile)
 
 
 def nx2infomap(g, name=None, n_iter=10, seed=123456):
@@ -245,4 +257,4 @@ def nx2infomap(g, name=None, n_iter=10, seed=123456):
         name = 'nxdigraph'
     print 'pajek name:', name
     write_pajek(g, name+'.net')
-    return infomap(name, n_iter, seed)
+    return _infomap(name, n_iter, seed)
