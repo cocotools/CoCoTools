@@ -6,7 +6,9 @@ with some bugs in Rosvall's infomap Pajek reader.
 
 from networkx.utils import is_string_like, open_file, make_str
 
+
 def quote_spaces(x):
+    """Called by make_quoted_str."""
     try:
         has_space = ' ' in x
     except TypeError:
@@ -18,6 +20,7 @@ def quote_spaces(x):
 
     
 def make_quoted_str(x):
+    """Called by generate_pajek."""
     if not isinstance(x, basestring):
         x = str(x)
     return quote_spaces(x)
@@ -25,6 +28,8 @@ def make_quoted_str(x):
 
 def generate_pajek(G):
     """Generate lines in Pajek graph format.
+
+    Called by write_pajek.
 
     Parameters
     ----------

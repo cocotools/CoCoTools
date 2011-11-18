@@ -4,6 +4,7 @@
 import csv
 from os.path import splitext
 
+
 def get_coord_dict(g, coord_file, dim='XY'):
     """Return dict mapping regions in g to coordinates in coord_file.
 
