@@ -10,6 +10,17 @@ class MapGraphError(Exception):
 
 class MapGraph(DiGraph):
 
+    """Subclass of the NetworkX DiGraph designed to hold Mapping data.
+
+    The DiGraph methods add_edge and add_edges_from have been overridden,
+    to enforce that edges added have valid attributes referring to their
+    transformation paths, precision description codes, and relation codes.
+    
+    A new method, deduce_edges, has been added for deducing new spatial
+    relationships between regions based on those already present in the
+    graph.
+    """
+
 #------------------------------------------------------------------------------
 # Construction Methods
 #------------------------------------------------------------------------------
