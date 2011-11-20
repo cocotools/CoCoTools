@@ -1,15 +1,38 @@
 import numpy as np
 
+def _process_single_steps(single_steps, which):
+    pass
+
+
 def add_translated_edges(self, mapp, conn, desired_bmap):
     for s, t in conn.edges_iter():
         s_dict = _make_translation_dict(s, mapp, desired_bmap)
         t_dict = _make_translation_dict(t, mapp, desired_bmap)
         s_dict, t_dict = _add_conn_data(s_dict, t_dict, conn)
-        for new_s, old_s_dict in s_dict.iter_items():
+        for new_s, old_s_dict in s_dict.iteritems():
             attr = _add_new_attr(old_s_dict, 'Source')
-            for new_t, old_t_dict in t_dict.iter_items():
+            for new_t, old_t_dict in t_dict.iteritems():
                 attr = _add_new_attr(old_t_dict, 'Target')
                 self.add_edge(new_s, new_t, attr)
+
+
+def _add_new_attr(old_dict, which):
+    single_steps, multi_steps = _separate_rcs(old_dict)
+    new_attr1 = _process_single_steps(single_steps, which)
+    new_attr2 = _process_multi_steps(multi_steps, which)
+    return _resolve_intramap_tie(newattr1, newattr2, which)
+
+                
+def _separate_rcs(old_dict):
+    single_steps, multi_steps = {}, {}
+    for old_node, inner_dict in old_dict.iteritems():
+        if inner_dict['RC'] in ('I', 'L'):
+            single_steps[old_node] = inner_dict
+        elif inner_dict['RC'] in ('S', 'O'):
+            multi_steps[old_node] = inner_dict
+        else:
+            raise EndGraphError('invalid RC')
+    return single_steps, multi_steps
 
 
 def _add_conn_data(s_dict, t_dict, conn):
@@ -27,7 +50,7 @@ def _add_conn_data(s_dict, t_dict, conn):
             try:
                 attr = conn[s][t]
             except KeyError:
-                attr = {'EC_Source': 'U', 'EC_Target': 'U',
+                attr = {'EC_Source': 'Ux', 'EC_Target': 'Ux',
                         'PDC_Site_Source': 18, 'PDC_Site_Target': 18,
                         'PDC_EC_Source': 18, 'PDC_EC_Target': 18}
             s_dict = _add_edge_data(s_dict, s, attr, 'Source')

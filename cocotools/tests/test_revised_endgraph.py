@@ -1,7 +1,32 @@
 import nose.tools as nt
+import networkx as nx
 
 import cocotools as coco
 import cocotools.revised_endgraph as re
+
+
+def test__process_single_steps():
+    single_steps = {'A': {'RC': 'I', 'EC': ['C', 'Nc'], 'PDC': [0, 1]},
+                    'B': {'RC': 'L', 'EC': ['U', 'P'], 'PDC': [0, 1]},
+                    'C': {'RC': 'I', 'EC': ['X', 'P'], 'PDC': [0, 1]}}
+
+
+def test__separate_rcs():
+    old_dict = {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'], 'PDC': [0, 1]},
+                'A-5': {'RC': 'O', 'EC': ['U', 'U'], 'PDC': [18, 18]}}
+    single_steps, multi_steps = re._separate_rcs(old_dict)
+    nt.assert_equal(multi_steps, {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'],
+                                           'PDC': [0, 1]},
+                                   'A-5': {'RC': 'O', 'EC': ['U', 'U'],
+                                           'PDC': [18, 18]}})
+    nt.assert_equal(single_steps, {})
+
+
+def test__add_new_attr():
+    old_dict = {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'], 'PDC': [0, 1]},
+                'A-5': {'RC': 'O', 'EC': ['U', 'U'], 'PDC': [18, 18]}}
+#    nt.assert_equal(re._add_new_attr(old_dict, 'Target'),
+#                    {'EC_Target': 'P', 'PDC_Source': 9.25})
 
 
 def test__make_translation_dict():
@@ -47,18 +72,18 @@ def test__add_conn_data():
 
     new_s_dict, new_t_dict = re._add_conn_data(s_trans_dict, t_trans_dict, c)
     nt.assert_equal(new_s_dict,
-                    {'B-1': {'A-1': {'RC': 'S', 'EC': ['U', 'C'],
+                    {'B-1': {'A-1': {'RC': 'S', 'EC': ['Ux', 'C'],
                                      'PDC': [18.0, 1.0]},
-                             'A-2': {'RC': 'S', 'EC': ['U', 'N'],
+                             'A-2': {'RC': 'S', 'EC': ['Ux', 'N'],
                                      'PDC': [18.0, 6.5]}}})
     nt.assert_equal(new_t_dict.keys(), ['B-2', 'B-3'])
     nt.assert_equal(new_t_dict['B-2'],
                     {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'],
                              'PDC': [0, 1]},
-                     'A-5': {'RC': 'O', 'EC': ['U', 'U'],
+                     'A-5': {'RC': 'O', 'EC': ['Ux', 'Ux'],
                              'PDC': [18, 18]}})
     nt.assert_equal(new_t_dict['B-3'],
                     {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'],
                              'PDC': [0, 1]},
-                     'A-5': {'RC': 'O', 'EC': ['U', 'U'],
+                     'A-5': {'RC': 'O', 'EC': ['Ux', 'Ux'],
                              'PDC': [18, 18]}})
