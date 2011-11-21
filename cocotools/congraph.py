@@ -71,169 +71,32 @@ class ConGraph(DiGraph):
 # Translation Methods
 #------------------------------------------------------------------------------
 
-    def _single_ec_step(self, s, rc, t, node_label):
-        """Perform single-step operation of algebra of transformation.
+    def _add_conn_data(self, s_dict, t_dict):
 
-        Called by _translate_one_side.
+        # Extract sources and targets from the original BrainMap(s).
+        for nodes in ('sources', 'targets'):
+            exec 'old_%s = []' % nodes
+            exec 'inner_dicts = %s_dict.values()' % nodes[0]
+            exec 'old_%s += [k for d in inner_dicts for k in d.keys()]' % nodes
+            exec 'old_%s = set(old_%s)' % (nodes, nodes)
 
-        Returns
-        -------
-        EC, mean PDC : tuple
-          EC and mean PDC for new node (role indicated by node_label).
-        """
-        process_ec = {'I': {'N': 'N',
-                            'P': 'P',
-                            'X': 'X',
-                            'C': 'C'},
-                      'L': {'N': 'N',
-                            'P': 'U',
-                            'X': 'U',
-                            'C': 'C'}}
-        try:
-            edge_dict = self[s][t]
-        except KeyError:
-            return 'U', 18
-        return (process_ec[rc][edge_dict['EC_%s' % node_label]],
-                mean([edge_dict['PDC_EC_%s' % node_label],
-                      edge_dict['PDC_Site_%s' % node_label]]))
+        # Add ECs and PDCs for Cartesian product of old_sources and old_targets.
+        for s in old_sources:
+            for t in old_targets:
+                try:
+                    attr = self[s][t]
+                except KeyError:
+                    attr = {'EC_Source': 'Uu', 'EC_Target': 'Uu',
+                            'PDC_Site_Source': 18, 'PDC_Site_Target': 18,
+                            'PDC_EC_Source': 18, 'PDC_EC_Target': 18}
+                s_dict = _add_edge_data(s_dict, s, attr, 'Source')
+                t_dict = _add_edge_data(t_dict, t, attr, 'Target')
+        return s_dict, t_dict
 
-    def _multi_ec_step(self, s, rc, t, node_label, ec, pdc_sum):
-        """Called by _translate_one_side."""
-        process_ec = {'B': {'S': {'Np': 'Up',
-                                  'Nx': 'Up',
-                                  'Nc': 'N',
-                                  'N': 'N',
-                                  'P': 'P',
-                                  'X': 'X',
-                                  'C': 'C'
-                                  },
-                            'O': {'Np': 'Ux',
-                                  'Nx': 'Ux',
-                                  'Nc': 'N',
-                                  'N': 'N',
-                                  'P': 'Ux',
-                                  'X': 'Ux',
-                                  'C': 'C'
-                                  }
-                            },
-                      'N': {'S': {'Np': 'Up',
-                                  'Nx': 'Up',
-                                  'Nc': 'N',
-                                  'N': 'N',
-                                  'P': 'P',
-                                  'X': 'P',
-                                  'C': 'P'
-                                  },
-                            'O': {'Np': 'Up',
-                                  'Nx': 'Up',
-                                  'Nc': 'N',
-                                  'N': 'N',
-                                  'P': 'Up',
-                                  'X': 'Up',
-                                  'C': 'P'
-                                  }
-                            },
-                      'Up': {'S': {'Np': 'Up',
-                                   'Nx': 'Up',
-                                   'Nc': 'Up',
-                                   'N': 'Up',
-                                   'P': 'P',
-                                   'X': 'P',
-                                   'C': 'P'
-                                   },
-                             'O': {'Np': 'Up',
-                                   'Nx': 'Up',
-                                   'Nc': 'Up',
-                                   'N': 'Up',
-                                   'P': 'Up',
-                                   'X': 'Up',
-                                   'C': 'P'
-                                   }
-                             },
-                      'Ux': {'S': {'Np': 'Up',
-                                   'Nx': 'Up',
-                                   'Nc': 'Up',
-                                   'N': 'Up',
-                                   'P': 'P',
-                                   'X': 'X',
-                                   'C': 'X'
-                                   },
-                             'O': {'Np': 'Ux',
-                                   'Nx': 'Ux',
-                                   'Nc': 'Up',
-                                   'N': 'Up',
-                                   'P': 'Ux',
-                                   'X': 'Ux',
-                                   'C': 'X'
-                                   }
-                             },
-                      'P': {'S': {'Np': 'P',
-                                  'Nx': 'P',
-                                  'Nc': 'P',
-                                  'N': 'P',
-                                  'P': 'P',
-                                  'X': 'P',
-                                  'C': 'P'
-                                  },
-                            'O': {'Np': 'P',
-                                  'Nx': 'P',
-                                  'Nc': 'P',
-                                  'N': 'P',
-                                  'P': 'P',
-                                  'X': 'P',
-                                  'C': 'P'
-                                  }
-                            },
-                      'X': {'S': {'Np': 'P',
-                                  'Nx': 'P',
-                                  'Nc': 'P',
-                                  'N': 'P',
-                                  'P': 'P',
-                                  'X': 'X',
-                                  'C': 'X'
-                                  },
-                            'O': {'Np': 'X',
-                                  'Nx': 'X',
-                                  'Nc': 'P',
-                                  'N': 'P',
-                                  'P': 'X',
-                                  'X': 'X',
-                                  'C': 'X'
-                                  }
-                            },
-                      'C': {'S': {'Np': 'P',
-                                  'Nx': 'P',
-                                  'Nc': 'P',
-                                  'N': 'P',
-                                  'P': 'P',
-                                  'X': 'X',
-                                  'C': 'C'
-                                  },
-                            'O': {'Np': 'X',
-                                  'Nx': 'X',
-                                  'Nc': 'P',
-                                  'N': 'P',
-                                  'P': 'X',
-                                  'X': 'X',
-                                  'C': 'C'
-                                  }
-                            }
-                      }
-        try:
-            edge_dict = self[s][t]
-        except KeyError:
-            # The connection from s to t has not been studied.
-            edge_dict = {'EC_Source': 'N',
-                         'EC_Target': 'N',
-                         'PDC_EC_Source': 18,
-                         'PDC_EC_Target': 18,
-                         'PDC_Site_Source': 18,
-                         'PDC_Site_Target': 18}
-        return (process_ec[ec][rc][edge_dict['EC_%s' % node_label]],
-                pdc_sum + edge_dict['PDC_EC_%s' % node_label] +
-                edge_dict['PDC_Site_%s' % node_label])
-            
-            
+#------------------------------------------------------------------------------
+# Support Functions
+#------------------------------------------------------------------------------
+
 def _update_attr(old_attr, new_attr):
     """Called by add_edge."""
     for func in (_mean_pdcs, _ec_points):
@@ -278,3 +141,13 @@ def _ec_points(old_attr, new_attr):
     return [sum((points[a['EC_Source'][0]],
                  points[a['EC_Target'][0]])) for a in (old_attr, new_attr)]
 
+
+def _add_edge_data(node_dict, node, attr, which):
+    for inner_dict in node_dict.values():
+        if inner_dict.has_key(node):
+            ecs = inner_dict[node]['EC']
+            pdcs = inner_dict[node]['PDC']
+            ecs.append(attr['EC_%s' % which])
+            pdcs.append(mean([attr['PDC_Site_%s' % which],
+                              attr['PDC_EC_%s' % which]]))
+    return node_dict

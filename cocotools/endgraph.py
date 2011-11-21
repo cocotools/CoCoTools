@@ -76,7 +76,7 @@ class EndGraph(DiGraph):
             self.add_edge(source, target, new_attr)
 
     def add_translated_edges(self, mapp, conn, desired_bmap):
-        """Perform the ORT algebra of transformation.
+        """Perform the enhanced ORT algebra of transformation.
 
         Using spatial relationships in mapp, translate the anatomical
         connections in conn into the nomenclature of desired_bmap.
@@ -94,25 +94,14 @@ class EndGraph(DiGraph):
           Name of BrainMap to which translation will be performed.
         """
         for s, t in conn.edges_iter():
-            new_sources = _translate_one_side(mapp, conn, desired_bmap, s,
-                                              'Source', t)
-            new_targets = _translate_one_side(mapp, conn, desired_bmap, t,
-                                              'Target', s)
-            for new_s, s_values in new_sources.iteritems():
-                for new_t, t_values in new_targets.iteritems():
-                    for s_value in s_values:
-                        for t_value in t_values:
-                            s_ec, t_ec = s_value[0], t_value[0]
-                            ns = ('N', 'Nc', 'Np', 'Nx')
-                            if s_ec in ns or t_ec in ns:
-                                present = -1
-                            else:
-                                present = 1
-                            self.add_edge(new_s, new_t,
-                                          {'ECs': (s_ec, t_ec),
-                                           'PDC': np.mean([s_value[1],
-                                                           t_value[1]]),
-                                           'Presence-Absence': present})
+            s_dict = _make_translation_dict(s, mapp, desired_bmap)
+            t_dict = _make_translation_dict(t, mapp, desired_bmap)
+            s_dict, t_dict = _add_conn_data(s_dict, t_dict, conn)
+            for new_s, old_s_dict in s_dict.iteritems():
+                attr = _add_new_attr(old_s_dict, 'Source')
+                for new_t, old_t_dict in t_dict.iteritems():
+                    attr = _add_new_attr(old_t_dict, 'Target')
+                    self.add_edge(new_s, new_t, attr)
 
 
 def _evaluate_conflict(old_attr, new_attr, updated_score):
@@ -156,39 +145,6 @@ def _update_attr(old_attr, new_attr):
         return old_attr
     else:
         return _evaluate_conflict(old_attr, new_attr, updated_score)
-
-
-def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
-    """Returns dict mapping each new node to a list of (EC, PDC) tuples.
-
-    Called by add_translated_edges.
-    """
-    node_map = node.split('-')[0]
-    new_nodes = {}
-    for new_node in mapp._translate_node(node, desired_bmap):
-        single_steps, multi_steps = mapp._separate_rcs(new_node, node_map)
-        new_nodes[new_node] = []
-        for old_node, rc in single_steps:
-            if role == 'Source':
-                new_nodes[new_node].append(conn._single_ec_step(old_node, rc,
-                                                                other, role))
-            else:
-                new_nodes[new_node].append(conn._single_ec_step(other,
-                                                                rc, old_node,
-                                                                role))
-        if multi_steps:
-            ec = 'B'
-            pdc_sum = 0.0
-            for old_node, rc in multi_steps:
-                if role == 'Source':
-                    ec, pdc_sum = conn._multi_ec_step(old_node, rc, other,
-                                                      role, ec, pdc_sum)
-                else:
-                    ec, pdc_sum = conn._multi_ec_step(other, rc, old_node,
-                                                      role, ec, pdc_sum)
-            avg_pdc = pdc_sum / (2 * len(multi_steps))
-            new_nodes[new_node].append((ec, avg_pdc))
-    return new_nodes
         
 
 def _assert_valid_attr(attr):
@@ -204,3 +160,26 @@ def _assert_valid_attr(attr):
         raise EndGraphError('Attempted to add PDC = %s' % pdc)
     if attr['Presence-Absence'] not in (1, -1):
         raise EndGraphError('Attempted to add bad Presence-Absence score.')
+
+
+def _separate_rcs(old_dict):
+    single_steps, multi_steps = {}, {}
+    for old_node, inner_dict in old_dict.iteritems():
+        if inner_dict['RC'] in ('I', 'L'):
+            single_steps[old_node] = inner_dict
+        elif inner_dict['RC'] in ('S', 'O'):
+            multi_steps[old_node] = inner_dict
+        else:
+            raise EndGraphError('invalid RC')
+    return single_steps, multi_steps
+            
+            
+def _add_new_attr(old_dict, which):
+    single_steps, multi_steps = _separate_rcs(old_dict)
+    new_attr1 = _process_single_steps(single_steps, which)
+    new_attr2 = _process_multi_steps(multi_steps, which)
+    return _resolve_intramap_tie(newattr1, newattr2, which)
+    
+
+def _process_single_steps(single_steps, which):
+    pass

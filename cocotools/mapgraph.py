@@ -169,39 +169,18 @@ class MapGraph(DiGraph):
 # Translation Methods
 #------------------------------------------------------------------------------
 
-    def _separate_rcs(self, new_node, original_map):
-        """Return one list for single_steps and one for multi_steps.
+    def _make_translation_dict(self, node, desired_bmap):
+        translation_dict = {}
+        for new_node in self._translate_node(node, desired_bmap):
+            translation_dict[new_node] = {}
+            node_dict = translation_dict[new_node]
+            for old_node in self._translate_node(new_node,
+                                                 node.split('-', 1)[0]):
+                node_dict[old_node] = {'RC': self[old_node][new_node]['RC'],
+                                       'EC': [],
+                                       'PDC': []}
+        return translation_dict
 
-        Translate new_node back to original_map.  For each old_node
-        returned from this translation, get its RC with new_node.  RCs
-        of I and L will be used for single-step operations of the
-        algebra of transformation.  RCs of S and O will be used for
-        multi-step operations.
-
-        Returns
-        -------
-        single_steps, multi_steps : lists
-          Lists of (old_node, RC) tuples.
-
-        Notes
-        -----
-        If new_node's map is original_map, new_node is considered
-        identical (i.e., RC='I') to its counterpart in original_map
-        (i.e., itself).
-
-        Called by _translate_one_side.
-        """
-        single_steps, multi_steps = [], []
-        for old_node in self._translate_node(new_node, original_map):
-            if old_node == new_node:
-                single_steps.append((old_node, 'I'))
-            else:
-                rc = self[old_node][new_node]['RC']
-                if rc in ('I', 'L'):
-                    single_steps.append((old_node, rc))
-                elif rc in ('S', 'O'):
-                    multi_steps.append((old_node, rc))
-        return single_steps, multi_steps
             
     def _translate_node(self, node, out_map):
         """Return list of nodes from out_map coextensive with node.

@@ -11,6 +11,20 @@ import cocotools.mapgraph as mg
 # Integration Tests
 #------------------------------------------------------------------------------
 
+def test__make_translation_dict():
+    m = mg.MapGraph()
+    ebunch = [('A-1', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
+              ('A-2', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
+              ('A-4', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
+              ('A-4', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'}),
+              ('A-5', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
+              ('A-5', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'})]
+    m.add_edges_from(ebunch)
+    nt.assert_equal(m._make_translation_dict('A-1', 'B'),
+                    {'B-1': {'A-1': {'RC': 'S', 'EC': [], 'PDC': []},
+                             'A-2': {'RC': 'S', 'EC': [], 'PDC': []}}})
+
+                     
 def test_deduce_edges():
     """Integration test for deduce_edges."""
     # |-----------------------|
@@ -152,23 +166,6 @@ def test__code():
 # Translation Method Unit Tests
 #------------------------------------------------------------------------------
 
-def mock_translate_node(self, node, out_map):
-    return ['B-1', 'B-2', 'B-3', 'B-4']
-    
-    
-@replace('cocotools.MapGraph._translate_node', mock_translate_node)
-def test__separate_rcs():
-    g = mg.MapGraph()
-    add_edges_from = DiGraph.add_edges_from.im_func
-    add_edges_from(g, [('B-1', 'A-1', {'RC': 'I'}),
-                       ('B-2', 'A-1', {'RC': 'L'}),
-                       ('B-3', 'A-1', {'RC': 'S'}),
-                       ('B-4', 'A-1', {'RC': 'O'})])
-    nt.assert_equal(g._separate_rcs('A-1', 'B'),
-                    ([('B-1', 'I'), ('B-2', 'L')],
-                     [('B-3', 'S'), ('B-4', 'O')]))
-    
-    
 def test_translate_node():
     g = DiGraph()
     g.add_edges_from([('A-1', 'B-1'), ('A-1', 'C-1'), ('A-1', 'B-2')])
