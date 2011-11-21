@@ -170,15 +170,12 @@ class MapGraph(DiGraph):
 #------------------------------------------------------------------------------
 
     def _make_translation_dict(self, node, desired_bmap):
+        """Map regions in desired_bmap to regions in node's map."""
         translation_dict = {}
+        node_map = node.split('-')[0]
         for new_node in self._translate_node(node, desired_bmap):
-            translation_dict[new_node] = {}
-            node_dict = translation_dict[new_node]
-            for old_node in self._translate_node(new_node,
-                                                 node.split('-', 1)[0]):
-                node_dict[old_node] = {'RC': self[old_node][new_node]['RC'],
-                                       'EC': [],
-                                       'PDC': []}
+            translation_dict[new_node] = self._translate_node(new_node,
+                                                              node_map)
         return translation_dict
 
             

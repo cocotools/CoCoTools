@@ -94,16 +94,19 @@ class EndGraph(DiGraph):
           Name of BrainMap to which translation will be performed.
         """
         for s, t in conn.edges_iter():
-            s_dict = _make_translation_dict(s, mapp, desired_bmap)
-            t_dict = _make_translation_dict(t, mapp, desired_bmap)
-            s_dict, t_dict = _add_conn_data(s_dict, t_dict, conn)
-            for new_s, old_s_dict in s_dict.iteritems():
-                attr = _add_new_attr(old_s_dict, 'Source')
-                for new_t, old_t_dict in t_dict.iteritems():
-                    attr = _add_new_attr(old_t_dict, 'Target')
+            s_dict = mapp._make_translation_dict(s, desired_bmap)
+            t_dict = mapp._make_translation_dict(t, desired_bmap)
+            for new_s, old_sources in s_dict.iteritems():
+                for new_t, old_targets in t_dict.iteritems():
+                    old_edges = product(old_sources, old_targets)
+                    attr = _translate_attr(new_s, new_t, old_edges, mapp, conn)
                     self.add_edge(new_s, new_t, attr)
+                    
 
+def _translate_attr(new_s, new_t, old_edges, mapp, conn):
+    pass
 
+                    
 def _evaluate_conflict(old_attr, new_attr, updated_score):
     """Called by _update_attr."""
     ns = ('N', 'Nc', 'Np', 'Nx')
@@ -160,26 +163,3 @@ def _assert_valid_attr(attr):
         raise EndGraphError('Attempted to add PDC = %s' % pdc)
     if attr['Presence-Absence'] not in (1, -1):
         raise EndGraphError('Attempted to add bad Presence-Absence score.')
-
-
-def _separate_rcs(old_dict):
-    single_steps, multi_steps = {}, {}
-    for old_node, inner_dict in old_dict.iteritems():
-        if inner_dict['RC'] in ('I', 'L'):
-            single_steps[old_node] = inner_dict
-        elif inner_dict['RC'] in ('S', 'O'):
-            multi_steps[old_node] = inner_dict
-        else:
-            raise EndGraphError('invalid RC')
-    return single_steps, multi_steps
-            
-            
-def _add_new_attr(old_dict, which):
-    single_steps, multi_steps = _separate_rcs(old_dict)
-    new_attr1 = _process_single_steps(single_steps, which)
-    new_attr2 = _process_multi_steps(multi_steps, which)
-    return _resolve_intramap_tie(newattr1, newattr2, which)
-    
-
-def _process_single_steps(single_steps, which):
-    pass

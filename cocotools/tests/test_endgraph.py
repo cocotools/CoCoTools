@@ -1,3 +1,4 @@
+from itertools import product
 from testfixtures import replace
 from unittest import TestCase
 
@@ -11,32 +12,39 @@ import cocotools.endgraph as eg
 # Integration Tests
 #------------------------------------------------------------------------------
 
-def test__add_new_attr():
-    old_dict = {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'], 'PDC': [0, 1]},
-                'A-5': {'RC': 'O', 'EC': ['U', 'U'], 'PDC': [18, 18]}}
-#    nt.assert_equal(eg._add_new_attr(old_dict, 'Target'),
-#                    {'EC_Target': 'P', 'PDC_Source': 9.25})
+def test__translate_attr():
+    mapp = coco.MapGraph()
+    mapp.add_edges_from([('A-1', 'B-1', {'RC': 'S', 'PDC': 0, 'TP': []}),
+                         ('A-2', 'B-1', {'RC': 'S', 'PDC': 0, 'TP': []}),
+                         ('A-3', 'B-2', {'RC': 'O', 'PDC': 0, 'TP': []}),
+                         ('A-3', 'B-3', {'RC': 'O', 'PDC': 0, 'TP': []}),
+                         ('A-4', 'B-2', {'RC': 'O', 'PDC': 0, 'TP': []}),
+                         ('A-4', 'B-3', {'RC': 'O', 'PDC': 0, 'TP': []})])
+    conn = coco.ConGraph()
+    conn.add_edges_from([('A-1', 'A-4', {'EC_Source': 'Cc',
+                                         'EC_Target': 'Cc',
+                                         'Degree': '1',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4}),
+                         ('A-2', 'A-4', {'EC_Source': 'Nc',
+                                         'EC_Target': 'Cn',
+                                         'Degree': '0',
+                                         'PDC_Site_Source': 9,
+                                         'PDC_Site_Target': 1,
+                                         'PDC_EC_Source': 4,
+                                         'PDC_EC_Target': 1,
+                                         'PDC_Density': 4})])
+    old_edges = product(['A-1', 'A-2'], ['A-3', 'A-4'])
+    nt.assert_equal(eg._translate_attr('B-1', 'B-2', old_edges, mapp, conn),
+                    {'EC_Source': 'Px', 'EC_Target': 'Xp',
+                     'PDC_Source': 8.7, 'PDC_Target': 7.4})
 
 #------------------------------------------------------------------------------
 # Unit Tests
 #------------------------------------------------------------------------------
-
-def test__separate_rcs():
-    old_dict = {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'], 'PDC': [0, 1]},
-                'A-5': {'RC': 'O', 'EC': ['U', 'U'], 'PDC': [18, 18]}}
-    single_steps, multi_steps = eg._separate_rcs(old_dict)
-    nt.assert_equal(multi_steps, {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'],
-                                           'PDC': [0, 1]},
-                                   'A-5': {'RC': 'O', 'EC': ['U', 'U'],
-                                           'PDC': [18, 18]}})
-    nt.assert_equal(single_steps, {})
-
-
-def test__process_single_steps():
-    single_steps = {'A': {'RC': 'I', 'EC': ['C', 'Nc'], 'PDC': [0, 1]},
-                    'B': {'RC': 'L', 'EC': ['U', 'P'], 'PDC': [0, 1]},
-                    'C': {'RC': 'I', 'EC': ['X', 'P'], 'PDC': [0, 1]}}
-
 
 class EvaluateConflictTestCase(TestCase):
     

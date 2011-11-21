@@ -68,32 +68,6 @@ class ConGraph(DiGraph):
             self.add_edge(source, target, new_attr)
 
 #------------------------------------------------------------------------------
-# Translation Methods
-#------------------------------------------------------------------------------
-
-    def _add_conn_data(self, s_dict, t_dict):
-
-        # Extract sources and targets from the original BrainMap(s).
-        for nodes in ('sources', 'targets'):
-            exec 'old_%s = []' % nodes
-            exec 'inner_dicts = %s_dict.values()' % nodes[0]
-            exec 'old_%s += [k for d in inner_dicts for k in d.keys()]' % nodes
-            exec 'old_%s = set(old_%s)' % (nodes, nodes)
-
-        # Add ECs and PDCs for Cartesian product of old_sources and old_targets.
-        for s in old_sources:
-            for t in old_targets:
-                try:
-                    attr = self[s][t]
-                except KeyError:
-                    attr = {'EC_Source': 'Uu', 'EC_Target': 'Uu',
-                            'PDC_Site_Source': 18, 'PDC_Site_Target': 18,
-                            'PDC_EC_Source': 18, 'PDC_EC_Target': 18}
-                s_dict = _add_edge_data(s_dict, s, attr, 'Source')
-                t_dict = _add_edge_data(t_dict, t, attr, 'Target')
-        return s_dict, t_dict
-
-#------------------------------------------------------------------------------
 # Support Functions
 #------------------------------------------------------------------------------
 

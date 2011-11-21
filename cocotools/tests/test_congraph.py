@@ -7,52 +7,6 @@ import cocotools.congraph as cg
 # Integration Tests
 #------------------------------------------------------------------------------
 
-def test__add_conn_data():
-
-    c = cg.ConGraph()
-    c.add_edges_from([('A-1', 'A-4', {'EC_Source': 'Cc',
-                                      'EC_Target': 'Cc',
-                                      'Degree': '1',
-                                      'PDC_Site_Source': 0,
-                                      'PDC_Site_Target': 0,
-                                      'PDC_EC_Source': 2,
-                                      'PDC_EC_Target': 0,
-                                      'PDC_Density': 4}),
-                      ('A-2', 'A-4', {'EC_Source': 'Nc',
-                                      'EC_Target': 'Cn',
-                                      'Degree': '0',
-                                      'PDC_Site_Source': 9,
-                                      'PDC_Site_Target': 1,
-                                      'PDC_EC_Source': 4,
-                                      'PDC_EC_Target': 1,
-                                      'PDC_Density': 4})])
-    
-    s_trans_dict = {'B-1': {'A-1': {'RC': 'S', 'EC': [], 'PDC': []},
-                            'A-2': {'RC': 'S', 'EC': [], 'PDC': []}}}
-    t_trans_dict = {'B-2': {'A-4': {'RC': 'O', 'EC': [], 'PDC': []},
-                            'A-5': {'RC': 'O', 'EC': [], 'PDC': []}},
-                    'B-3': {'A-4': {'RC': 'O', 'EC': [], 'PDC': []},
-                            'A-5': {'RC': 'O', 'EC': [], 'PDC': []}}}
-
-    new_s_dict, new_t_dict = c._add_conn_data(s_trans_dict, t_trans_dict)
-    nt.assert_equal(new_s_dict,
-                    {'B-1': {'A-1': {'RC': 'S', 'EC': ['Uu', 'Cc'],
-                                     'PDC': [18.0, 1.0]},
-                             'A-2': {'RC': 'S', 'EC': ['Uu', 'Nc'],
-                                     'PDC': [18.0, 6.5]}}})
-    nt.assert_equal(new_t_dict.keys(), ['B-2', 'B-3'])
-    nt.assert_equal(new_t_dict['B-2'],
-                    {'A-4': {'RC': 'O', 'EC': ['Cc', 'Cn'],
-                             'PDC': [0, 1]},
-                     'A-5': {'RC': 'O', 'EC': ['Uu', 'Uu'],
-                             'PDC': [18, 18]}})
-    nt.assert_equal(new_t_dict['B-3'],
-                    {'A-4': {'RC': 'O', 'EC': ['Cc', 'Cn'],
-                             'PDC': [0, 1]},
-                     'A-5': {'RC': 'O', 'EC': ['Uu', 'Uu'],
-                             'PDC': [18, 18]}})
-
-    
 def test_add_edges_from():
     g = cg.ConGraph()
     # Only ECs differ between attr1 and attr2.

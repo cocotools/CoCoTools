@@ -21,8 +21,7 @@ def test__make_translation_dict():
               ('A-5', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'})]
     m.add_edges_from(ebunch)
     nt.assert_equal(m._make_translation_dict('A-1', 'B'),
-                    {'B-1': {'A-1': {'RC': 'S', 'EC': [], 'PDC': []},
-                             'A-2': {'RC': 'S', 'EC': [], 'PDC': []}}})
+                    {'B-1': ['A-1', 'A-2']})
 
                      
 def test_deduce_edges():
