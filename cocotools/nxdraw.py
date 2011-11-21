@@ -118,7 +118,6 @@ def draw_network(G, pos, node_color=None, ax=None,
         e.set_zorder(0.5)
 
     ax.autoscale()
-    #plt.axis('equal')
     plt.axis('tight')
     return ax
 
