@@ -50,7 +50,7 @@ def _add_conn_data(s_dict, t_dict, conn):
             try:
                 attr = conn[s][t]
             except KeyError:
-                attr = {'EC_Source': 'Ux', 'EC_Target': 'Ux',
+                attr = {'EC_Source': 'Uu', 'EC_Target': 'Uu',
                         'PDC_Site_Source': 18, 'PDC_Site_Target': 18,
                         'PDC_EC_Source': 18, 'PDC_EC_Target': 18}
             s_dict = _add_edge_data(s_dict, s, attr, 'Source')

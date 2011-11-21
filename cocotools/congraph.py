@@ -1,5 +1,11 @@
+from itertools import product
+
 from numpy import mean, float64
 from networkx import DiGraph
+
+
+ALL_POSSIBLE_ECS = [ec1 + ec2.lower() for ec1, ec2 in
+                    product(['X', 'C', 'P', 'N', 'U'], repeat=2)]
 
 
 class ConGraphError(Exception):
@@ -250,9 +256,9 @@ def _assert_valid_attr(attr):
                 raise ConGraphError('PDC is %s, type is %s' %
                                     (value, type(value)))
         elif key.split('_')[0] == 'EC':
-            assert value in ('C', 'N', 'P', 'X', 'Nc', 'Np', 'Nx')
+            assert value in ALL_POSSIBLE_ECS
         elif key == 'Degree':
-            ecs = [attr['EC_Source'], attr['EC_Target']]
+            ecs = [attr['EC_Source'][0], attr['EC_Target'][0]]
             assert ((value == '0' and 'N' in ecs)
                     or (value in ('1', '2', '3', 'X') and 'N' not in ecs))
     
@@ -269,6 +275,6 @@ def _ec_points(old_attr, new_attr):
     """Called by _update_attr."""
     # Score it like golf.
     points = {'C': -4, 'N': -4, 'Nc': -4, 'P': -3, 'X': -2, 'Np': -1, 'Nx': 0}
-    return [sum((points[a['EC_Source']],
-                 points[a['EC_Target']])) for a in (old_attr, new_attr)]
+    return [sum((points[a['EC_Source'][0]],
+                 points[a['EC_Target'][0]])) for a in (old_attr, new_attr)]
 

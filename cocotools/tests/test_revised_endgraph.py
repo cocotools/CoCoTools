@@ -46,16 +46,16 @@ def test__make_translation_dict():
 def test__add_conn_data():
 
     c = coco.ConGraph()
-    c.add_edges_from([('A-1', 'A-4', {'EC_Source': 'C',
-                                      'EC_Target': 'C',
+    c.add_edges_from([('A-1', 'A-4', {'EC_Source': 'Cc',
+                                      'EC_Target': 'Cc',
                                       'Degree': '1',
                                       'PDC_Site_Source': 0,
                                       'PDC_Site_Target': 0,
                                       'PDC_EC_Source': 2,
                                       'PDC_EC_Target': 0,
                                       'PDC_Density': 4}),
-                      ('A-2', 'A-4', {'EC_Source': 'N',
-                                      'EC_Target': 'Nc',
+                      ('A-2', 'A-4', {'EC_Source': 'Nc',
+                                      'EC_Target': 'Cn',
                                       'Degree': '0',
                                       'PDC_Site_Source': 9,
                                       'PDC_Site_Target': 1,
@@ -72,18 +72,18 @@ def test__add_conn_data():
 
     new_s_dict, new_t_dict = re._add_conn_data(s_trans_dict, t_trans_dict, c)
     nt.assert_equal(new_s_dict,
-                    {'B-1': {'A-1': {'RC': 'S', 'EC': ['Ux', 'C'],
+                    {'B-1': {'A-1': {'RC': 'S', 'EC': ['Uu', 'Cc'],
                                      'PDC': [18.0, 1.0]},
-                             'A-2': {'RC': 'S', 'EC': ['Ux', 'N'],
+                             'A-2': {'RC': 'S', 'EC': ['Uu', 'Nc'],
                                      'PDC': [18.0, 6.5]}}})
     nt.assert_equal(new_t_dict.keys(), ['B-2', 'B-3'])
     nt.assert_equal(new_t_dict['B-2'],
-                    {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'],
+                    {'A-4': {'RC': 'O', 'EC': ['Cc', 'Cn'],
                              'PDC': [0, 1]},
-                     'A-5': {'RC': 'O', 'EC': ['Ux', 'Ux'],
+                     'A-5': {'RC': 'O', 'EC': ['Uu', 'Uu'],
                              'PDC': [18, 18]}})
     nt.assert_equal(new_t_dict['B-3'],
-                    {'A-4': {'RC': 'O', 'EC': ['C', 'Nc'],
+                    {'A-4': {'RC': 'O', 'EC': ['Cc', 'Cn'],
                              'PDC': [0, 1]},
-                     'A-5': {'RC': 'O', 'EC': ['Ux', 'Ux'],
+                     'A-5': {'RC': 'O', 'EC': ['Uu', 'Uu'],
                              'PDC': [18, 18]}})

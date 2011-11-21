@@ -195,10 +195,8 @@ def _element2edge(prim_e, search_type):
         edge_attr['TP'] = []
     else:
         ec_s, ec_t = edge_attr['EC_Source'], edge_attr['EC_Target']
-        if ec_s == 'N':
-            ec_t = 'N%s' % ec_t.lower()
-        if ec_t == 'N':
-            ec_s = 'N%s' % ec_s.lower()
+        edge_attr['EC_Source'] = ec_s + ec_t.lower()
+        edge_attr['EC_Target'] = ec_t + ec_s.lower()
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text.upper(), site_ids[1].text.upper(), edge_attr
 

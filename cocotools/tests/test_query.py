@@ -98,10 +98,10 @@ def test__element2edge():
     with open('cocotools/tests/sample_con.xml') as xml:
         prim_e = etree.parse(xml).find('%sIntegratedPrimaryProjection' % cq.P)
     nt.assert_true(etree.iselement(prim_e))
-    edge = ('B05-2', 'PP99-9/46D', {'EC_Target': 'X',
+    edge = ('B05-2', 'PP99-9/46D', {'EC_Target': 'Xx',
                                     'Degree': 'X',
                                     'PDC_Site_Target': 'X',
-                                    'EC_Source': 'X',
+                                    'EC_Source': 'Xx',
                                     'PDC_Density': 'X',
                                     'PDC_EC_Target': 'X',
                                     'PDC_Site_Source': 'X',

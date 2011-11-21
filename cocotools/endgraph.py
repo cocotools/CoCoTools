@@ -1,5 +1,11 @@
+from itertools import product
+
 from networkx import DiGraph
 import numpy as np
+
+
+ALL_POSSIBLE_ECS = [ec1 + ec2.lower() for ec1, ec2 in
+                    product(['X', 'C', 'P', 'N', 'U'], repeat=2)]
 
 
 class EndGraphError(Exception):
@@ -191,7 +197,7 @@ def _assert_valid_attr(attr):
     Called by add_edge.
     """
     for ec in attr['ECs']:
-        if ec not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
+        if ec not in ALL_POSSIBLE_ECS:
             raise EndGraphError('Attempted to add EC = %s' % ec)
     pdc = attr['PDC']
     if not (type(pdc) in (float, int, np.float64) and 0 <= pdc <= 18):
