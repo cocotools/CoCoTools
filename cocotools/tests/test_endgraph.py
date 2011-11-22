@@ -12,6 +12,10 @@ import cocotools.endgraph as eg
 # Integration Tests
 #------------------------------------------------------------------------------
 
+def test__first_ec_merge():
+    nt.assert_equal(1, 0)
+
+
 def test__make_connection_dict():
     mapp = coco.MapGraph()
     mapp.add_edges_from([('A-1', 'B-1', {'RC': 'S', 'PDC': 0, 'TP': []}),

@@ -127,6 +127,10 @@ def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
 
     # Return attr.
     return {'Source_EC': s_ec, 'Target_EC': t_ec}
+
+
+def _first_ec_merge(conn_dict):
+    pass
     
                     
 def _make_connection_dict(old_others, old_nodes, new_node, mapp, conn, which):
