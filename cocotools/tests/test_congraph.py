@@ -39,6 +39,23 @@ def test_add_edges_from():
                      'PDC_Density': 0})
 
 #------------------------------------------------------------------------------
+# Method Unit Tests
+#------------------------------------------------------------------------------
+
+def test__get_ec():
+    conn = cg.ConGraph()
+    conn.add_edge('A-1', 'A-4', {'EC_Source': 'Cx',
+                                 'EC_Target': 'Xc',
+                                 'Degree': '1',
+                                 'PDC_Site_Source': 0,
+                                 'PDC_Site_Target': 0,
+                                 'PDC_EC_Source': 2,
+                                 'PDC_EC_Target': 0,
+                                 'PDC_Density': 4})
+    nt.assert_equal(conn._get_ec('A-1', 'A-4', 'Source'), 'Cx')
+    nt.assert_equal(conn._get_ec('A-1', 'A-5', 'Source'), 'Uu')
+    
+#------------------------------------------------------------------------------
 # Support Function Unit Tests
 #------------------------------------------------------------------------------
 

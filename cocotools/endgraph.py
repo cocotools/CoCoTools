@@ -98,15 +98,51 @@ class EndGraph(DiGraph):
             t_dict = mapp._make_translation_dict(t, desired_bmap)
             for new_s, old_sources in s_dict.iteritems():
                 for new_t, old_targets in t_dict.iteritems():
-                    old_edges = product(old_sources, old_targets)
-                    attr = _translate_attr(new_s, new_t, old_edges, mapp, conn)
+                    attr = _translate_attr(new_s, new_t, old_sources,
+                                           old_targets, mapp, conn)
                     self.add_edge(new_s, new_t, attr)
                     
 
-def _translate_attr(new_s, new_t, old_edges, mapp, conn):
-    pass
+def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
+    # Keep in mind: An EC answers the question, How much of this
+    # region connects to a specified amount of the other region?
+    
+    # Determine source ECs to each old target separately.
+    # That is, map old targets to EC-RC pairs (EC is for old source to
+    # old target, RC is for old source to new source).
+    s_conn_dict = _make_connection_dict(old_targets, old_sources, new_s, mapp,
+                                        conn, 'Source')
 
+    # Merge to make a single EC to each old_target.
+    s_conn_dict = _first_ec_merge(s_conn_dict)
+
+    # Merge again to make a single EC to the combination of old_targets.
+    s_ec = _second_ec_merge(s_conn_dict)
+
+    # Repeat the process to get a final target EC.
+    t_conn_dict = _make_connection_dict(old_sources, old_targets, new_t, mapp,
+                                        conn, 'Target')
+    t_conn_dict = _first_ec_merge(t_conn_dict)
+    t_ec = _second_ec_merge(t_conn_dict)
+
+    # Return attr.
+    return {'Source_EC': s_ec, 'Target_EC': t_ec}
+    
                     
+def _make_connection_dict(old_others, old_nodes, new_node, mapp, conn, which):
+    conn_dict = {}
+    for other in old_others:
+        conn_dict[other] = []
+        conn_list = conn_dict[other]
+        for node in old_nodes:
+            # The function for getting the EC handles the case where
+            # the connection does not exist.  The RC must exist, so no
+            # additional function is required.
+            conn_list.append((conn._get_ec(node, other, which),
+                              mapp[node][new_node]['RC']))
+    return conn_dict
+
+
 def _evaluate_conflict(old_attr, new_attr, updated_score):
     """Called by _update_attr."""
     ns = ('N', 'Nc', 'Np', 'Nx')

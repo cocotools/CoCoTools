@@ -67,6 +67,17 @@ class ConGraph(DiGraph):
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
 
+    def _get_ec(self, node, other, which):
+        try:
+            if which == 'Source':
+                return self[node][other]['EC_Source']
+            elif which == 'Target':
+                return self[other][node]['EC_Target']
+            else:
+                raise ValueError('invalid which')
+        except KeyError:
+            return 'Uu'
+
 #------------------------------------------------------------------------------
 # Support Functions
 #------------------------------------------------------------------------------
