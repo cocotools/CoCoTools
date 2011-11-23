@@ -21,26 +21,28 @@ def test__make_connection_dict():
                          ('A-4', 'B-2', {'RC': 'O', 'PDC': 0, 'TP': []}),
                          ('A-4', 'B-3', {'RC': 'O', 'PDC': 0, 'TP': []})])
     conn = coco.ConGraph()
-    conn.add_edges_from([('A-1', 'A-4', {'EC_Source': 'Cc',
-                                         'EC_Target': 'Cc',
+    conn.add_edges_from([('A-1', 'A-4', {'EC_Source': 'C',
+                                         'EC_Target': 'C',
                                          'Degree': '1',
                                          'PDC_Site_Source': 0,
                                          'PDC_Site_Target': 0,
                                          'PDC_EC_Source': 2,
                                          'PDC_EC_Target': 0,
-                                         'PDC_Density': 4}),
-                         ('A-2', 'A-4', {'EC_Source': 'Nc',
-                                         'EC_Target': 'Cn',
+                                         'PDC_Density': 4,
+                                         'Connection': 'Present'}),
+                         ('A-2', 'A-4', {'EC_Source': 'N',
+                                         'EC_Target': 'C',
                                          'Degree': '0',
                                          'PDC_Site_Source': 9,
                                          'PDC_Site_Target': 1,
                                          'PDC_EC_Source': 4,
                                          'PDC_EC_Target': 1,
-                                         'PDC_Density': 4})])
+                                         'PDC_Density': 4,
+                                         'Connection': 'Absent'})])
     nt.assert_equal(eg._make_connection_dict(['A-3', 'A-4'], ['A-1', 'A-2'],
-                                             'B-1', mapp, conn, 'Source'),
-                    {'A-3': [('Uu', 'S'), ('Uu', 'S')],
-                     'A-4': [('Cc', 'S'), ('Nc', 'S')]})
+                                             'B-1', mapp, conn),
+                    {'A-3': [('Unknown', 'S'), ('Unknown', 'S')],
+                     'A-4': [('Present', 'S'), ('Absent', 'S')]})
 
 #------------------------------------------------------------------------------
 # Unit Tests

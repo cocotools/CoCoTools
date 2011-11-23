@@ -4,10 +4,6 @@ from numpy import mean, float64
 from networkx import DiGraph
 
 
-ALL_POSSIBLE_ECS = [ec1 + ec2.lower() for ec1, ec2 in
-                    product(['X', 'C', 'P', 'N', 'U'], repeat=2)]
-
-
 class ConGraphError(Exception):
     pass
 
@@ -67,16 +63,11 @@ class ConGraph(DiGraph):
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
 
-    def _get_ec(self, node, other, which):
+    def _get_connection(self, node, other):
         try:
-            if which == 'Source':
-                return self[node][other]['EC_Source']
-            elif which == 'Target':
-                return self[other][node]['EC_Target']
-            else:
-                raise ValueError('invalid which')
+            return self[node][other]['Connection']
         except KeyError:
-            return 'Uu'
+            return 'Unknown'
 
 #------------------------------------------------------------------------------
 # Support Functions
@@ -97,18 +88,20 @@ def _assert_valid_attr(attr):
     """Called by add_edge."""
     for key in ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 'Degree',
                 'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
-                'PDC_Density'):
+                'PDC_Density', 'Connection'):
         value = attr[key]
         if 'PDC' in key:
             if not (type(value) in (int, float, float64) and 0 <= value <= 18):
                 raise ConGraphError('PDC is %s, type is %s' %
                                     (value, type(value)))
         elif key.split('_')[0] == 'EC':
-            assert value in ALL_POSSIBLE_ECS
+            assert value in ('N', 'P', 'X', 'C')
         elif key == 'Degree':
             ecs = [attr['EC_Source'][0], attr['EC_Target'][0]]
             assert ((value == '0' and 'N' in ecs)
                     or (value in ('1', '2', '3', 'X') and 'N' not in ecs))
+        elif key == 'Connection':
+            assert value in ('Absent', 'Present', 'Unknown')
     
             
 def _mean_pdcs(old_attr, new_attr):

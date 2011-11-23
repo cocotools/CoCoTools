@@ -10,59 +10,60 @@ import cocotools.congraph as cg
 def test_add_edges_from():
     g = cg.ConGraph()
     # Only ECs differ between attr1 and attr2.
-    attr1 = {'EC_Source': 'Cp', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
-            'Degree': '1', 'EC_Target': 'Pc', 'PDC_Site_Target': 0,
-            'PDC_EC_Target': 0, 'PDC_Density': 0}
-    attr2 = {'EC_Source': 'Pp', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
-            'Degree': '1', 'EC_Target': 'Pp', 'PDC_Site_Target': 0,
-            'PDC_EC_Target': 0, 'PDC_Density': 0}
-    attr3 = {'EC_Source': 'Cp', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
-            'Degree': '1', 'EC_Target': 'Pc', 'PDC_Site_Target': 0,
-            'PDC_EC_Target': 0, 'PDC_Density': 1}
-    attr4 = {'EC_Source': 'Pp', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
-            'Degree': '1', 'EC_Target': 'Pp', 'PDC_Site_Target': 0,
-            'PDC_EC_Target': 0, 'PDC_Density': 0}
+    attr1 = {'EC_Source': 'C', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
+            'Degree': '1', 'EC_Target': 'P', 'PDC_Site_Target': 0,
+            'PDC_EC_Target': 0, 'PDC_Density': 0, 'Connection': 'Present'}
+    attr2 = {'EC_Source': 'P', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
+            'Degree': '1', 'EC_Target': 'P', 'PDC_Site_Target': 0,
+            'PDC_EC_Target': 0, 'PDC_Density': 0, 'Connection': 'Present'}
+    attr3 = {'EC_Source': 'C', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
+            'Degree': '1', 'EC_Target': 'P', 'PDC_Site_Target': 0,
+            'PDC_EC_Target': 0, 'PDC_Density': 1, 'Connection': 'Present'}
+    attr4 = {'EC_Source': 'P', 'PDC_Site_Source': 0, 'PDC_EC_Source': 0,
+            'Degree': '1', 'EC_Target': 'P', 'PDC_Site_Target': 0,
+            'PDC_EC_Target': 0, 'PDC_Density': 0, 'Connection': 'Present'}
     g.add_edges_from([('A-1', 'B-1', attr1), ('A-1', 'B-1', attr2),
                       ('C-1', 'D-1', attr3), ('C-1', 'D-1', attr4)])
     nt.assert_equal(g.number_of_edges(), 2)
     # attr1 should win based on EC points.
     nt.assert_equal(g['A-1']['B-1'],
-                    {'EC_Source': 'Cp', 'PDC_Site_Source': 0,
-                     'PDC_EC_Source': 0, 'Degree': '1', 'EC_Target': 'Pc',
+                    {'EC_Source': 'C', 'PDC_Site_Source': 0,
+                     'PDC_EC_Source': 0, 'Degree': '1', 'EC_Target': 'P',
                      'PDC_Site_Target': 0, 'PDC_EC_Target': 0,
-                     'PDC_Density': 0})
+                     'PDC_Density': 0, 'Connection': 'Present'})
     # attr 4 should win based on mean PDCs.
     nt.assert_equal(g['C-1']['D-1'],
-                    {'EC_Source': 'Pp', 'PDC_Site_Source': 0,
-                     'PDC_EC_Source': 0, 'Degree': '1', 'EC_Target': 'Pp',
+                    {'EC_Source': 'P', 'PDC_Site_Source': 0,
+                     'PDC_EC_Source': 0, 'Degree': '1', 'EC_Target': 'P',
                      'PDC_Site_Target': 0, 'PDC_EC_Target': 0,
-                     'PDC_Density': 0})
+                     'PDC_Density': 0, 'Connection': 'Present'})
 
 #------------------------------------------------------------------------------
 # Method Unit Tests
 #------------------------------------------------------------------------------
 
-def test__get_ec():
+def test__get_connection():
     conn = cg.ConGraph()
-    conn.add_edge('A-1', 'A-4', {'EC_Source': 'Cx',
-                                 'EC_Target': 'Xc',
+    conn.add_edge('A-1', 'A-4', {'EC_Source': 'C',
+                                 'EC_Target': 'X',
                                  'Degree': '1',
                                  'PDC_Site_Source': 0,
                                  'PDC_Site_Target': 0,
                                  'PDC_EC_Source': 2,
                                  'PDC_EC_Target': 0,
-                                 'PDC_Density': 4})
-    nt.assert_equal(conn._get_ec('A-1', 'A-4', 'Source'), 'Cx')
-    nt.assert_equal(conn._get_ec('A-1', 'A-5', 'Source'), 'Uu')
+                                 'PDC_Density': 4,
+                                 'Connection': 'Present'})
+    nt.assert_equal(conn._get_connection('A-1', 'A-4'), 'Present')
+    nt.assert_equal(conn._get_connection('A-1', 'A-5'), 'Unknown')
     
 #------------------------------------------------------------------------------
 # Support Function Unit Tests
 #------------------------------------------------------------------------------
 
 def test__assert_valid_attr():
-    attr = {'EC_Source': 'Xp', 'PDC_Site_Source': 5, 'PDC_EC_Source': 8,
-            'Degree': '1', 'EC_Target': 'Px', 'PDC_Site_Target': 10,
-            'PDC_EC_Target': 15, 'PDC_Density': 18}
+    attr = {'EC_Source': 'X', 'PDC_Site_Source': 5, 'PDC_EC_Source': 8,
+            'Degree': '1', 'EC_Target': 'P', 'PDC_Site_Target': 10,
+            'PDC_EC_Target': 15, 'PDC_Density': 18, 'Connection': 'Present'}
     nt.assert_false(cg._assert_valid_attr(attr))
 
                     

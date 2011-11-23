@@ -4,10 +4,6 @@ from networkx import DiGraph
 import numpy as np
 
 
-ALL_POSSIBLE_ECS = [ec1 + ec2.lower() for ec1, ec2 in
-                    product(['X', 'C', 'P', 'N', 'U'], repeat=2)]
-
-
 class EndGraphError(Exception):
     pass
 
@@ -104,12 +100,10 @@ class EndGraph(DiGraph):
                     
 
 def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
-    # Keep in mind: An EC answers the question, How much of this
-    # region connects to a specified amount of the other region?
-    
-    # Determine source ECs to each old target separately.
-    # That is, map old targets to EC-RC pairs (EC is for old source to
-    # old target, RC is for old source to new source).
+    # Determine source Connections to each old target separately.
+    # That is, map old targets to Connection-RC pairs (Connection is
+    # for old source to old target, RC is for old source to new
+    # source).
     s_conn_dict = _make_connection_dict(old_targets, old_sources, new_s, mapp,
                                         conn, 'Source')
 
@@ -129,20 +123,16 @@ def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
     return {'Source_EC': s_ec, 'Target_EC': t_ec}
 
 
-def _first_ec_merge(conn_dict):
-    pass
-    
-                    
-def _make_connection_dict(old_others, old_nodes, new_node, mapp, conn, which):
+def _make_connection_dict(old_others, old_nodes, new_node, mapp, conn):
     conn_dict = {}
     for other in old_others:
         conn_dict[other] = []
         conn_list = conn_dict[other]
         for node in old_nodes:
-            # The function for getting the EC handles the case where
-            # the connection does not exist.  The RC must exist, so no
-            # additional function is required.
-            conn_list.append((conn._get_ec(node, other, which),
+            # The function for getting the Connection handles the case
+            # where the edge does not exist.  The RC must exist,
+            # so no additional function is required.
+            conn_list.append((conn._get_connection(node, other),
                               mapp[node][new_node]['RC']))
     return conn_dict
 

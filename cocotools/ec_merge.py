@@ -1,4 +1,7 @@
-# An X or P with an N is as good as a U.  To conclude known-absence,
+    # Keep in mind: An EC answers the question, How much of this
+    # region connects to a specified amount of the other region?
+
+    # An X or P with an N is as good as a U.  To conclude known-absence,
 # we need to know about the missing part, but we can never get it.
 #
 # Edges going into this module are specific observations.  Edges
