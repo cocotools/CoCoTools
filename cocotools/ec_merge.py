@@ -63,10 +63,16 @@
 # Absent: C with N.
 # Unknown: N with P or X.
 
-
+# SO:
+#    
 # If ever you have an S to a region with a Present EC, you're gonna
 # stay present.  The only way to be absent is to have RCs only to
 # things that are absent.  An RC of O leads to Unknown unless EC is Absent.
+#
+# IL:
+#
+# I stays the same.  For L, present --> unknown, absent --> absent,
+#    unknown --> unknown
 
 
 so_ec_merge = {'B': {'S': {'Present': 'Present',

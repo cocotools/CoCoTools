@@ -174,16 +174,15 @@ class MapGraph(DiGraph):
         translation_dict = {}
         node_map = node.split('-')[0]
         for new_node in self._translate_node(node, desired_bmap):
-            translation_dict[new_node] = self._translate_node(new_node,
-                                                              node_map)
+            translation_dict[new_node] = {'S': [], 'I': [], 'L': [], 'O': []}
+            node_dict = translation_dict[new_node]
+            for rc in node_dict:
+                node_dict[rc] = self._translate_node(new_node, node_map, rc)
         return translation_dict
 
             
-    def _translate_node(self, node, out_map):
-        """Return list of nodes from out_map coextensive with node.
-
-        Called by _translate_one_side.
-        """
+    def _translate_node(self, node, out_map, rc=None):
+        """Return list of nodes from out_map coextensive with node."""
         if node.split('-')[0] == out_map:
             return [node]
         neighbors = []
@@ -192,7 +191,10 @@ class MapGraph(DiGraph):
                 neighbors += method(node)
             except NetworkXError:
                 pass
-        return [n for n in set(neighbors) if n.split('-')[0] == out_map]
+        result = [n for n in set(neighbors) if n.split('-')[0] == out_map]
+        if rc:
+            result = [n for n in result if self[n][node]['RC'] == rc]
+        return result
 
 #------------------------------------------------------------------------------
 # Support Functions

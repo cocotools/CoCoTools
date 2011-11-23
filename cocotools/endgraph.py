@@ -100,25 +100,7 @@ class EndGraph(DiGraph):
                     
 
 def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
-    # Get old source Connections to each old target, divided by RC
-    # from old source to new source.
-    s_conn_dict = _make_connection_dict(old_targets, old_sources, new_s, mapp,
-                                        conn, 'Source')
-
-    # Determine new source's connection to each old_target.
-    s_conn_dict = _first_ec_merge(s_conn_dict)
-
-    # Merge again to make a single EC to the combination of old_targets.
-    s_ec = _second_ec_merge(s_conn_dict)
-
-    # Repeat the process to get a final target EC.
-    t_conn_dict = _make_connection_dict(old_sources, old_targets, new_t, mapp,
-                                        conn, 'Target')
-    t_conn_dict = _first_ec_merge(t_conn_dict)
-    t_ec = _second_ec_merge(t_conn_dict)
-
-    # Return attr.
-    return {'Source_EC': s_ec, 'Target_EC': t_ec}
+    pass
 
 
 def _make_connection_dict(old_others, old_nodes, new_node, mapp, conn):
