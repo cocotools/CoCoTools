@@ -100,14 +100,12 @@ class EndGraph(DiGraph):
                     
 
 def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
-    # Determine source Connections to each old target separately.
-    # That is, map old targets to Connection-RC pairs (Connection is
-    # for old source to old target, RC is for old source to new
-    # source).
+    # Get old source Connections to each old target, divided by RC
+    # from old source to new source.
     s_conn_dict = _make_connection_dict(old_targets, old_sources, new_s, mapp,
                                         conn, 'Source')
 
-    # Merge to make a single EC to each old_target.
+    # Determine new source's connection to each old_target.
     s_conn_dict = _first_ec_merge(s_conn_dict)
 
     # Merge again to make a single EC to the combination of old_targets.
@@ -126,14 +124,13 @@ def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
 def _make_connection_dict(old_others, old_nodes, new_node, mapp, conn):
     conn_dict = {}
     for other in old_others:
-        conn_dict[other] = []
-        conn_list = conn_dict[other]
+        conn_dict[other] = {'S': [], 'O': [], 'I': [], 'L': []}
+        other_dict = conn_dict[other]
         for node in old_nodes:
-            # The function for getting the Connection handles the case
-            # where the edge does not exist.  The RC must exist,
-            # so no additional function is required.
-            conn_list.append((conn._get_connection(node, other),
-                              mapp[node][new_node]['RC']))
+            # The RC must exist, whereas the desired edge in conn may
+            # not.
+            rc = mapp[node][new_node]['RC']
+            other_dict[rc].append(conn._get_connection(node, other))
     return conn_dict
 
 

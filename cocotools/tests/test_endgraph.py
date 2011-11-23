@@ -41,8 +41,14 @@ def test__make_connection_dict():
                                          'Connection': 'Absent'})])
     nt.assert_equal(eg._make_connection_dict(['A-3', 'A-4'], ['A-1', 'A-2'],
                                              'B-1', mapp, conn),
-                    {'A-3': [('Unknown', 'S'), ('Unknown', 'S')],
-                     'A-4': [('Present', 'S'), ('Absent', 'S')]})
+                    {'A-3': {'S': ['Unknown', 'Unknown'],
+                             'O': [],
+                             'I': [],
+                             'L': []},
+                     'A-4': {'S': ['Present', 'Absent'],
+                             'O': [],
+                             'I': [],
+                             'L': []}})
 
 #------------------------------------------------------------------------------
 # Unit Tests
