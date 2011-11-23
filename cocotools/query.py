@@ -194,11 +194,21 @@ def _element2edge(prim_e, search_type):
     if search_type == 'Mapping':
         edge_attr['TP'] = []
     else:
-        ec_s, ec_t = edge_attr['EC_Source'], edge_attr['EC_Target']
-        edge_attr['EC_Source'] = ec_s + ec_t.lower()
-        edge_attr['EC_Target'] = ec_t + ec_s.lower()
+        edge_attr = _reduce_ecs(edge_attr)
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text.upper(), site_ids[1].text.upper(), edge_attr
+
+
+def _reduce_ecs(attr):
+    s_ec, t_ec = attr['EC_Source'], attr['EC_Target']
+    present = ('C', 'P', 'X')
+    if s_ec in present and t_ec in present:
+        attr['Connection'] = 'Present'
+    elif s_ec + t_ec in ('NC', 'CN'):
+        attr['Connection'] = 'Absent'
+    else:
+        attr['Connection'] = 'Unknown'
+    return attr
 
 
 def _element_tree(xml_str):

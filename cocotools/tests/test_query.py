@@ -55,6 +55,21 @@ def mock_single_map_ebunch(search_type, bmap):
 # Private Function Unit Tests
 #------------------------------------------------------------------------------
 
+def test__reduce_ecs():
+    attr = {'EC_Source': 'X', 'EC_Target': 'N'}
+    nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Unknown',
+                                           'EC_Source': 'X',
+                                           'EC_Target': 'N'})
+    attr = {'EC_Source': 'X', 'EC_Target': 'P'}
+    nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Present',
+                                           'EC_Source': 'X',
+                                           'EC_Target': 'P'})
+    attr = {'EC_Source': 'N', 'EC_Target': 'C'}
+    nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Absent',
+                                           'EC_Source': 'N',
+                                           'EC_Target': 'C'})
+    
+    
 class ScrubElementTestCase(TestCase):
 
     def setUp(self):
@@ -98,14 +113,15 @@ def test__element2edge():
     with open('cocotools/tests/sample_con.xml') as xml:
         prim_e = etree.parse(xml).find('%sIntegratedPrimaryProjection' % cq.P)
     nt.assert_true(etree.iselement(prim_e))
-    edge = ('B05-2', 'PP99-9/46D', {'EC_Target': 'Xx',
+    edge = ('B05-2', 'PP99-9/46D', {'EC_Target': 'X',
                                     'Degree': 'X',
                                     'PDC_Site_Target': 'X',
-                                    'EC_Source': 'Xx',
+                                    'EC_Source': 'X',
                                     'PDC_Density': 'X',
                                     'PDC_EC_Target': 'X',
                                     'PDC_Site_Source': 'X',
-                                    'PDC_EC_Source': 'X'})
+                                    'PDC_EC_Source': 'X',
+                                    'Connection': 'Present'})
     nt.assert_equal(element2edge(prim_e, 'Connectivity'), edge)
 
 
