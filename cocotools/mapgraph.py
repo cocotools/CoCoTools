@@ -14,14 +14,67 @@ class MapGraph(DiGraph):
 
     """Subclass of the NetworkX DiGraph designed to hold Mapping data.
 
-    The DiGraph methods add_edge and add_edges_from have been overridden,
-    to enforce that edges have valid attributes with the highest likelihood
-    of correctness referring to their transformation paths, precision
-    description codes, and relation codes.
+    Parameters
+    ----------
+    conn : CoCoTools.ConGraph
+      Graph containing all available connectivity data.
+
+    Notes
+    -----
+    Each node must be specified in CoCoMac format as a string:
+    'BrainMap-BrainSite'.  Nodes not in this format are rejected.
     
-    A new method, deduce_edges, has been added for deducing new spatial
-    relationships between regions based on those already present in the
-    graph.
+    Edges must have just the following attributes:
+    
+    (1) 'RC' (relation code).  Allowable values are 'I' (identical to),
+    'S' (smaller than), 'L' (larger than), or 'O' (overlaps with).  These
+    values complete the sentence, The source node is _____ the target node.
+
+    (2) 'TP' (transformation path).  This is a list of regions that form a
+    chain of relationships mediating the relationship between the source
+    and the target.  When the relationship between the source and the
+    target has been pulled directly from the literature, 'TP' is an empty
+    list.  But when source's relationship to target is known because of
+    source's relationship to region X and region X's relationship to
+    target, 'TP' is ['X'].  The list grows with the number of intervening
+    nodes.  Of note, the nature of 'TP' is such that the 'TP' for the edge
+    from target to source must be the reverse of the 'TP' for the edge from
+    source to target.
+
+    (3) 'PDC' (precision description code).  A value (from zero to 18, with
+    zero being the best) representing how precisely the relationship is
+    described in the original literature.  When the edge is absent from
+    the literature and has been deduced based on other edges (i.e., when
+    the length of 'TP' is greater than zero), the 'PDC' corresponds to the
+    worst 'PDC' of the edges represented by 'TP'.
+
+    Accurate deduction of new spatial relationships among regions and
+    accurate translation of connectivity data between maps demand that each
+    map be represented at just one level of resolution.  This implies that
+    when a suite of spatially related regions from the same map is
+    identified, one or more regions must be excluded from the MapGraph
+    until all remaining are disjoint.
+
+    MapGraph has been designed such that when a user attempts to add an
+    edge using the add_edge method, an error is raised if the nodes
+    supplied are in the same map.  If the user calls add_edges_from
+    instead, intra-map edges are added to the graph; however, before the
+    method returns, all but one level of resolution is removed from the
+    graph.  The level with the most anatomical connections (i.e., edges
+    in conn) is chosen; in the event of a tie, the level with the most
+    inter-map spatial relationships is chosen; if the tie persists, the
+    finest level is chosen arbitrarily.
+
+    New spatial relationships are deduced using an enhanced version of
+    Objective Relational Transformation (ORT) with the deduce_edges method.
+    The strategy used in MapGraph for handling intramap spatial
+    relationships described above ensures that levels of resolution will
+    not be mixed within maps when deduce_edges is called.  This allows
+    deduce_edges to assume all regions within a map are disjoint, which
+    enables, after all possible deductions have been made, automatic
+    identification and removal of relationships that cannot be true due to
+    their implication (in combination with other known relationships) of
+    spatial overlap between regions in the same map.
     """
 
     def __init__(self, conn):
