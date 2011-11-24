@@ -6,6 +6,7 @@ from mocker import MockerTestCase
 from networkx import DiGraph
 
 import cocotools.mapgraph as mg
+from cocotools import ConGraph
 
 #------------------------------------------------------------------------------
 # Integration Tests
@@ -14,7 +15,7 @@ import cocotools.mapgraph as mg
 class MakeTranslationDictTestCase(TestCase):
     
     def test_diff_map(self):
-        m = mg.MapGraph()
+        m = mg.MapGraph(ConGraph())
         ebunch = [('A-1', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
                   ('A-2', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
                   ('A-4', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
@@ -29,7 +30,7 @@ class MakeTranslationDictTestCase(TestCase):
                                   'O': []}})
 
     def test_same_map(self):
-        m = mg.MapGraph()        
+        m = mg.MapGraph(ConGraph())
         self.assertEqual(m._make_translation_dict('B-1', 'B'),
                          {'B-1': {'S': [],
                                   'I': ['B-1'],
@@ -56,7 +57,7 @@ def test_deduce_edges():
               ('D-1', 'C-1', {'RC': 'I', 'PDC': 18, 'TP': []}),
               ('D-1', 'A-1', {'RC': 'O', 'PDC': 2, 'TP': []}),
               ('D-2', 'A-1', {'RC': 'O', 'PDC': 6, 'TP': []}))
-    g = mg.MapGraph()
+    g = mg.MapGraph(ConGraph())
     g.add_edges_from(ebunch)
     g.deduce_edges()
     nt.assert_equal(g['A-1'],
@@ -102,9 +103,6 @@ def test_deduce_edges():
                      'D-1': {'RC': 'L', 'PDC': 9.5, 'TP': ['C-1']}
                      })
 
-#------------------------------------------------------------------------------
-# Construction Method Unit Tests
-#------------------------------------------------------------------------------
 
 class TP_PDCS_TestCase(TestCase):
 
@@ -163,9 +161,6 @@ class AssertValidEdgeTestCase(TestCase):
         attr = {'PDC': 5, 'RC': 'I', 'TP': ['B', 'C', 'D']}
         self.assertFalse(self.AVE(g, 'A', 'E', attr))
                                                            
-#------------------------------------------------------------------------------
-# Deduction Method Unit Tests
-#------------------------------------------------------------------------------
 
 def test__code():
     g = DiGraph()
@@ -174,15 +169,16 @@ def test__code():
                       ('B', 'Y', {'RC': 'L'})))
     nt.assert_equal(mg.MapGraph._code.im_func(g, 'X', ['A', 'B'], 'Y'), 'SIL')
 
-#------------------------------------------------------------------------------
-# Translation Method Unit Tests
-#------------------------------------------------------------------------------
 
 def test_translate_node():
     g = DiGraph()
     g.add_edges_from([('A-1', 'B-1'), ('A-1', 'C-1'), ('A-1', 'B-2')])
     translate_node = mg.MapGraph._translate_node.im_func
     nt.assert_equal(translate_node(g, 'A-1', 'B'), ['B-2', 'B-1'])
+
+
+def test_init():
+    nt.assert_raises(mg.MapGraphError, mg.MapGraph, DiGraph())
 
 #------------------------------------------------------------------------------
 # Support Function Unit Tests

@@ -3,6 +3,8 @@ from copy import deepcopy
 from numpy import mean, float64
 from networkx import DiGraph, NetworkXError
 
+from congraph import ConGraph
+
 
 class MapGraphError(Exception):
     pass
@@ -22,9 +24,11 @@ class MapGraph(DiGraph):
     graph.
     """
 
-#------------------------------------------------------------------------------
-# Construction Methods
-#------------------------------------------------------------------------------
+    def __init__(self, conn):
+        DiGraph.__init__.im_func(self)
+        if not isinstance(conn, ConGraph):
+            raise MapGraphError('Associated ConGraph not supplied')
+        self.conn = conn
 
     def _tp_pdcs(self, source, target, attr1, attr2=None):
         """Return mean PDC for relation chain in attr(s).
@@ -149,8 +153,6 @@ class MapGraph(DiGraph):
 
         (1) Kotter and Wanke's (2005) adjustment to the determination of
         single relation codes for deduced edges is incorporated.
-
-        (2) Edges are allowed between regions in the same BrainMap.
         """
         for node in self.nodes_iter():
             ebunch = []
