@@ -42,6 +42,41 @@ def test_add_edges_from():
 # Method Unit Tests
 #------------------------------------------------------------------------------
 
+def test__get_so_votes():
+    conn = cg.ConGraph()
+    conn.add_edges_from([('A-1', 'A-4', {'EC_Source': 'C',
+                                         'EC_Target': 'X',
+                                         'Degree': '1',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
+                                         'Connection': 'Present'}),
+                         ('A-1', 'A-5', {'EC_Source': 'C',
+                                         'EC_Target': 'N',
+                                         'Degree': '0',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
+                                         'Connection': 'Absent'}),
+                         ('A-2', 'A-5', {'EC_Source': 'C',
+                                         'EC_Target': 'N',
+                                         'Degree': '0',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
+                                         'Connection': 'Absent'})])
+    old_sources = {'S': ['A-1', 'A-2'], 'I': [], 'L': [], 'O': []}
+    unique_old_targets = set(['A-3', 'A-4', 'A-5'])
+    nt.assert_equal(conn._get_so_votes(old_sources, unique_old_targets),
+                    {'A-3': 'Unknown', 'A-4': 'Present', 'A-5': 'Absent'})
+
+
 def test__get_connection():
     conn = cg.ConGraph()
     conn.add_edge('A-1', 'A-4', {'EC_Source': 'C',

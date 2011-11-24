@@ -18,10 +18,6 @@ class ConGraph(DiGraph):
     description codes (PDCs), and degree.
     """
 
-#------------------------------------------------------------------------------
-# Construction Methods
-#------------------------------------------------------------------------------
-    
     def add_edge(self, source, target, new_attr):
         """Add an edge from source to target if it is new and valid.
 
@@ -68,6 +64,40 @@ class ConGraph(DiGraph):
             return self[node][other]['Connection']
         except KeyError:
             return 'Unknown'
+
+    def _get_so_votes(self, old_sources, unique_old_targets):
+        translator = {None: {'S': {'Present': 'Present',
+                                   'Absent': 'Absent',
+                                   'Unknown': 'Unknown'},
+                             'O': {'Present': 'Unknown',
+                                   'Absent': 'Absent',
+                                   'Unknown': 'Unknown'}},
+                      'Absent': {'S': {'Present': 'Present',
+                                       'Absent': 'Absent',
+                                       'Unknown': 'Unknown'},
+                                 'O': {'Present': 'Unknown',
+                                       'Absent': 'Absent',
+                                       'Unknown': 'Unknown'}},
+                      'Unknown': {'S': {'Present': 'Present',
+                                        'Absent': 'Unknown',
+                                        'Unknown': 'Unknown'},
+                                  'O': {'Present': 'Unknown',
+                                        'Absent': 'Unknown',
+                                        'Unknown': 'Unknown'}}}
+        so_votes = {}
+        for t in unique_old_targets:
+            consensus = None
+            for rc in ('S', 'O'):
+                for s in old_sources[rc]:
+                    try:
+                        connection = self[s][t]['Connection']
+                    except KeyError:
+                        connection = 'Unknown'
+                    consensus = translator[consensus][rc][connection]
+                    if consensus == 'Present':
+                        break
+                so_votes[t] = consensus
+        return so_votes
 
 #------------------------------------------------------------------------------
 # Support Functions
