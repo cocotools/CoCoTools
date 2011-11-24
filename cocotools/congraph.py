@@ -59,12 +59,6 @@ class ConGraph(DiGraph):
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
 
-    def _get_connection(self, node, other):
-        try:
-            return self[node][other]['Connection']
-        except KeyError:
-            return 'Unknown'
-
     def _get_i_votes(self, old_sources, unique_old_targets):
         i_votes = {}
         for t in unique_old_targets:
@@ -184,14 +178,3 @@ def _ec_points(old_attr, new_attr):
     points = {'C': -4, 'N': -4, 'Nc': -4, 'P': -3, 'X': -2, 'Np': -1, 'Nx': 0}
     return [sum((points[a['EC_Source'][0]],
                  points[a['EC_Target'][0]])) for a in (old_attr, new_attr)]
-
-
-def _add_edge_data(node_dict, node, attr, which):
-    for inner_dict in node_dict.values():
-        if inner_dict.has_key(node):
-            ecs = inner_dict[node]['EC']
-            pdcs = inner_dict[node]['PDC']
-            ecs.append(attr['EC_%s' % which])
-            pdcs.append(mean([attr['PDC_Site_%s' % which],
-                              attr['PDC_EC_%s' % which]]))
-    return node_dict

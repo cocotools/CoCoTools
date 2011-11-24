@@ -1,5 +1,3 @@
-from itertools import product
-
 from networkx import DiGraph
 import numpy as np
 
@@ -99,6 +97,39 @@ class EndGraph(DiGraph):
                     self.add_edge(new_s, new_t, attr)
 
 
+def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
+    unique_old_targets = set([t for t_list in old_targets.values() for t in
+                              t_list])
+
+    # Reduce the S and O regions in old_sources to a single vote for
+    # Connection from new_s to each old_target.
+    so_votes = conn._get_so_votes(old_sources, unique_old_targets)
+
+    # Translate the L regions in old_sources to votes for Connections.
+    L_votes = conn._get_L_votes(old_sources, unique_old_targets)
+
+    # Turn the I regions into Connections.
+    i_votes = conn._get_i_votes(old_sources, unique_old_targets)
+
+    # Now we have an SO vote to each old_target, an L vote to each
+    # old_target, and an I vote to each old_target.
+
+    # Turn the set of SO votes into three votes to new_t: An SO-->SO,
+    # an SO-->I, and an SO-->L.
+    so_votes = _reduce_votes(so_votes, old_targets)
+
+    # Do the same for the L votes.
+    L_votes = _reduce_votes(L_votes, old_targets)
+
+    # And the same for the I votes.
+    i_votes = _reduce_votes(i_votes, old_targets)
+
+    # Remove Unknowns from the nine final votes.
+    # Raise an error if you don't have a consensus.
+    # Return the consensus.
+    return _get_final_vote(so_votes, L_votes, i_votes)
+
+
 def _reduce_votes(votes, old_targets):
     rc2votes = {'S': [], 'I': [], 'O': [], 'L': []}
     for rc, regions in old_targets.iteritems():
@@ -159,38 +190,6 @@ def _get_so_votes(rc2votes):
                 return consensus
     return consensus
     
-
-def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
-    # Reduce the S and O regions in old_sources to a single vote for
-    # Connection from new_s to each old_target.
-    unique_old_targets = set([t for t_list in old_targets.values() for t in
-                              t_list])
-    so_votes = conn._get_so_votes(old_sources, unique_old_targets)
-
-    # Translate the L regions in old_sources to votes for Connections.
-    L_votes = conn._get_L_votes(old_sources, unique_old_targets)
-
-    # Turn the I regions into Connections.
-    i_votes = conn._get_i_votes(old_sources, unique_old_targets)
-
-    # Now we have an SO vote to each old_target, an L vote to each
-    # old_target, and an I vote to each old_target.
-
-    # Turn the set of SO votes into three votes to new_t: An SO-->SO,
-    # an SO-->I, and an SO-->L.
-    so_votes = _reduce_votes(so_votes, old_targets)
-
-    # Do the same for the L votes.
-    L_votes = _reduce_votes(L_votes, old_targets)
-
-    # And the same for the I votes.
-    i_votes = _reduce_votes(i_votes, old_targets)
-
-    # Remove Unknowns from the nine final votes.
-    # Raise an error if you don't have a consensus.
-    # Return the consensus.
-    return _get_final_vote(so_votes, L_votes, i_votes)
-
 
 def _get_final_vote(so_votes, L_votes, i_votes):
     connection_set = set()

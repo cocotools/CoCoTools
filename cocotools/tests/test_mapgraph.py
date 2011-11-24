@@ -11,22 +11,32 @@ import cocotools.mapgraph as mg
 # Integration Tests
 #------------------------------------------------------------------------------
 
-def test__make_translation_dict():
-    m = mg.MapGraph()
-    ebunch = [('A-1', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
-              ('A-2', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
-              ('A-4', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
-              ('A-4', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'}),
-              ('A-5', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
-              ('A-5', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'})]
-    m.add_edges_from(ebunch)
-    nt.assert_equal(m._make_translation_dict('A-1', 'B'),
-                    {'B-1': {'S': ['A-1', 'A-2'],
-                             'I': [],
-                             'L': [],
-                             'O': []}})
+class MakeTranslationDictTestCase(TestCase):
+    
+    def test_diff_map(self):
+        m = mg.MapGraph()
+        ebunch = [('A-1', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
+                  ('A-2', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
+                  ('A-4', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
+                  ('A-4', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'}),
+                  ('A-5', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
+                  ('A-5', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'})]
+        m.add_edges_from(ebunch)
+        self.assertEqual(m._make_translation_dict('A-1', 'B'),
+                         {'B-1': {'S': ['A-1', 'A-2'],
+                                  'I': [],
+                                  'L': [],
+                                  'O': []}})
 
-                     
+    def test_same_map(self):
+        m = mg.MapGraph()        
+        self.assertEqual(m._make_translation_dict('B-1', 'B'),
+                         {'B-1': {'S': [],
+                                  'I': ['B-1'],
+                                  'L': [],
+                                  'O': []}})
+
+        
 def test_deduce_edges():
     """Integration test for deduce_edges."""
     # |-----------------------|

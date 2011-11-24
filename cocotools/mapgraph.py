@@ -183,7 +183,7 @@ class MapGraph(DiGraph):
             
     def _translate_node(self, node, out_map, rc=None):
         """Return list of nodes from out_map coextensive with node."""
-        if node.split('-')[0] == out_map:
+        if node.split('-')[0] == out_map and (rc == None or rc == 'I'):
             return [node]
         neighbors = []
         for method in (self.successors, self.predecessors):
