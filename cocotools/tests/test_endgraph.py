@@ -23,6 +23,18 @@ def test__reduce_votes():
 # Unit Tests
 #------------------------------------------------------------------------------
 
+def test__get_final_vote():
+    so = {'SO': 'Present', 'I': 'Absent', 'L': 'Unknown'}
+    L = {'SO': 'Absent', 'I': 'Unknown', 'L': 'Present'}
+    i = {'SO': 'Unknown', 'I': 'Present', 'L': 'Absent'}
+    nt.assert_raises(eg.EndGraphError, eg._get_final_vote, so, L, i)
+
+    so = {'SO': 'Present', 'I': 'Unknown', 'L': 'Unknown'}
+    L = {'SO': 'Unknown', 'I': 'Unknown', 'L': 'Present'}
+    i = {'SO': 'Unknown', 'I': 'Present', 'L': 'Unknown'}
+    nt.assert_equal(eg._get_final_vote(so, L, i), 'Present')
+
+    
 def test__get_L_votes():
     rc2votes = {'L': ['Present']}
     nt.assert_equal(eg._get_L_votes(rc2votes), 'Unknown')

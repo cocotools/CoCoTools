@@ -192,6 +192,20 @@ def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
     return _get_final_vote(so_votes, L_votes, i_votes)
 
 
+def _get_final_vote(so_votes, L_votes, i_votes):
+    connection_set = set()
+    for vote_dict in (so_votes, L_votes, i_votes):
+        for vote in vote_dict.values():
+            connection_set.add(vote)
+    try:
+        connection_set.remove('Unknown')
+    except KeyError:
+        pass
+    if len(connection_set) > 1:
+        raise EndGraphError('no within-map consensus')
+    return connection_set.pop()
+
+
 def _evaluate_conflict(old_attr, new_attr, updated_score):
     """Called by _update_attr."""
     ns = ('N', 'Nc', 'Np', 'Nx')
