@@ -65,6 +65,22 @@ class ConGraph(DiGraph):
         except KeyError:
             return 'Unknown'
 
+    def _get_L_votes(self, old_sources, unique_old_targets):
+        """If there are no L's, return 'Unknown' connection to each target."""
+        L_votes = {}
+        for t in unique_old_targets:
+            for s in old_sources['L']:
+                try:
+                    connection = self[s][t]['Connection']
+                except KeyError:
+                    continue
+                if connection == 'Absent':
+                    L_votes[t] = connection
+                    break
+            else:
+                L_votes[t] = 'Unknown'
+        return L_votes
+
     def _get_so_votes(self, old_sources, unique_old_targets):
         translator = {None: {'S': {'Present': 'Present',
                                    'Absent': 'Absent',
