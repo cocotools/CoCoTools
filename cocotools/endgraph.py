@@ -97,7 +97,68 @@ class EndGraph(DiGraph):
                     attr = _translate_attr(new_s, new_t, old_sources,
                                            old_targets, mapp, conn)
                     self.add_edge(new_s, new_t, attr)
-                    
+
+
+def _reduce_votes(votes, old_targets):
+    rc2votes = {'S': [], 'I': [], 'O': [], 'L': []}
+    for rc, regions in old_targets.iteritems():
+        for region in regions:
+            rc2votes[rc].append(votes[region])
+    reduced_votes = {}
+    reduced_votes['SO'] = _get_so_votes(rc2votes)
+    reduced_votes['I'] = _get_i_votes(rc2votes)
+    reduced_votes['L'] = _get_L_votes(rc2votes)
+    return reduced_votes
+
+
+def _get_i_votes(rc2votes):
+    connection_set = set()
+    for vote in rc2votes['I']:
+        connection_set.add(vote)
+    if len(connection_set) == 3 or (len(connection_set) == 2 and
+                                    'Unknown' not in connection_set):
+        return 'Unknown'
+    elif 'Present' in connection_set:
+        return 'Present'
+    else:
+        return 'Absent'
+
+
+def _get_L_votes(rc2votes):
+    for vote in rc2votes['L']:
+        if vote == 'Absent':
+            return vote
+    else:
+        return 'Unknown'
+
+
+def _get_so_votes(rc2votes):
+    translator = {None: {'S': {'Present': 'Present',
+                               'Absent': 'Absent',
+                               'Unknown': 'Unknown'},
+                         'O': {'Present': 'Unknown',
+                               'Absent': 'Absent',
+                               'Unknown': 'Unknown'}},
+                  'Absent': {'S': {'Present': 'Present',
+                                   'Absent': 'Absent',
+                                   'Unknown': 'Unknown'},
+                             'O': {'Present': 'Unknown',
+                                   'Absent': 'Absent',
+                                   'Unknown': 'Unknown'}},
+                  'Unknown': {'S': {'Present': 'Present',
+                                    'Absent': 'Unknown',
+                                    'Unknown': 'Unknown'},
+                              'O': {'Present': 'Unknown',
+                                    'Absent': 'Unknown',
+                                    'Unknown': 'Unknown'}}}
+    consensus = None
+    for rc in ('S', 'O'):
+        for vote in rc2votes[rc]:
+            consensus = translator[consensus][rc][vote]
+            if consensus == 'Present':
+                return consensus
+    return consensus
+    
 
 def _translate_attr(new_s, new_t, old_sources, old_targets, mapp, conn):
     # Reduce the S and O regions in old_sources to a single vote for

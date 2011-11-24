@@ -74,11 +74,13 @@ class ConGraph(DiGraph):
                     connection_set.add(self[s][t]['Connection'])
                 except KeyError:
                     pass
-            if len(connection_set) == 3 or (len(connection_set == 2) and
+            if len(connection_set) == 3 or (len(connection_set) == 2 and
                                             'Unknown' not in connection_set):
                 i_votes[t] = 'Unknown'
+            elif 'Present' in connection_set:
+                i_votes[t] = 'Present'
             else:
-                i_votes[t] = connection_set.pop()
+                i_votes[t] = 'Absent'
         return i_votes
 
     def _get_L_votes(self, old_sources, unique_old_targets):
@@ -120,6 +122,8 @@ class ConGraph(DiGraph):
         for t in unique_old_targets:
             consensus = None
             for rc in ('S', 'O'):
+                if consensus == 'Present':
+                    break
                 for s in old_sources[rc]:
                     try:
                         connection = self[s][t]['Connection']

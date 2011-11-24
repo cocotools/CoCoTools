@@ -9,9 +9,35 @@ import cocotools as coco
 import cocotools.endgraph as eg
 
 #------------------------------------------------------------------------------
+# Integration Tests
+#------------------------------------------------------------------------------
+
+def test__reduce_votes():
+    so_votes = {'t1': 'Present', 't2': 'Absent', 't3': 'Unknown',
+                't4': 'Unknown'}
+    old_targets = {'S': ['t1'], 'I': ['t2'], 'O': ['t3'], 'L': ['t4']}
+    nt.assert_equal(eg._reduce_votes(so_votes, old_targets),
+                    {'SO': 'Present', 'I': 'Absent', 'L': 'Unknown'})
+
+#------------------------------------------------------------------------------
 # Unit Tests
 #------------------------------------------------------------------------------
 
+def test__get_L_votes():
+    rc2votes = {'L': ['Present']}
+    nt.assert_equal(eg._get_L_votes(rc2votes), 'Unknown')
+    
+def test__get_so_votes():
+    rc2votes = {'S': ['Present'], 'I': ['Absent'], 'O': ['Unknown'],
+                'L': ['Unknown']}
+    nt.assert_equal(eg._get_so_votes(rc2votes), 'Present')
+
+
+def test__get_i_votes():
+    rc2votes = {'I': ['Unknown', 'Absent']}
+    nt.assert_equal(eg._get_i_votes(rc2votes), 'Absent')
+    
+    
 class EvaluateConflictTestCase(TestCase):
     
     def test_N_vs_C(self):

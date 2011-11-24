@@ -75,6 +75,10 @@ def test__get_i_votes():
     unique_old_targets = set(['A-4'])
     nt.assert_equal(conn._get_i_votes(old_sources, unique_old_targets),
                     {'A-4': 'Unknown'})
+    # Check w/ length 2.
+    old_sources = {'S': [], 'I': ['A-1', 'A-2'], 'L': [], 'O': []}
+    nt.assert_equal(conn._get_i_votes(old_sources, unique_old_targets),
+                    {'A-4': 'Present'})
 
     
 def test__get_L_votes():
@@ -140,8 +144,17 @@ def test__get_so_votes():
                                          'PDC_EC_Source': 2,
                                          'PDC_EC_Target': 0,
                                          'PDC_Density': 4,
+                                         'Connection': 'Absent'}),
+                         ('A-6', 'A-5', {'EC_Source': 'C',
+                                         'EC_Target': 'N',
+                                         'Degree': '0',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
                                          'Connection': 'Absent'})])
-    old_sources = {'S': ['A-1', 'A-2'], 'I': [], 'L': [], 'O': []}
+    old_sources = {'S': ['A-1', 'A-2'], 'I': [], 'L': [], 'O': ['A-6']}
     unique_old_targets = set(['A-3', 'A-4', 'A-5'])
     nt.assert_equal(conn._get_so_votes(old_sources, unique_old_targets),
                     {'A-3': 'Unknown', 'A-4': 'Present', 'A-5': 'Absent'})
