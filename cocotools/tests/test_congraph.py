@@ -42,6 +42,41 @@ def test_add_edges_from():
 # Method Unit Tests
 #------------------------------------------------------------------------------
 
+def test__get_i_votes():
+    conn = cg.ConGraph()
+    conn.add_edges_from([('A-1', 'A-4', {'EC_Source': 'C',
+                                         'EC_Target': 'X',
+                                         'Degree': '1',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
+                                         'Connection': 'Present'}),
+                         ('A-3', 'A-4', {'EC_Source': 'C',
+                                         'EC_Target': 'N',
+                                         'Degree': '0',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
+                                         'Connection': 'Absent'}),
+                         ('A-2', 'A-4', {'EC_Source': 'P',
+                                         'EC_Target': 'N',
+                                         'Degree': '0',
+                                         'PDC_Site_Source': 0,
+                                         'PDC_Site_Target': 0,
+                                         'PDC_EC_Source': 2,
+                                         'PDC_EC_Target': 0,
+                                         'PDC_Density': 4,
+                                         'Connection': 'Unknown'})])
+    old_sources = {'S': [], 'I': ['A-1', 'A-2', 'A-3'], 'L': [], 'O': []}
+    unique_old_targets = set(['A-4'])
+    nt.assert_equal(conn._get_i_votes(old_sources, unique_old_targets),
+                    {'A-4': 'Unknown'})
+
+    
 def test__get_L_votes():
     conn = cg.ConGraph()
     conn.add_edges_from([('A-1', 'A-4', {'EC_Source': 'C',
