@@ -1,6 +1,4 @@
-from unittest import TestCase
-
-from testfixtures import replace, Replacer
+from testfixtures import replace
 from networkx import DiGraph
 import nose.tools as nt
 
@@ -15,36 +13,34 @@ def test_init():
 
     
 def test__check_nodes():
-    nt.assert_raises(mg.MapGraphError, mg._check_nodes, ['B'])
-    nt.assert_raises(mg.MapGraphError, mg._check_nodes, ['-24'])
-    nt.assert_raises(mg.MapGraphError, mg._check_nodes, ['B-38'])
+    nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
+                     ['B'])
+    nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
+                     ['-24'])
+    nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
+                     ['B-38'])
 
 
-class AddEdgeTestCase(TestCase):
+def test__get_rc_chain():
+    mock_g = DiGraph()
+    mock_g.add_edges_from([('A', 'B', {'RC': 'I'}), ('B', 'C', {'RC': 'S'}),
+                           ('C', 'D', {'RC': 'L'}), ('D', 'E', {'RC': 'O'})])
+    tp = ['B', 'C', 'D']
+    nt.assert_equal(mg.MapGraph._get_rc_chain.im_func(mock_g, 'A', tp, 'E'),
+                    'ISLO')
 
-    def setUp(self):
-        self.r = Replacer()
-        self.r.replace('cocotools.mapgraph._check_nodes', lambda nodes: None)
 
-    def tearDown(self):
-        self.r.restore()
+def test__deduce_rc():
+    nt.assert_equal(mg.MapGraph._deduce_rc.im_func(None, 'IIISSSIII'), 'S')
+    nt.assert_equal(mg.MapGraph._deduce_rc.im_func(None, 'LOSL'), None)
+    nt.assert_equal(mg.MapGraph._deduce_rc.im_func(None, 'LOS'), None)
 
-    def test_nodes_in_same_map(self):
-        self.assertRaises(mg.MapGraphError, mg.MapGraph.add_edge.im_func,
-                          None, 'B05-1', 'B05-2', rc='I', pdc=0)
 
-    def test_good_tp_supplied(self):
-        pass
-
-    def test_bad_tp_supplied(self):
-        pass
-
-    def test_rc_and_pdc_supplied(self):
-        pass
-
-    def test_bad_rc_supplied(self):
-        pass
-
-    def test_bad_pdc_supplied(self):
-        pass
-        
+def test__get_worst_pdc_in_tp():
+    mock_g = DiGraph()
+    mock_g.add_edges_from([('A', 'B', {'PDC': 0}), ('B', 'C', {'PDC': 5}),
+                           ('C', 'D', {'PDC': 7}), ('D', 'E', {'PDC': 17})])
+    tp = ['B', 'C', 'D']
+    nt.assert_equal(mg.MapGraph._get_worst_pdc_in_tp.im_func(mock_g, 'A', tp,
+                                                             'E'),
+                    17)

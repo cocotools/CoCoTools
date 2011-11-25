@@ -5,6 +5,10 @@ from networkx import DiGraph
 from congraph import ConGraph
 
 
+class TPError(Exception):
+    pass
+
+
 class MapGraphError(Exception):
     pass
 
@@ -102,7 +106,7 @@ class MapGraph(DiGraph):
         node : string
           BrainSite in CoCoMac format.
         """
-        _check_nodes([node])
+        self._check_nodes([node])
         DiGraph.add_node.im_func(self, node)
 
     def add_nodes_from(self, nodes):
@@ -126,7 +130,7 @@ class MapGraph(DiGraph):
         If any one of the nodes supplied is in an incorrect format, none of
         the nodes are added to the graph.
         """
-        _check_nodes(nodes)
+        self._check_nodes(nodes)
         DiGraph.add_nodes_from.im_func(self, nodes)
 
     def add_edge(self, source, target, rc=None, pdc=None, tp=None):
@@ -155,21 +159,118 @@ class MapGraph(DiGraph):
           Nodes in path between source and target on the basis of which
           this edge has been deduced.
         """
-        _check_nodes([source, target])
+        self._check_nodes([source, target])
         if source.split('-')[0] == target.split('-')[0]:
             raise MapGraphError('source and target are from the same BrainMap.')
         if tp:
-            pass
+            rc = self._deduce_rc(self._get_rc_chain(source, tp, target))
+            if rc:
+                pdc = self._get_worst_pdc_in_tp(source, tp, target)
+                # We can assume the acquired PDC is valid because it is
+                # already in the graph, and there is no way to get an
+                # invalid one in the graph.  And if we got this far,
+                # the TP and RC are valid as well.
+                self._add_valid_edge(source, target, rc, pdc, tp)
+            else:
+                raise TPError('RC between source and target cannot be deduced.')
         else:
-            pass
+            tp = []
+            # Make sure rc and pdc are valid.
 
-def _check_nodes(nodes):
-    """Raise error if any node in nodes is not in CoCoMac format.
+    def _get_worst_pdc_in_tp(self, source, tp, target):
+        """Return the worst PDC for edges from source to target via tp.
 
-    Parameters
-    ----------
-    nodes : list
-    """
-    for node in nodes:
-        if not re.match(r'[A-Z]+[0-9]{2}-.+', node):
-            raise MapGraphError('node is not in CoCoMac format.')
+        The worst PDC is the greatest, as PDCs correspond to indices in the
+        PDC hierarchy (cocotools.query.PDC_HIER).
+
+        Parameters
+        ----------
+        source : string
+          A node in the graph.
+
+        tp : list
+          TP that mediates relationship between source and target.
+
+        target : string
+          A node in the graph.
+
+        Returns
+        -------
+        worst_pdc : integer
+          PDC for the least precise edge from source to target via tp.
+        """
+        worst_pdc = self[source][tp[0]]['PDC']
+        pdc = self[tp[-1]][target]['PDC']
+        if pdc > worst_pdc:
+            worst_pdc = pdc
+        for i in range(len(tp) - 1):
+            pdc = self[tp[i]][tp[i + 1]]['PDC']
+            if pdc > worst_pdc:
+                worst_pdc = pdc
+        return worst_pdc
+
+    def _get_rc_chain(self, source, tp, target):
+        """Return RCs for edges from source to target via tp.
+
+        Parameters
+        ----------
+        source : string
+          A node in the graph.
+
+        tp : list
+          TP that mediates relationship between source and target.
+
+        target : string
+          A node in the graph.
+
+        Returns
+        -------
+        rc_chain : string
+          Concatenated RCs for edges from source to target through tp.
+        """
+        middle = ''
+        for i in range(len(tp) - 1):
+            middle += self[tp[i]][tp[i + 1]]['RC']
+        return self[source][tp[0]]['RC'] + middle + self[tp[-1]][target]['RC']
+
+    def _deduce_rc(self, rc_chain):
+        """Deduce a single RC from a chain of them.
+
+        Return None if a single RC cannot be resolved.
+
+        Parameters
+        ----------
+        rc_chain : string
+          Concatenated RCs corresponding to a TP between two nodes.
+
+        Returns
+        -------
+        deduced_rc : string
+          RC corresponding to the relationship between the two nodes.
+        """
+        map_step = {'I': {'I': 'I', 'S': 'S', 'L': 'L', 'O': 'O'},
+                    'S': {'I': 'S', 'S': 'S'},
+                    'L': {'I': 'L', 'S': 'ISLO', 'L': 'L', 'O': 'LO'},
+                    'O': {'I': 'O', 'S': 'SO'},
+                    'SO': {'I': 'SO', 'S': 'SO'},
+                    'LO': {'I': 'LO', 'S': 'ISLO'},
+                    'ISLO': {'I': 'ISLO', 'S': 'ISLO'}}
+        deduced_rc = 'I'
+        for rc in rc_chain:
+            try:
+                deduced_rc = map_step[deduced_rc][rc]
+            except KeyError:
+                return
+        if len(deduced_rc) == 1:
+            return deduced_rc
+
+    def _check_nodes(self, nodes):
+        """Raise error if any node in nodes is not in CoCoMac format.
+
+        Parameters
+        ----------
+        nodes : list
+        """
+        for node in nodes:
+            if not re.match(r'[A-Z]+[0-9]{2}-.+', node):
+                raise MapGraphError('node is not in CoCoMac format.')

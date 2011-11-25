@@ -142,13 +142,6 @@ def test__tp_len():
     nt.assert_equal(mg._tp_len(old_attr, new_attr), (3, 0))
 
 
-def test_rc_res():
-    rc_res = mg._rc_res
-    nt.assert_equal(rc_res('IIISSSIII'), 'S')
-    nt.assert_false(rc_res('LOSL'))
-    nt.assert_false(rc_res('LOS'))
-
-        
 def test__reverse_attr():
     attr = {'RC': 'S', 'PDC': 5, 'TP': ['A', 'B', 'C']}
     nt.assert_equal(mg._reverse_attr(attr),
@@ -269,13 +262,6 @@ def test__reverse_attr():
 # Deduction Methods
 #------------------------------------------------------------------------------
 
-    def _code(self, p, tp, s):
-        """Called by deduce_edges"""
-        middle = ''
-        for i in range(len(tp) - 1):
-            middle += self[tp[i]][tp[i + 1]]['RC']
-        return self[p][tp[0]]['RC'] + middle + self[tp[-1]][s]['RC']
-
     def deduce_edges(self):
         """Deduce new edges based on those in the graph and add them.
 
@@ -341,32 +327,6 @@ def _pdcs(old_attr, new_attr):
 def _tp_len(old_attr, new_attr):
     """Called by _update_attr."""
     return len(old_attr['TP']), len(new_attr['TP'])
-
-
-def _rc_res(tpc):
-    """Return RC corresponding to TP code.
-
-    Return False if RC = D or len(RC) > 1.
-
-    Called by deduce_edges.
-    """
-    map_step = {'I': {'I': 'I', 'S': 'S', 'L': 'L', 'O': 'O'},
-                'S': {'I': 'S', 'S': 'S'},
-                'L': {'I': 'L', 'S': 'ISLO', 'L': 'L', 'O': 'LO'},
-                'O': {'I': 'O', 'S': 'SO'},
-                'SO': {'I': 'SO', 'S': 'SO'},
-                'LO': {'I': 'LO', 'S': 'ISLO'},
-                'ISLO': {'I': 'ISLO', 'S': 'ISLO'}}
-    rc_res = 'I'
-    for rc in tpc:
-        try:
-            rc_res = map_step[rc_res][rc]
-        except KeyError:
-            return False
-    if len(rc_res) > 1:
-        return False
-    elif len(rc_res) == 1:
-        return rc_res
 
         
 def _reverse_attr(attr):
