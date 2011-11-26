@@ -327,13 +327,3 @@ def _pdcs(old_attr, new_attr):
 def _tp_len(old_attr, new_attr):
     """Called by _update_attr."""
     return len(old_attr['TP']), len(new_attr['TP'])
-
-        
-def _reverse_attr(attr):
-    """Called by add_edge."""
-    rc_switch = {'I': 'I', 'S': 'L', 'L': 'S', 'O': 'O', None: None}
-    # Need to deep copy to prevent modification of attr.
-    tp = deepcopy(attr['TP'])
-    tp.reverse()
-    return {'RC': rc_switch[attr['RC']], 'PDC': attr['PDC'],
-            'TP': tp}

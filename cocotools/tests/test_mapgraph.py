@@ -44,3 +44,23 @@ def test__get_worst_pdc_in_tp():
     nt.assert_equal(mg.MapGraph._get_worst_pdc_in_tp.im_func(mock_g, 'A', tp,
                                                              'E'),
                     17)
+
+
+def test__add_edge_and_its_reverse():
+    mock_g = DiGraph()
+    mg.MapGraph._add_edge_and_its_reverse.im_func(mock_g, 'A', 'B', 'S', 0,
+                                                  ['C', 'D'])
+    nt.assert_equal(mock_g.edge, {'A': {'B': {'RC': 'S', 'PDC': 0,
+                                              'TP': ['C', 'D']}},
+                                  'B': {'A': {'RC': 'L', 'PDC': 0,
+                                              'TP': ['D', 'C']}}})
+
+
+def test__new_attributes_are_better():
+    mock_g = DiGraph()
+    mock_g.add_edge('A', 'B', PDC=5, TP=['C', 'D', 'E'])
+    method = mg.MapGraph._new_attributes_are_better.im_func
+    nt.assert_true(method(mock_g, 'A', 'B', 18, []))
+    nt.assert_true(method(mock_g, 'A', 'B', 2, ['C', 'D', 'E']))
+    nt.assert_false(method(mock_g, 'A', 'B', 2, ['C', 'D', 'E', 'F']))
+    nt.assert_false(method(mock_g, 'A', 'B', 5, ['C', 'D', 'E']))
