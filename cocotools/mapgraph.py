@@ -534,7 +534,19 @@ class MapGraph(DiGraph):
 
         hierarchy : dictionary
           Larger regions are mapped to smaller and identical regions.
+
+        Returns
+        -------
+        hierarchy : dictionary
+          Input hierarchy with big_one and small_one added.
+
+        Notes
+        -----
+        This method was designed under the assumption that 'O' RCs will
+        never exist within BrainMaps.
         """
+        # Determine which regions at the highest level of hierarchy
+        # big_one is larger than and which it is smaller than.
         larger_than = []
         smaller_than = []
         for large_region in hierarchy:
@@ -546,7 +558,27 @@ class MapGraph(DiGraph):
                 larger_than.append(large_region)                
             else:
                 smaller_than.append(large_region)
+        # We've got a contradiction if it is larger than one region at
+        # the highest level and smaller than another at the same level.
         if larger_than and smaller_than:
-            raise MapGraphError('%s has contradictory spatial hierarchy' %
+            raise MapGraphError('%s has contradictory spatial hierarchy.' %
                                 big_one.split('-')[0])
-        # Keep working here.
+        elif larger_than:
+            # big_one is at a level higher than the highest one in
+            # hierarchy.
+            #
+            # We will set big_one at the highest level in the
+            # hierarchy, pop the regions in larger_than out of
+            # hierarchy, and put them (and those regions they map to)
+            # in the inner-dict big_one maps to.
+            within_big_one = {}
+            for region in larger_than:
+                within_big_one[region] = hierarchy.pop(region)
+            hierarchy[big_one] = within_big_one
+            # Now put small_one in the hierarchy.
+            
+        elif smaller_than:
+            pass
+        else:
+            pass
+        return hierarchy
