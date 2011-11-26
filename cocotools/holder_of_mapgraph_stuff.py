@@ -1,3 +1,22 @@
+                max_connections = 0
+                for i, node in enumerate(top_level_key):
+                    try:
+                        n_connections = len(conn.predecessors(node) +
+                                            conn.successors(node))
+                    except nx.NetworkXError:
+                        continue
+                    if n_connections > max_connections:
+                        best_indices = [i]
+                        max_connections = n_connections
+                    elif n_connections == max_connections:
+                        best_indices.append(i)
+                if len(best_indices) == 1:
+                else:
+                    # Two or more nodes are tied for the highest
+                    # number of connections (and that number may be
+                    # zero).
+                    pass        # CONTINUE HERE
+
 from copy import deepcopy
 
 from numpy import mean, float64
