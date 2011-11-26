@@ -485,7 +485,55 @@ class MapGraph(nx.DiGraph):
             # one level of resolution.
             for hierarchy in map_hierarchies:
                 hierarchy = self._merge_identical_nodes(hierarchy)
-                # NOW ACTUALLY CHOOSE A LEVEL OF RESOLUTION.
+                self._keep_one_level(hierarchy)
+
+    def _keep_one_level(self, hierarchy):
+        """Isolate levels in hierarchy and remove all but one from the graph.
+
+        hierarchy itself is also changed in the same way the graph is.
+
+        Parameters
+        ----------
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions.  All regions are
+          from the same BrainMap.
+
+        Returns
+        -------
+        hierarchy : dictionary
+          Input hierarchy with all but one level of resolution removed.
+        """
+        if not hierarchy:
+            return hierarchy
+        for top_node, next_level in hierarchy.iteritems():
+            if next_level:
+                break
+        else:
+            # This is the lowest level.
+            return hierarchy
+        # top_node is now set to a node that maps to lower-level
+        # nodes.  But we need to make sure the nodes it maps to are at
+        # the lowest level.
+        #
+        # Use deepcopy here so that the actual hierarchy can be
+        # modified as we iterate through the copy.
+        top_node_dict = copy.deepcopy(next_level)
+        for lower_dict in top_node_dict.values():
+            if lower_dict:
+                # At least one node top_node maps to -- the one that
+                # maps to this lower_dict -- is not at the lowest
+                # level.  Call _keep_one_level on top_node_dict.
+                hierarchy[top_node] = self._keep_one_level(next_level)
+        # Now top_node maps to the lowest level.  We need to choose
+        # top_node or the nodes it maps to.
+        try:
+            top_node_connections = len(conn.predecessors(top_node) +
+                                       conn.successors(top_node))
+        except nx.NetworkXError:
+            top_node_connections = 0
+        lower_connections = 0
+        # Add up connections of nodes in next_level.
+        # CONTINUE HERE.
 
     def _merge_identical_nodes(self, hierarchy):
         """Merge identical nodes in hierarchy and in the graph.
