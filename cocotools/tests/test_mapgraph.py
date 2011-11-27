@@ -109,11 +109,23 @@ def test_add_to_hierarchy():
 
 @replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
 def test_find_bottom_of_hierarchy():
+
     # The recursion in _find_bottom_of_hierarchy requires that we use an
     # actual MapGraph in this test.
     mock_mapp = mg.MapGraph()
-    hierarchy = {'B': {'D': {'E': {}}, 'I': {'F': {'K': {}}, 'H': {}}},
-                 'J': {'A': {}}}
-    path, bottom = mock_mapp._find_bottom_of_hierarchy(hierarchy)
+    hierarchy = {'J': {'A': {}}}
+    path, bottom = mock_mapp._find_bottom_of_hierarchy(hierarchy, [])
     nt.assert_equal(path, [])
     nt.assert_equal(bottom, ['J', ['A']])
+
+    hierarchy = {'B': {'I': {'F': {'K': {}, 'L': {}}, 'H': {}}}}
+    path, bottom = mock_mapp._find_bottom_of_hierarchy(hierarchy, [])
+    nt.assert_equal(path, ['B', 'I'])
+    nt.assert_equal(bottom, ['F', ['K', 'L']])
+
+    # Test what it returns when all regions are at the same level, the
+    # goal state.
+    hierarchy = {'A': {}, 'B': {}}
+    path, bottom = mock_mapp._find_bottom_of_hierarchy(hierarchy, [])
+    nt.assert_equal(path, [])
+    nt.assert_equal(bottom, [])

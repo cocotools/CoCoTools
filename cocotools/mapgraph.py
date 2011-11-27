@@ -6,18 +6,6 @@ import networkx as nx
 from congraph import ConGraph
 
 
-class RCError(Exception):
-    pass
-
-
-class PDCError(Exception):
-    pass
-
-
-class TPError(Exception):
-    pass
-
-
 class MapGraphError(Exception):
     pass
 
@@ -37,7 +25,7 @@ class MapGraph(nx.DiGraph):
     'BrainMap-BrainSite'.  Nodes not in this format are rejected.  Node
     attributes are not allowed.
     
-    Edges have the following attributes (but only RC and PDC need be
+    Edges have the following attributes (but only RC and PDC should be
     supplied by the user):
     
     (1) RC (relation code).  Allowable values are 'I' (identical to),
@@ -57,12 +45,13 @@ class MapGraph(nx.DiGraph):
 
     (3) PDC (precision description code).  An integer (from zero to 18,
     with zero being the best) corresponding to an index in the PDC
-    hierarchy (cocotools.query.PDC_HIER).  Entries in the hierarchy
-    represent levels of precision with which a statement in the original
-    literature can be made.  When the edge is absent from the literature
-    and has been deduced based on other edges (i.e., when the length of
-    TP is greater than zero), the PDC corresponds to the worst PDC
-    of the edges represented by TP.
+    hierarchy (cocotools.query.PDC_HIER), which was developed by the
+    CoCoMac curators.  Entries in the hierarchy represent levels of
+    precision with which a statement in the original literature can be
+    made.  When the edge is absent from the literature and has been
+    deduced based on other edges (i.e., when the TP length is greater
+    than zero), the PDC corresponds to the worst PDC of the edges
+    represented by TP.
 
     Accurate deduction of new spatial relationships among regions and
     accurate translation of connectivity data between maps demand that each
@@ -72,20 +61,21 @@ class MapGraph(nx.DiGraph):
     until all remaining are disjoint.
 
     MapGraph has been designed such that when a user attempts to add an
-    edge using the add_edge method, an error is raised if the nodes
-    supplied are in the same map.  If the user calls add_edges_from
+    edge using the add_edge method, an error is raised by default if the
+    nodes supplied are in the same map.  If the user calls add_edges_from
     instead, intra-map edges are added to the graph; however, before the
     method returns, all but one level of resolution is removed from the
     graph.  The level with the most anatomical connections (i.e., edges
-    in conn) is chosen; in the event of a tie, the level with the most
-    inter-map spatial relationships is chosen; if the tie persists, the
-    finest level is chosen.
+    in conn) is chosen; in the event of a tie, the finest level of
+    resolution is chosen.
 
-    Redundant nodes within a map are merged in this MapGraph and in conn.
+    Redundant nodes within a map are merged into a single node in this
+    graph and in the associated ConGraph.  A name for the node is chosen
+    from the list of redundant ones arbitrarily
 
     New spatial relationships are deduced using an enhanced version of
     Objective Relational Transformation (ORT) with the deduce_edges method.
-    The strategy used in MapGraph for handling intramap spatial
+    The strategy used in MapGraph for handling intra-map spatial
     relationships described above ensures that levels of resolution will
     not be mixed within maps when deduce_edges is called.  This allows
     deduce_edges to assume all regions within a map are disjoint, which
@@ -144,113 +134,356 @@ class MapGraph(nx.DiGraph):
         self._check_nodes(nodes)
         nx.DiGraph.add_nodes_from.im_func(self, nodes)
 
-    def add_edge(self, source, target, rc=None, pdc=None, tp=None,
-                 allow_intramap=False):
-        """Add edges between source and target to the graph.
+    def _remove_level_from_hierarchy(self, hierarchy, path, nodes_to_remove):
+        """Remove nodes at the same level from hierarchy.
 
-        Either rc and pdc or tp must be supplied.  Users should only
-        supply rc and pdc; tp is supplied by the deduce_edges method.  If
-        tp is supplied, anything supplied for rc or pdc is ignored.  If rc
-        and pdc are supplied, anything supplied for tp is ignored.
+        Map the nodes at the level above these nodes to those at the level
+        below, if both exist.  Keep hierarchy otherwise intact.
 
         Parameters
         ----------
-        source : string
-          BrainSite in CoCoMac format.
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions.  All regions are
+          from the same BrainMap.
+        
+        path : list
+          Ordered keys through hierarchy that lead to the nodes to remove.
 
-        target : string
-          BrainSite in CoCoMac format.
-
-        rc : string (optional)
-          'I', 'S', 'L', or 'O'.
-
-        pdc : integer (optional)
-          Index in the PDC hierarchy (cocotools.query.PDC_HIER); lower is
-          better.
-
-        tp : list (optional)
-          Nodes in path between source and target on the basis of which
-          this edge has been deduced.
-
-        allow_intramap : bool (optional)
-          True or False.  States whether edges between BrainSites in the
-          same map should be allowed.  Note that setting this to True may
-          cause serious problems for attempts to deduce new spatial
-          relationships or translate anatomical connections between
-          BrainMaps.  allow_intramap is set to False by default.
+        nodes_to_remove : list
+          Nodes that define the level in the hierarchy to be removed.
 
         Returns
         -------
-        intramap_nodes : set
-          If allow_intramap is set to True, source and target are returned
-          in this set only if they are from the same BrainMap and the edge
-          and its reciprocal are successfully added to the graph.
+        hierarchy : dictionary
+          Input hierarchy sans the level defined by nodes_to_remove.
         """
-        self._check_nodes([source, target])
-        if source == target:
-            raise MapGraphError('source and target are the same node.')
-        if not allow_intramap and source.split('-')[0] == target.split('-')[0]:
-            raise MapGraphError('source and target are from the same BrainMap.')
-        if tp:
-            rc = self._deduce_rc(self._get_rc_chain(source, tp, target))
-            if rc:
-                pdc = self._get_worst_pdc_in_tp(source, tp, target)
-                # We can assume the acquired PDC is valid because it is
-                # already in the graph, and there is no way to put an
-                # invalid one in the graph.  And since we got this far,
-                # the TP and RC are valid as well.
-                return self._add_valid_edge(source, target, rc, pdc, tp)
-            else:
-                raise TPError('RC between source and target cannot be deduced.')
+        if not path:
+            # Nodes to remove are at the highest level of the
+            # hierarchy.
+            for node in nodes_to_remove:
+                hierarchy.update(hierarchy.pop(node))
         else:
-            if rc not in ('I', 'S', 'L', 'O'):
-                raise RCError('Supplied RC is invalid.')
-            if not isinstance(pdc, int) and not 0 <= pdc <= 18:
-                raise PDCError('Supplied PDC is invalid.')
-            return self._add_valid_edge(source, target, rc, pdc, [])
+            while path:
+                first_key = path.pop(0)
+                # CONTINUE HERE.
+        return hierarchy
 
-    def _add_valid_edge(self, source, target, rc, pdc, tp):
-        """Incorporate supplied valid edge data into graph.
+#------------------------------------------------------------------------------
+# Methods for Removing Nodes
+#------------------------------------------------------------------------------
 
-        If reciprocal edges between source and target are not already in
-        the graph, add them.  If these edges are already in the graph,
-        update the edge attributes.
+    def _find_bottom_of_hierarchy(self, hierarchy, path):
+        """Return nodes at the lowest level and a node that maps to them.
+
+        Also return the path through the dict that leads to the
+        second-lowest node.
 
         Parameters
         ----------
-        source : string
-          BrainSite in CoCoMac format.
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions.  All regions are
+          from the same BrainMap.
 
-        target : string
-          BrainSite in CoCoMac format.
-
-        rc : string
-          'I', 'S', 'L', or 'O'.
-
-        pdc : integer
-          Index in the PDC hierarchy (cocotools.query.PDC_HIER); lower is
-          better.
-
-        tp : list
-          Nodes in path between source and target on the basis of which
-          this edge has been deduced.
+        path : list
+          Keys to use, one after the other, to get closer to the bottom of
+          the hierarchy.
 
         Returns
         -------
-        intramap_nodes : set
-          source and target are put in this set only if they are from the
-          same BrainMap.
+        path : list
+          Keys to use, one after the other, to reach the second-lowest node
+          found in the hierarchy.
+
+        bottom : list
+          The node at the second-lowest level of the hierarchy and the
+          node(s) it maps to (the latter are a list within the list).
 
         Notes
         -----
-        This method's interactions with other methods are setup so that
-        this method will always receive valid edge data.  Thus, no checks
-        are made within this method to ensure the data are valid.
+        For developers: I tried to set path as [] by default, but,
+        strangely, this caused the method to append to a variable named
+        path outside this method.
         """
-        if not self.has_edge(source, target):
-            return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
-        elif self._new_attributes_are_better(source, target, pdc, tp):
-            return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
+        for node, nodes_beneath in hierarchy.iteritems():
+            if nodes_beneath:
+                path.append(node)
+                break
+        else:
+            try:
+                return path[:-1], [path[-1], hierarchy.keys()]
+            except IndexError:
+                # We get here if the original hierarchy supplied has
+                # just one level of resolution.
+                return [], []
+        return self._find_bottom_of_hierarchy(nodes_beneath, path)
+                
+    def _keep_one_level(self, hierarchy):
+        """Isolate levels in hierarchy and remove all but one from the graph.
+
+        hierarchy itself is changed in the same way the graph is and then
+        returned.
+
+        Parameters
+        ----------
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions.  All regions are
+          from the same BrainMap.
+
+        Returns
+        -------
+        hierarchy : dictionary
+          Input hierarchy with all but one level of resolution removed.
+        """
+        while True:
+            path, bottom = self._find_bottom_of_hierarchy(hierarchy, [])
+            if not bottom:
+                # hierarchy now has just one level of resolution.
+                break
+            larger_node, smaller_nodes = bottom
+            # See which level has more edges in self.conn.
+            try:
+                larger_connections = len(self.conn.predecessors(larger_node) +
+                                         self.conn.successors(larger_node))
+            except nx.NetworkXError:
+                larger_connections = 0
+            smaller_connections = 0
+            for s in smaller_nodes:
+                try:
+                    smaller_connections += len(self.conn.predecessors(s))
+                    smaller_connections += len(self.conn.successors(s))
+                except nx.NetworkXError:
+                    pass
+            # Remove the level with fewer connections from the graph.
+            #
+            # Note, removing the nodes from self.conn as well would be
+            # superfluous; removing their mapping information is
+            # enough to prevent nodes from playing a role in the
+            # translation stage of ORT.
+            if len(larger_connections) > len(smaller_connections):
+                self.remove_nodes_from(smaller_nodes)
+                path.append(larger_node)
+                hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
+                                                              smaller_nodes)
+            else:
+                self.remove_node(larger_node)
+                hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
+                                                              [larger_node])
+        return hierarchy
+
+    def _merge_identical_nodes(self, hierarchy):
+        """Merge identical nodes in hierarchy and in the graph.
+
+        The name to keep is chosen arbitrarily.
+
+        As each node is removed, its inter-map edges in this graph and
+        all its edges in self.conn are given to the node being kept.
+
+        Parameters
+        ----------
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions.  Keys are tuples of
+          identical regions.  All regions are from the same BrainMap.
+
+        Returns
+        -------
+        hierarchy : dictionary
+          Input hierarchy with all but one of the identical nodes in each
+          key tuple removed.  Keys are now strings representing remaining
+          nodes.
+        """
+        for top_level_key in hierarchy:
+            if len(top_level_key) == 1:
+                # No node removal necessary.
+                hierarchy[top_level_key[0]] = hierarchy.pop(top_level_key)
+            else:
+                identical_nodes = list(top_level_key)
+                keeper = identical_nodes.pop(0)
+                hierarchy[keeper] = hierarchy.pop(top_level_key)
+                for loser in identical_nodes:
+                    # Give its inter-map edges to keeper and then
+                    # remove it.
+                    neighbors = self.neighbors(loser)
+                    for n in neighbors:
+                        if n.split('-')[0] != keeper.split('-')[0]:
+                            self.add_edge(keeper, n, rc=self[loser][n]['RC'],
+                                          pdc=self[loser][n]['PDC'])
+                    self.remove_node(loser)
+                    # Give loser's conn edges to keeper.  We don't
+                    # need to remove loser from conn because its conn
+                    # edges can't be translated anyway.
+                    try:
+                        predecessors = self.conn.predecessors(loser)
+                        successors = self.conn.successors(loser)
+                    except nx.NetworkXError:
+                        # loser isn't in conn.
+                        continue
+                    for p in predecessors:
+                        attributes = self.conn[p][loser]
+                        self.conn.add_edge(p, keeper, attributes)
+                    for s in successors:
+                        attributes = self.conn[loser][s]
+                        self.conn.add_edge(keeper, s, attributes)
+        return hierarchy
+
+    def _relate_node_to_others(self, node_x, others):
+        """Return others to which node_x is related and the corresponding RC.
+
+        An exception is raised if node_x has more than one RC to others,
+        if it is smaller than more than one other, or if it is identical to
+        more than one other.
+
+        Parameters
+        ----------
+        node_x : string
+          A node from the same BrainMap as others.
+
+        others : list
+          Tuples of identical nodes from the same BrainMap as node_x.
+
+        Returns
+        -------
+        related_others : list or string
+          Those nodes in others to which node_x has an edge.  If there is
+          only one related other, return it as a string.  If there are
+          none, an empty list is returned.
+
+        rc : string
+          RC corresponding to the edges from node_x to those in
+          related_others.  'D' for disjoint is returned if no nodes in
+          others are related to node_x.
+        """
+        # The counts will record whether any regions (not how many)
+        # are in the associated lists.
+        x_is_larger, L_count = [], 0
+        x_is_identical, i_count = [], 0
+        x_is_smaller, s_count = [], 0
+        for identical_group in others:
+            rc = []
+            for node in identical_group:
+                try:
+                    rc.append(self[node_x][node]['RC'])
+                except KeyError:
+                    continue
+            # node_x must have the same RC (or lack thereof) with all
+            # members of an identical group.  So, if it has an RC to
+            # one of them, it must have an RC to all of them, and it
+            # must be the same RC.
+            if rc and len(rc) != len(identical_group) and len(set(rc)) != 1:
+                raise MapGraphError("""%s has different RCs to identical nodes
+%s""" % (node_x, identical_group))
+            elif not rc:
+                continue
+            rc = rc[0]
+            if rc == 'O':
+                raise MapGraphError("""%s and %s have an RC of 'O'.
+Intra-map RCs must be 'S', 'I', or 'L'.""" % (node_x, identical_group))
+            elif rc == 'L':
+                L_count = 1
+                x_is_larger.append(identical_group)
+            elif rc == 'I':
+                i_count = 1
+                x_is_identical.append(identical_group)
+                if len(x_is_identical) > 1:
+                    raise MapGraphError("""%s is identical to multiple
+disjoint nodes in its own map.""" % node_x)
+            else:
+                s_count = 1
+                x_is_smaller.append(identical_group)
+                if len(x_is_smaller) > 1:
+                    raise MapGraphError("""%s is smaller than multiple
+disjoint nodes in its own map.""" % node_x)
+        if L_count + i_count + s_count > 1:
+            raise MapGraphError("""%s has different RCs to disjoint nodes in
+its own map.""" % node_x)
+        if L_count:
+            return x_is_larger, 'L'
+        if i_count:
+            return x_is_identical[0], 'I'
+        if s_count:
+            return x_is_smaller[0], 'S'
+        return [], 'D'
+    
+    def _add_to_hierarchy(self, node_x, hierarchy):
+        """Incorporate new BrainSites into a BrainMap's spatial hierarchy.
+
+        Raise an error if node_x cannot be placed in hierarchy.
+
+        Parameters
+        ----------
+        node_x : string
+          BrainSite from the BrainMap whose hierarchy has been passed as
+          input.  It is given the x suffix to distinguish it from other
+          nodes referred to in this method.
+
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions in the same
+          BrainMap.  Keys are tuples of identical regions.
+
+        Returns
+        -------
+        hierarchy : dictionary
+          Input hierarchy with node_x added.
+
+        Notes
+        -----
+        This method is persnickety: All relationships between members of
+        hierarchy must be pre-specified in the graph as edges.  If edges
+        are missing, this method will raise an exception or return an
+        erroneous hierarchy.
+
+        Exceptions are also raised if contradictions are detected among
+        suites of intra-map edges.
+        """
+        related_to_x, rc = self._relate_node_to_others(node_x,
+                                                       hierarchy.keys())
+        if rc == 'L':
+            # node_x is at a level higher than the highest one in
+            # hierarchy.
+            within_node_x = {}
+            for key in related_to_x:
+                within_node_x[key] = hierarchy.pop(key)
+            hierarchy[(node_x,)] = within_node_x
+        elif rc == 'S':
+            inner_hierarchy = hierarchy[related_to_x]
+            hierarchy[related_to_x] = self._add_to_hierarchy(node_x,
+                                                             inner_hierarchy)
+        elif rc == 'I':
+            new_key = tuple([node_x] + [node for node in related_to_x])
+            hierarchy[new_key] = hierarchy.pop(related_to_x)
+        else:
+            # node_x is disjoint from all nodes at the highest level
+            # of the hierarchy.
+            hierarchy[(node_x,)] = {}
+        return hierarchy
+
+    def _determine_hierarchies(self, intramap_nodes):
+        """Resolve spatial hierarchy for each BrainMap.
+
+        Parameters
+        ----------
+        intramap_nodes : set
+          Nodes, not necessarily all in the same BrainMap, with intra-map
+          edges.
+
+        Returns
+        -------
+        hierarchies : dictionary
+          Highest-level keys are BrainMaps.  The value for each BrainMap is
+          a dict mapping the largest BrainSites to those they contain, and
+          so on.
+        """
+        hierarchies = {}
+        for node in intramap_nodes:
+            brain_map = node.split('-')[0]
+            if not hierarchies.has_key(brain_map):
+                hierarchies[brain_map] = {}
+            hierarchy = hierarchies[brain_map]
+            hierarchies[brain_map] = self._add_to_hierarchy(node, hierarchy)
+        return hierarchies
+
+#------------------------------------------------------------------------------
+# Methods for Adding Edges
+#------------------------------------------------------------------------------
 
     def _new_attributes_are_better(self, source, target, pdc, tp):
         """Return True if pdc and tp are improvements and False otherwise.
@@ -276,8 +509,17 @@ class MapGraph(nx.DiGraph):
           Nodes in path between source and target on the basis of which
           this edge has been deduced.
 
+        Returns
+        -------
+        bool
+          True if supplied attributes are better than those in the graph.
+          False otherwise.
+
         Notes
         -----
+        This method is called only if edges between source and target are
+        already in the graph.
+        
         There is no point in comparing the PDCs of the edges implied by the
         TPs, as the PDC supplied to this method is always the worst one of
         all these edges.
@@ -331,11 +573,55 @@ class MapGraph(nx.DiGraph):
         if source.split('-')[0] == target.split('-')[0]:
             return set([source, target])
 
+    def _add_valid_edge(self, source, target, rc, pdc, tp):
+        """Incorporate supplied valid edge data into graph.
+
+        If reciprocal edges between source and target are not already in
+        the graph, add them.  If these edges are already in the graph,
+        update the edge attributes.
+
+        Parameters
+        ----------
+        source : string
+          BrainSite in CoCoMac format.
+
+        target : string
+          BrainSite in CoCoMac format.
+
+        rc : string
+          'I', 'S', 'L', or 'O'.
+
+        pdc : integer
+          Index in the PDC hierarchy (cocotools.query.PDC_HIER); lower is
+          better.
+
+        tp : list
+          Nodes in path between source and target on the basis of which
+          this edge has been deduced.
+
+        Returns
+        -------
+        intramap_nodes : set
+          source and target are put in this set only if they are from the
+          same BrainMap, and only if new data are added for the edges
+          between them.
+
+        Notes
+        -----
+        This method is called by add_edge only after the validity of the
+        edge data has been confirmed.  Thus, no additional validity checks
+        are made here.
+        """
+        if not self.has_edge(source, target):
+            return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
+        elif self._new_attributes_are_better(source, target, pdc, tp):
+            return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
+
     def _get_worst_pdc_in_tp(self, source, tp, target):
         """Return the worst PDC for edges from source to target via tp.
 
-        The worst PDC is the greatest, as PDCs correspond to indices in the
-        PDC hierarchy (cocotools.query.PDC_HIER).
+        The worst PDC is the largest integer, as PDCs correspond to indices in
+        the PDC hierarchy (cocotools.query.PDC_HIER).
 
         Parameters
         ----------
@@ -362,30 +648,6 @@ class MapGraph(nx.DiGraph):
             if pdc > worst_pdc:
                 worst_pdc = pdc
         return worst_pdc
-
-    def _get_rc_chain(self, source, tp, target):
-        """Return RCs for edges from source to target via tp.
-
-        Parameters
-        ----------
-        source : string
-          A node in the graph.
-
-        tp : list
-          TP that mediates relationship between source and target.
-
-        target : string
-          A node in the graph.
-
-        Returns
-        -------
-        rc_chain : string
-          Concatenated RCs for edges from source to target through tp.
-        """
-        middle = ''
-        for i in range(len(tp) - 1):
-            middle += self[tp[i]][tp[i + 1]]['RC']
-        return self[source][tp[0]]['RC'] + middle + self[tp[-1]][target]['RC']
 
     def _deduce_rc(self, rc_chain):
         """Deduce a single RC from a chain of them.
@@ -418,8 +680,32 @@ class MapGraph(nx.DiGraph):
         if len(deduced_rc) == 1:
             return deduced_rc
 
+    def _get_rc_chain(self, source, tp, target):
+        """Return RCs for edges from source to target via tp.
+
+        Parameters
+        ----------
+        source : string
+          A node in the graph.
+
+        tp : list
+          TP that mediates relationship between source and target.
+
+        target : string
+          A node in the graph.
+
+        Returns
+        -------
+        rc_chain : string
+          Concatenated RCs for edges from source to target through tp.
+        """
+        middle = ''
+        for i in range(len(tp) - 1):
+            middle += self[tp[i]][tp[i + 1]]['RC']
+        return self[source][tp[0]]['RC'] + middle + self[tp[-1]][target]['RC']
+
     def _check_nodes(self, nodes):
-        """Raise error if any node in nodes is not in CoCoMac format.
+        """Raise an exception if any node in nodes is not in CoCoMac format.
 
         Parameters
         ----------
@@ -429,6 +715,80 @@ class MapGraph(nx.DiGraph):
             if not re.match(r'[A-Z]+[0-9]{2}-.+', node):
                 raise MapGraphError('node is not in CoCoMac format.')
 
+#------------------------------------------------------------------------------
+# Public Methods
+#------------------------------------------------------------------------------
+
+    def add_edge(self, source, target, rc=None, pdc=None, tp=None,
+                 allow_intramap=False):
+        """Add edges between source and target to the graph.
+
+        Either rc and pdc or tp must be supplied.  Users should only
+        supply rc and pdc; tp is supplied by the deduce_edges method.  If
+        tp is supplied, anything supplied for rc or pdc is ignored.  If rc
+        and pdc are supplied, anything supplied for tp is ignored.
+
+        Self-loops are not allowed.
+
+        Parameters
+        ----------
+        source : string
+          BrainSite in CoCoMac format.
+
+        target : string
+          BrainSite in CoCoMac format.
+
+        rc : string (optional)
+          'I', 'S', 'L', or 'O'.
+
+        pdc : integer (optional)
+          Index in the PDC hierarchy (cocotools.query.PDC_HIER); lower is
+          better.
+
+        tp : list (optional)
+          Nodes in path between source and target on the basis of which
+          this edge has been deduced.
+
+        allow_intramap : bool (optional)
+          True or False.  States whether edges between BrainSites in the
+          same map should be allowed.  Note that setting this to True may
+          cause serious problems for attempts to deduce new spatial
+          relationships or translate anatomical connections between
+          BrainMaps.  allow_intramap is set to False by default.
+
+        Returns
+        -------
+        intramap_nodes : set
+          source and target are returned in this set only if they are from
+          the same BrainMap and the edge and its reciprocal are
+          successfully added to the graph.  Such addition only occurs if
+          allow_intramap is set to True.
+        """
+        self._check_nodes([source, target])
+        if source == target:
+            raise MapGraphError('source and target are the same node.')
+        if not allow_intramap and source.split('-')[0] == target.split('-')[0]:
+            raise MapGraphError('%s and %s are from the same BrainMap.' %
+                                (source, target))
+        if tp:
+            rc = self._deduce_rc(self._get_rc_chain(source, tp, target))
+            if rc:
+                pdc = self._get_worst_pdc_in_tp(source, tp, target)
+                # We can assume the acquired PDC is valid because it is
+                # already in the graph, and there is no way to put an
+                # invalid one in the graph.  And since we got this far,
+                # the TP and RC are valid as well.
+                return self._add_valid_edge(source, target, rc, pdc, tp)
+            else:
+                raise MapGraphError("""RC between %s and %s cannot be
+deduced.""" % (source, target))
+        else:
+            if rc not in ('I', 'S', 'L', 'O'):
+                raise MapGraphError('Supplied RC is invalid.')
+            if not isinstance(pdc, int) and not 0 <= pdc <= 18:
+                raise MapGraphError('Supplied PDC is invalid.')
+            return self._add_valid_edge(source, target, rc, pdc, [])
+        
     def add_edges_from(self, edges):
         """Add edges to the graph.
 
@@ -437,12 +797,12 @@ class MapGraph(nx.DiGraph):
         and attributes being a dictionary of valid edge attributes.
 
         A valid edge attribute dictionary contains either an RC and a PDC
-        or a TP.  Users should have their edges contain only RCs and PDCs.
-        Edges received from functions in the query module are in the
-        correct format.
+        or a TP.  Users should specify only RCs and PDCs; the TP property
+        is used by the deduce_edges method.  Edges received from functions
+        in the query module are in the correct format.
 
         If intra-map edges are supplied, it is important that there be
-        enough edges for this method to make out distinct levels of
+        enough edges for add_edges_from to make out distinct levels of
         resolution in the BrainMap and sensibly choose between them (see
         Notes).  If insufficient information is supplied, an error will be
         raised.
@@ -455,17 +815,18 @@ class MapGraph(nx.DiGraph):
 
         Notes
         -----
-        Do not call this method after deduce_edges!  Errors will result!
-        The reason is, this method assumes all edges have empty TPs.
-        
         Unlike the default for add_edge, this method adds intra-map edges
         to the graph.  However, before returning, it removes nodes at all
         but one level of resolution for each BrainMap from the graph.  The
         level with the most anatomical connections (i.e., edges in
-        self.conn) is kept; in the event of a tie, the level with the most
-        inter-map spatial relationships is kept; if the tie persists, the
-        finest level is kept.  Identical nodes are merged; a name is chosen
-        arbitrarily.
+        self.conn) is kept; in the event of a tie, the finest level of
+        resolution is kept.  Identical intra-map nodes are merged into a
+        single node whose name is chosen arbitrarily.
+        
+        This method assumes all edges have empty TPs, so do not call it
+        after deduce_edges.  If this method is called after deduce_edges,
+        and nodes are removed, edges in whose TPs the removed nodes play
+        a role will not be removed.
         """
         # intramap_nodes will hold nodes with intra-map edges.
         intramap_nodes = set()
@@ -486,285 +847,3 @@ class MapGraph(nx.DiGraph):
             for hierarchy in map_hierarchies:
                 hierarchy = self._merge_identical_nodes(hierarchy)
                 self._keep_one_level(hierarchy)
-
-    def _find_bottom_of_hierarchy(self, hierarchy, path=[]):
-        """Return nodes at the lowest level and a node that maps to them.
-
-        Also return the path through the dict that leads to the
-        second-lowest node.
-
-        Parameters
-        ----------
-        hierarchy : dictionary
-          Larger regions are mapped to smaller regions.  All regions are
-          from the same BrainMap.
-
-        path : list (optional)
-          Keys to use, one after the other, to get closer to the bottom of
-          the hierarchy.
-
-        Returns
-        -------
-        path : list
-          Keys to use, one after the other, to reach the second-lowest node
-          found in the hierarchy.
-
-        bottom : list
-          The node at the second-lowest level of the hierarchy and the
-          node(s) it maps to (the latter are a list within the list).
-        """
-        if path:
-            for key in path:
-                hierarchy = hierarchy[key]
-        for node, nodes_beneath in hierarchy.iteritems():
-            if nodes_beneath:
-                path.append(node)
-                break
-        else:
-            return path[:-1], [path[-1], hierarchy.keys()]
-        return self._find_bottom_of_hierarchy(hierarchy, path)
-                
-    def _keep_one_level(self, hierarchy):
-        """Isolate levels in hierarchy and remove all but one from the graph.
-
-        hierarchy itself is also changed in the same way the graph is.
-
-        Parameters
-        ----------
-        hierarchy : dictionary
-          Larger regions are mapped to smaller regions.  All regions are
-          from the same BrainMap.
-
-        Returns
-        -------
-        hierarchy : dictionary
-          Input hierarchy with all but one level of resolution removed.
-        """
-        for top_node, next_level in hierarchy.iteritems():
-            if next_level:
-                # top_node is now set to a node that maps to lower-level
-                # nodes.  But we need to make sure the nodes it maps to are at
-                # the lowest level.
-                #
-                # Use deepcopy here so that the actual hierarchy can be
-                # modified as we iterate through the copy.
-                top_node_dict = copy.deepcopy(next_level)
-                for lower_node_dict in top_node_dict.values():
-                    if lower_node_dict:
-                        # top_node maps to the node that maps to this
-                        # dict (call it lower_node), and because this
-                        # dict isn't empty, lower_node is not at the
-                        # lowest level.  We need to flatten that part
-                        # of the hierarchy.
-                        hierarchy[top_node] = self._keep_one_level(next_level)
-        # Now top_node maps to the lowest level.  We need to choose
-        # top_node or the nodes it maps to.
-        try:
-            top_node_connections = (self.conn.predecessors(top_node) +
-                                    self.conn.successors(top_node))
-        except nx.NetworkXError:
-            top_node_connections = []
-        lower_connections = []
-        for lower_node in next_level:
-            try:
-                lower_connections += self.conn.predecessors(lower_node)
-                lower_connections += self.conn.successors(lower_node)
-            except nx.NetworkXError:
-                pass
-        # Note, we don't need to remove any nodes from self.conn.
-        # Removing the nodes from this graph is good enough; without
-        # mapping information, nodes in conn will play no role in the
-        # translation stage of ORT.
-        if len(top_node_connections) > len(lower_connections):
-            self.remove_nodes_from(next_level.keys())
-            hierarchy[top_node] = {}
-        else:
-            self.remove_node(top_node)
-            hierarchy.update(hierarchy.pop(top_node))
-        return hierarchy
-
-    def _merge_identical_nodes(self, hierarchy):
-        """Merge identical nodes in hierarchy and in the graph.
-
-        The name to keep is chosen arbitrarily.
-
-        Give edges in conn and inter-map edges in this graph belonging to
-        redundant nodes to the one being kept.
-
-        Parameters
-        ----------
-        hierarchy : dictionary
-          Larger regions are mapped to smaller regions.  Keys are tuples of
-          identical regions.  All regions are from the same BrainMap.
-
-        Returns
-        -------
-        hierarchy : dictionary
-          Input hierarchy with all but one of the identical nodes in each
-          key tuple removed.  Keys are now strings representing remaining
-          nodes.
-        """
-        for top_level_key in hierarchy:
-            if len(top_level_key) == 1:
-                # No node removal necessary.
-                hierarchy[top_level_key[0]] = hierarchy.pop(top_level_key)
-            else:
-                identical_nodes = list(top_level_key)
-                keeper = identical_nodes.pop(best_indices[0])
-                hierarchy[keeper] = hierarchy.pop(top_level_key)
-                for loser in identical_nodes:
-                    # Give its inter-map edges to keeper and then
-                    # remove it.
-                    neighbors = self.neighbors(loser)
-                    for neighbor in neighbors:
-                        if neighbor.split('-')[0] != keeper.split('-')[0]:
-                            rc = self[loser][neighbor]['RC']
-                            pdc = self[loser][neighbor]['PDC']
-                            self.add_edge(keeper, neighbor, rc=rc, pdc=pdc)
-                    self.remove_node(loser)
-                    # Give loser's conn edges to keeper and then
-                    # remove it from conn.
-                    try:
-                        predecessors = conn.predecessors(loser)
-                        successors = conn.sucessors(loser)
-                    except nx.NetworkXError:
-                        # loser isn't in conn.
-                        continue
-                    for p in predecessors:
-                        attributes = conn[p][loser]
-                        conn.add_edge(p, keeper, attributes)
-                    for s in successors:
-                        attributes = conn[loser][s]
-                        conn.add_edge(keeper, s, attributes)
-                    conn.remove_node(loser)
-        return hierarchy
-
-    def _determine_hierarchies(self, intramap_nodes):
-        """Resolve spatial hierarchy for each BrainMap.
-
-        Parameters
-        ----------
-        intramap_nodes : set
-          Nodes, not necessarily all in the same BrainMap, with intra-map
-          edges.
-
-        Returns
-        -------
-        hierarchies : dictionary
-          Highest-level keys are BrainMaps.  The value for each BrainMap is
-          a dict mapping the largest BrainSites to those they contain, and
-          so on.
-        """
-        hierarchies = {}
-        for node in intramap_nodes:
-            brain_map = node.split('-')[0]
-            if not hierarchies.has_key(brain_map):
-                hierarchies[brain_map] = {}
-            hierarchy = hierarchies[brain_map]
-            hierarchies[brain_map] = self._add_to_hierarchy(node, hierarchy)
-        return hierarchies
-
-    def _add_to_hierarchy(self, node_x, hierarchy):
-        """Incorporate new BrainSites into a BrainMap's spatial hierarchy.
-
-        Raise an error if node_x cannot be placed in hierarchy.
-
-        Parameters
-        ----------
-        node_x : string
-          Node in the graph.  It is given the x suffix just to distinguish
-          it from other nodes referred to in this method.
-
-        hierarchy : dictionary
-          Larger regions are mapped to smaller regions.  Keys are tuples of
-          identical regions.
-
-        Returns
-        -------
-        hierarchy : dictionary
-          Input hierarchy with node added.
-
-        Notes
-        -----
-        This method is persnickety: All relationships between members of
-        hierarchy must be pre-specified in the graph as edges.  If edges
-        are missing, this method will raise an exception or return an
-        erroneous hierarchy.
-        """
-        # Categorize nodes at the highest level of the hierarchy on
-        # the basis of their RCs to node_x.
-        larger_than_x = []
-        smaller_than_x = []
-        identical_to_x = []
-        # Remember, keys are tuples of identical regions.
-        for top_level_key in hierarchy:
-            rc = set()
-            for top_level_node in top_level_key:
-                try:
-                    rc.add(self[top_level_node][node_x]['RC'])
-                except KeyError:
-                    continue
-            if len(rc) == 0:
-                # node_x is disjoint from nodes in this key.
-                continue
-            elif len(rc) > 1:
-                raise MapGraphError("""%s are identical but have different
-                                    RCs to %s.""" % (top_level_key, node_x))
-            rc = rc.pop()
-            if rc == 'O':
-                raise MapGraphError("%s and %s have an RC of 'O'." %
-                                    (node_x, top_level_key))
-            elif rc == 'L':
-                larger_than_x.append(top_level_key)
-            elif rc == 'I':
-                identical_to_x.append(top_level_key)
-            else:
-                smaller_than_x.append(top_level_key)
-        if smaller_than_x:
-            # Perform a sanity check.
-            if larger_than_x or identical_to_x:
-                raise MapGraphError("""One or more intra-map edges for %s are
-missing and/or contradictory.  Make the necessary changes and then repeat the
-last command.""" % node_x.split('-')[0])
-            # node_x is at a level higher than the highest one in
-            # hierarchy.
-            #
-            # We will set node_x at the highest level in the
-            # hierarchy, pop the nodes in larger_than out of
-            # hierarchy, and put them (and those nodes they map to)
-            # in the inner-dict node_x maps to.
-            within_node_x = {}
-            for key in smaller_than_x:
-                within_node_x[key] = hierarchy.pop(key)
-            hierarchy[(node_x,)] = within_node_x
-        elif larger_than_x:
-            # Perform the same sort of sanity check.
-            if identical_to_x:
-                raise MapGraphError("""%s and %s are disjoint, but %s is
-                                    smaller than the former and identical
-                                    to the latter.""" %
-                                    (larger_than_x, identical_to_x, node_x))
-            # node_x can be smaller than just one node at the highest
-            # level of the hierarchy
-            if len(larger_than_x) > 1:
-                raise MapGraphError('%s is smaller than %s, which are ' +
-                                    'disjoint from each other.' %
-                                    (node_x, larger_than_x))
-            larger_than_x = larger_than_x[0]
-            inner_hierarchy = hierarchy[larger_than_x]
-            # Here comes the recursion!
-            hierarchy[larger_than_x] = self._add_to_hierarchy(node_x,
-                                                              inner_hierarchy)
-        elif identical_to_x:
-            if len(identical_to_x) > 1:
-                raise MapGraphError("""%s is identical to %s, which are
-                                    disjoint from each other.""" %
-                                    (node_x, identical_to_x))
-            identical_to_x = identical_to_x[0]
-            new_key = tuple([node_x] + [node for node in identical_to_x])
-            hierarchy[new_key] = hierarchy.pop(identical_to_x)
-        else:
-            # node_x is disjoint from all nodes at the highest level
-            # of the hierarchy.
-            hierarchy[(node_x,)] = {}
-        return hierarchy
