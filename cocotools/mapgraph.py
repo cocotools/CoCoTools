@@ -487,6 +487,43 @@ class MapGraph(nx.DiGraph):
                 hierarchy = self._merge_identical_nodes(hierarchy)
                 self._keep_one_level(hierarchy)
 
+    def _find_bottom_of_hierarchy(self, hierarchy, path=[]):
+        """Return nodes at the lowest level and a node that maps to them.
+
+        Also return the path through the dict that leads to the
+        second-lowest node.
+
+        Parameters
+        ----------
+        hierarchy : dictionary
+          Larger regions are mapped to smaller regions.  All regions are
+          from the same BrainMap.
+
+        path : list (optional)
+          Keys to use, one after the other, to get closer to the bottom of
+          the hierarchy.
+
+        Returns
+        -------
+        path : list
+          Keys to use, one after the other, to reach the second-lowest node
+          found in the hierarchy.
+
+        bottom : list
+          The node at the second-lowest level of the hierarchy and the
+          node(s) it maps to (the latter are a list within the list).
+        """
+        if path:
+            for key in path:
+                hierarchy = hierarchy[key]
+        for node, nodes_beneath in hierarchy.iteritems():
+            if nodes_beneath:
+                path.append(node)
+                break
+        else:
+            return path[:-1], [path[-1], hierarchy.keys()]
+        return self._find_bottom_of_hierarchy(hierarchy, path)
+                
     def _keep_one_level(self, hierarchy):
         """Isolate levels in hierarchy and remove all but one from the graph.
 
@@ -503,42 +540,56 @@ class MapGraph(nx.DiGraph):
         hierarchy : dictionary
           Input hierarchy with all but one level of resolution removed.
         """
-        if not hierarchy:
-            return hierarchy
         for top_node, next_level in hierarchy.iteritems():
             if next_level:
-                break
-        else:
-            # This is the lowest level.
-            return hierarchy
-        # top_node is now set to a node that maps to lower-level
-        # nodes.  But we need to make sure the nodes it maps to are at
-        # the lowest level.
-        #
-        # Use deepcopy here so that the actual hierarchy can be
-        # modified as we iterate through the copy.
-        top_node_dict = copy.deepcopy(next_level)
-        for lower_dict in top_node_dict.values():
-            if lower_dict:
-                # At least one node top_node maps to -- the one that
-                # maps to this lower_dict -- is not at the lowest
-                # level.  Call _keep_one_level on top_node_dict.
-                hierarchy[top_node] = self._keep_one_level(next_level)
+                # top_node is now set to a node that maps to lower-level
+                # nodes.  But we need to make sure the nodes it maps to are at
+                # the lowest level.
+                #
+                # Use deepcopy here so that the actual hierarchy can be
+                # modified as we iterate through the copy.
+                top_node_dict = copy.deepcopy(next_level)
+                for lower_node_dict in top_node_dict.values():
+                    if lower_node_dict:
+                        # top_node maps to the node that maps to this
+                        # dict (call it lower_node), and because this
+                        # dict isn't empty, lower_node is not at the
+                        # lowest level.  We need to flatten that part
+                        # of the hierarchy.
+                        hierarchy[top_node] = self._keep_one_level(next_level)
         # Now top_node maps to the lowest level.  We need to choose
         # top_node or the nodes it maps to.
         try:
-            top_node_connections = len(conn.predecessors(top_node) +
-                                       conn.successors(top_node))
+            top_node_connections = (self.conn.predecessors(top_node) +
+                                    self.conn.successors(top_node))
         except nx.NetworkXError:
-            top_node_connections = 0
-        lower_connections = 0
-        # Add up connections of nodes in next_level.
-        # CONTINUE HERE.
+            top_node_connections = []
+        lower_connections = []
+        for lower_node in next_level:
+            try:
+                lower_connections += self.conn.predecessors(lower_node)
+                lower_connections += self.conn.successors(lower_node)
+            except nx.NetworkXError:
+                pass
+        # Note, we don't need to remove any nodes from self.conn.
+        # Removing the nodes from this graph is good enough; without
+        # mapping information, nodes in conn will play no role in the
+        # translation stage of ORT.
+        if len(top_node_connections) > len(lower_connections):
+            self.remove_nodes_from(next_level.keys())
+            hierarchy[top_node] = {}
+        else:
+            self.remove_node(top_node)
+            hierarchy.update(hierarchy.pop(top_node))
+        return hierarchy
 
     def _merge_identical_nodes(self, hierarchy):
         """Merge identical nodes in hierarchy and in the graph.
 
         The name to keep is chosen arbitrarily.
+
+        Give edges in conn and inter-map edges in this graph belonging to
+        redundant nodes to the one being kept.
 
         Parameters
         ----------

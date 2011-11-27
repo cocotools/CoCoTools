@@ -105,3 +105,15 @@ def test_add_to_hierarchy():
                                         ('I',): {('F',): {('K',): {}},
                                                  ('H', 'G'): {}}})
     nt.assert_equal(hierarchy[('J',)], {('A',): {}})
+
+
+@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
+def test_find_bottom_of_hierarchy():
+    # The recursion in _find_bottom_of_hierarchy requires that we use an
+    # actual MapGraph in this test.
+    mock_mapp = mg.MapGraph()
+    hierarchy = {'B': {'D': {'E': {}}, 'I': {'F': {'K': {}}, 'H': {}}},
+                 'J': {'A': {}}}
+    path, bottom = mock_mapp._find_bottom_of_hierarchy(hierarchy)
+    nt.assert_equal(path, [])
+    nt.assert_equal(bottom, ['J', ['A']])
