@@ -91,48 +91,9 @@ class MapGraph(nx.DiGraph):
             raise MapGraphError('conn must be a ConGraph instance.')
         self.conn = conn
 
-    def add_node(self, node):
-        """Add a node to the graph.
-
-        This method is the same as that for the NetworkX DiGraph, with two
-        exceptions:
-
-        (1) The node must be a string representing a BrainSite in CoCoMac
-        format.
-
-        (2) Node attributes are not allowed.
-
-        Parameters
-        ----------
-        node : string
-          BrainSite in CoCoMac format.
-        """
-        self._check_nodes([node])
-        nx.DiGraph.add_node.im_func(self, node)
-
-    def add_nodes_from(self, nodes):
-        """Add nodes to the graph.
-
-        This method is the same as that for the NetworkX DiGraph, with two
-        exceptions:
-
-        (1) Each node must be a string representing a BrainSite in CoCoMac
-        format.
-
-        (2) Node attributes are not allowed.
-
-        Parameters
-        ----------
-        nodes : list
-          BrainSites in CoCoMac format.
-
-        Notes
-        -----
-        If any one of the nodes supplied is in an incorrect format, none of
-        the nodes are added to the graph.
-        """
-        self._check_nodes(nodes)
-        nx.DiGraph.add_nodes_from.im_func(self, nodes)
+#------------------------------------------------------------------------------
+# Methods for Removing Nodes
+#------------------------------------------------------------------------------
 
     def _remove_level_from_hierarchy(self, hierarchy, path, nodes_to_remove):
         """Remove nodes at the same level from hierarchy.
@@ -156,22 +117,52 @@ class MapGraph(nx.DiGraph):
         -------
         hierarchy : dictionary
           Input hierarchy sans the level defined by nodes_to_remove.
+
+        Notes
+        -----
+        If there is more than one node to remove, then the nodes are at the
+        lowest level in the hierarchy.  If there is a single node to
+        remove, it's at the second-to-lowest level.
         """
         if not path:
-            # Nodes to remove are at the highest level of the
-            # hierarchy.
-            for node in nodes_to_remove:
-                hierarchy.update(hierarchy.pop(node))
+            # There is one node to remove, and it's at the highest
+            # level of the hierarchy.
+            hierarchy.update(hierarchy.pop(nodes_to_remove[0]))
+        elif len(nodes_to_remove) == 1:
+            # There is one node to remove, and it's not at the highest
+            # level of the hierarchy.
+            #
+            # Guess at some lengths path might be.
+            if len(path) == 1:
+                key = path[0]
+                node_dict = hierarchy[key]
+                hierarchy[key] = node_dict.pop(nodes_to_remove[0])
+            elif len(path) == 2:
+                key1, key2 = path
+                node_dict = hierarchy[key1][key2]
+                hierarchy[key1][key2] = node_dict.pop(nodes_to_remove[0])
+            elif len(path) == 3:
+                key1, key2, key3 = path
+                node_dict = hierarchy[key1][key2][key3]
+                hierarchy[key1][key2][key3] = node_dict.pop(nodes_to_remove[0])
+            else:
+                raise MapGraphError('path has length greater than 3.')
         else:
-            while path:
-                first_key = path.pop(0)
-                # CONTINUE HERE.
+            # There is more than one node to remove, and it's at the
+            # lowest level of the hierarchy.
+            if len(path) == 1:
+                key = path[0]
+                hierarchy[key] = {}
+            elif len(path) == 2:
+                key1, key2 = path
+                hierarchy[key1][key2] = {}
+            elif len(path) == 3:
+                key1, key2, key3 = path
+                hierarchy[key1][key2][key3] = {}
+            else:
+                raise MapGraphError('path has length greater than 3.')
         return hierarchy
-
-#------------------------------------------------------------------------------
-# Methods for Removing Nodes
-#------------------------------------------------------------------------------
-
+        
     def _find_bottom_of_hierarchy(self, hierarchy, path):
         """Return nodes at the lowest level and a node that maps to them.
 
@@ -716,7 +707,7 @@ its own map.""" % node_x)
                 raise MapGraphError('node is not in CoCoMac format.')
 
 #------------------------------------------------------------------------------
-# Public Methods
+# Core Public Methods
 #------------------------------------------------------------------------------
 
     def add_edge(self, source, target, rc=None, pdc=None, tp=None,
@@ -847,3 +838,52 @@ deduced.""" % (source, target))
             for hierarchy in map_hierarchies:
                 hierarchy = self._merge_identical_nodes(hierarchy)
                 self._keep_one_level(hierarchy)
+
+#------------------------------------------------------------------------------
+# Other Public Methods
+#------------------------------------------------------------------------------
+
+    def add_node(self, node):
+        """Add a node to the graph.
+
+        This method is the same as that for the NetworkX DiGraph, with two
+        exceptions:
+
+        (1) The node must be a string representing a BrainSite in CoCoMac
+        format.
+
+        (2) Node attributes are not allowed.
+
+        Parameters
+        ----------
+        node : string
+          BrainSite in CoCoMac format.
+        """
+        self._check_nodes([node])
+        nx.DiGraph.add_node.im_func(self, node)
+
+    def add_nodes_from(self, nodes):
+        """Add nodes to the graph.
+
+        This method is the same as that for the NetworkX DiGraph, with two
+        exceptions:
+
+        (1) Each node must be a string representing a BrainSite in CoCoMac
+        format.
+
+        (2) Node attributes are not allowed.
+
+        Parameters
+        ----------
+        nodes : list
+          BrainSites in CoCoMac format.
+
+        Notes
+        -----
+        If any one of the nodes supplied is in an incorrect format, none of
+        the nodes are added to the graph.
+        """
+        self._check_nodes(nodes)
+        nx.DiGraph.add_nodes_from.im_func(self, nodes)
+
+                
