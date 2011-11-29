@@ -6,3 +6,4 @@ from cocotools.infomap import nx2infomap
 from cocotools.stats import *
 from cocotools.nxdraw import *
 from cocotools.utils import *
+from cocotools.brain_maps import *
