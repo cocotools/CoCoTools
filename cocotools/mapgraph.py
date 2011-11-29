@@ -808,6 +808,22 @@ deduced.""" % (source, target))
             for hierarchy in map_hierarchies:
                 self._keep_one_level(hierarchy)
 
+    def deduce_edges(self):
+        """Deduce new edges based on those in the graph and add them.
+
+        Intra-map edges are disallowed.  It is assumed that all regions
+        in the graph from the same BrainMap are disjoint (i.e., at the same
+        level of resolution).
+        """
+        for node in self.nodes_iter():
+            ebunch = []
+            for p in self.predecessors(node):
+                for s in self.successors(node):
+                    if p.split('-')[0] != s.split('-')[0]:
+                        tp = self[p][node]['TP'] + [node] + self[node][s]['TP']
+                        ebunch.append((p, s, {'TP': tp}))
+            self.add_edges_from(ebunch)
+
 #------------------------------------------------------------------------------
 # Other Public Methods
 #------------------------------------------------------------------------------

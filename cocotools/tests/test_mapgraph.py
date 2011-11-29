@@ -9,7 +9,7 @@ from cocotools import ConGraph
 
 
 # Deliberately not tested: _add_valid_edge, add_edge, add_edges_from,
-# add_node, add_nodes_from.
+# add_node, add_nodes_from, deduce_edges.
 
 #------------------------------------------------------------------------------
 # Integration Tests
