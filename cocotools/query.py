@@ -198,6 +198,25 @@ def _element2edge(prim_e, search_type):
 
 
 def _reduce_ecs(attr):
+    """Determine the information conveyed by the ECs.
+
+    Unless the two ECs are C and N, specifying a genuinely absent
+    connection, the node that was injected may have been over-injected
+    or under-injected.  In an over-injection, parts of the region were
+    injected that do not connect to the other region; all the dye in the
+    other region is there because of just a small part of the full extent
+    of injection.  In an under-injection, more dye would have been seen in
+    the non-injected region had more of the injected region been injected.
+
+    To exacerbate the uncertainty this reasoning exposes, we don't even
+    know which region was injected (unless one EC is N).  When both ECs are
+    in (C, P, X) the best we can say is that some or all of the source
+    projects to some or all of the target -- both ECs are X or,
+    equivalently, the connection is present.  When one EC is P or X and the
+    other is N, we can't say anything about the connection because we don't
+    know whether the uninjected parts of the P/X region connect to the
+    other one.
+    """
     s_ec, t_ec = attr['EC_Source'], attr['EC_Target']
     present = ('C', 'P', 'X')
     if s_ec in present and t_ec in present:
