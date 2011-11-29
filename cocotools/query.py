@@ -191,9 +191,7 @@ def _element2edge(prim_e, search_type):
             else:
                 datum = _scrub_element(prim_e, attr_tag)
                 edge_attr[attr_tag] = datum
-    if search_type == 'Mapping':
-        edge_attr['TP'] = []
-    else:
+    if search_type == 'Connectivity':
         edge_attr = _reduce_ecs(edge_attr)
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text.upper(), site_ids[1].text.upper(), edge_attr

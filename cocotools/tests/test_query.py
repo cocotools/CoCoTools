@@ -107,7 +107,7 @@ def test__element2edge():
     with open('cocotools/tests/sample_map.xml') as xml:
         prim_e = etree.parse(xml).find('%sPrimaryRelation' % cq.P)
     nt.assert_true(etree.iselement(prim_e))
-    edge = ('B05-19', 'PP99-19', {'RC': 'X', 'PDC': 'X', 'TP': []})
+    edge = ('B05-19', 'PP99-19', {'RC': 'X', 'PDC': 'X'})
     nt.assert_equal(element2edge(prim_e, 'Mapping'), edge)
     # Connectivity
     with open('cocotools/tests/sample_con.xml') as xml:
