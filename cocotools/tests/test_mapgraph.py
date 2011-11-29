@@ -1,3 +1,5 @@
+from unittest import TestCase
+
 from testfixtures import replace
 from networkx import DiGraph
 import nose.tools as nt
@@ -5,6 +7,57 @@ import nose.tools as nt
 import cocotools.mapgraph as mg
 from cocotools import ConGraph
 
+
+# Deliberately not tested: _add_valid_edge, add_edge, add_edges_from,
+# add_node, add_nodes_from.
+
+#------------------------------------------------------------------------------
+# Integration Tests
+#------------------------------------------------------------------------------
+
+def mock_init(self, conn):
+    DiGraph.__init__.im_func(self)
+    self.conn = conn
+
+
+@replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
+@replace('cocotools.mapgraph.MapGraph.add_nodes_from', DiGraph.add_nodes_from)
+def test_keep_one_level():
+    # Not mocked: _find_bottom_of_hierarchy, _remove_level_from_hierarchy.
+    hierarchy = {'J': {'A': {}}, 'B': {'I': {'F': {'K': {}, 'L': {}}, 'H': {}},
+                                       'D': {'E': {}}}}
+    mock_conn = DiGraph()
+    mock_conn.add_edges_from([('D', 'Z'), ('Y', 'F'), ('J', 'X')])
+    mapp = mg.MapGraph(mock_conn)
+    mapp.add_nodes_from(['A', 'B', 'D', 'E', 'F', 'H', 'I', 'J', 'K',
+                         'L'])
+    nt.assert_equal(mapp._keep_one_level(hierarchy),
+                    {'D': {}, 'F': {}, 'J': {}, 'H': {}})
+    nt.assert_equal(mapp.nodes(), ['D', 'F', 'H', 'J'])
+
+
+@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
+@replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
+def test_add_to_hierarchy():
+    # Not mocked: _relate_node_to_others
+    mapp = mg.MapGraph()
+    # Add to an empty hierarchy.
+    hierarchy = mapp._add_to_hierarchy('A-1', {})
+    nt.assert_equal(hierarchy, {'A-1': {}})
+    # RC = D.
+    hierarchy = mapp._add_to_hierarchy('A-2', hierarchy)
+    nt.assert_equal(hierarchy, {'A-1': {}, 'A-2': {}})
+    # RC = L.
+    mapp.add_edges_from([('A-3', 'A-1', {'RC': 'L'}),
+                         ('A-3', 'A-2', {'RC': 'L'})])
+    hierarchy = mapp._add_to_hierarchy('A-3', hierarchy)
+    nt.assert_equal(hierarchy, {'A-3': {'A-1': {}, 'A-2': {}}})
+    # RC = S for the first round, then RC = L.
+    mapp.add_edges_from([('A-4', 'A-3', {'RC': 'S'}),
+                         ('A-4', 'A-1', {'RC': 'L'})])
+    hierarchy = mapp._add_to_hierarchy('A-4', hierarchy)
+    nt.assert_equal(hierarchy, {'A-3': {'A-4': {'A-1': {}}, 'A-2': {}}})
+        
 #------------------------------------------------------------------------------
 # Unit Tests
 #------------------------------------------------------------------------------
@@ -13,9 +66,26 @@ def test_init():
     nt.assert_raises(mg.MapGraphError, mg.MapGraph, DiGraph())
 
 
-def test_remove_level_from_hierarchy():
-    pass
+class RemoveLevelFromHierarchyTestCase(TestCase):
 
+    def setUp(self):
+        self.hierarchy = {'J': {'A': {}},
+                          'B': {'I': {'F': {'K': {}, 'L': {}}, 'H': {}},
+                                'D': {'E': {}}}}
+        self.method = mg.MapGraph._remove_level_from_hierarchy.im_func
+
+    def test_remove_intermediate_level(self):
+        result = self.method(None, self.hierarchy, ['B', 'I'], ['F'])
+        self.assertEqual(result, {'J': {'A': {}},
+                                  'B': {'I': {'K': {}, 'L': {}, 'H': {}},
+                                        'D': {'E': {}}}})
+
+    def test_remove_lowest_level(self):
+        result = self.method(None, self.hierarchy, ['B', 'I', 'F'], ['K', 'L'])
+        self.assertEqual(result, {'J': {'A': {}},
+                                  'B': {'I': {'F': {}, 'H': {}},
+                                        'D': {'E': {}}}})
+                       
 
 @replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
 def test_find_bottom_of_hierarchy():
@@ -41,60 +111,56 @@ def test_find_bottom_of_hierarchy():
     nt.assert_equal(bottom, [])
 
 
-def test_keep_one_level():
-    pass
-
-
+@replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
+@replace('cocotools.mapgraph.MapGraph.add_edge', DiGraph.add_edge)
+@replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 def test_merge_identical_nodes():
-    pass
+    mock_conn = DiGraph()
+    mock_conn.add_edges_from([('A-1', 'A-5'), ('A-4', 'A-1')])
+    mapp = mg.MapGraph(mock_conn)
+    # Here we aren't adding the reciprocals, because add_edges_from
+    # has been mocked.  And _merge_identical_nodes is designed only to
+    # get a node's neighbors (i.e., its successors), assuming that
+    # these are the same as its predecessors.
+    mapp.add_edges_from([('A-1', 'A-3', {'RC': 'S', 'PDC': 5}),
+                         ('A-1', 'B-1', {'RC': 'I', 'PDC': 7}),
+                         ('A-1', 'C-1', {'RC': 'L', 'PDC': 10}),
+                         ('A-1', 'A-2', {'RC': 'I', 'PDC': 12})])
+    mapp._merge_identical_nodes('A-2', 'A-1')
+    nt.assert_equal(mapp.conn.edges(), [('A-1', 'A-5'), ('A-2', 'A-5'),
+                                        ('A-4', 'A-1'), ('A-4', 'A-2')])
+    nt.assert_equal(mapp.edges(), [('A-2', 'B-1'), ('A-2', 'C-1')])
 
 
 def test_relate_node_to_others():
-    pass
+    mock_mapp = DiGraph()
+    relate = mg.MapGraph._relate_node_to_others.im_func
+    nt.assert_equal(relate(mock_mapp, 'A-1', ['A-2', 'A-3', 'A-4']),
+                    ([], 'D'))
+    mock_mapp.add_edge('A-1', 'A-3', RC='I')
+    nt.assert_equal(relate(mock_mapp, 'A-1', ['A-2', 'A-3', 'A-4']),
+                    ('A-3', 'I'))
+    mock_mapp.add_edges_from([('A-1', 'A-3', {'RC': 'L'}),
+                              ('A-1', 'A-4', {'RC': 'L'})])
+    nt.assert_equal(relate(mock_mapp, 'A-1', ['A-2', 'A-3', 'A-4']),
+                    (['A-3', 'A-4'], 'L'))
 
 
+def mock_add_to_hierarchy(self, node, hierarchy):
+    hierarchy[node] = {}
+    return hierarchy
+    
+
+@replace('cocotools.mapgraph.MapGraph._add_to_hierarchy',
+         mock_add_to_hierarchy)
 @replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
-@replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
-def test_add_to_hierarchy():
-    # The recursion in _add_to_hierarchy requires that we use an
-    # actual MapGraph in this test.
-    mock_g = mg.MapGraph()
-    # This system of intra-map spatial relationships is too
-    # complicated to understand at a glance.  I worked it out, and it
-    # works, so you can trust me blindly or work it out yourself.  If
-    # you come up with a test that's easier to understand but just as
-    # comprehensive, feel free to replace this one.
-    mock_g.add_edges_from([('A', 'J', {'RC': 'S'}), ('J', 'A', {'RC': 'L'}),
-                           ('B', 'C', {'RC': 'L'}), ('C', 'B', {'RC': 'S'}),
-                           ('B', 'D', {'RC': 'L'}), ('D', 'B', {'RC': 'S'}),
-                           ('B', 'E', {'RC': 'L'}), ('E', 'B', {'RC': 'S'}),
-                           ('B', 'I', {'RC': 'L'}), ('I', 'B', {'RC': 'S'}),
-                           ('B', 'F', {'RC': 'L'}), ('F', 'B', {'RC': 'S'}),
-                           ('B', 'G', {'RC': 'L'}), ('G', 'B', {'RC': 'S'}),
-                           ('B', 'H', {'RC': 'L'}), ('H', 'B', {'RC': 'S'}),
-                           ('C', 'D', {'RC': 'I'}), ('D', 'C', {'RC': 'I'}),
-                           ('C', 'E', {'RC': 'L'}), ('E', 'C', {'RC': 'S'}),
-                           ('D', 'E', {'RC': 'L'}), ('E', 'D', {'RC': 'S'}),
-                           ('I', 'F', {'RC': 'L'}), ('F', 'I', {'RC': 'S'}),
-                           ('I', 'G', {'RC': 'L'}), ('G', 'I', {'RC': 'S'}),
-                           ('I', 'H', {'RC': 'L'}), ('H', 'I', {'RC': 'S'}),
-                           ('G', 'H', {'RC': 'I'}), ('H', 'G', {'RC': 'I'}),
-                           ('B', 'K', {'RC': 'L'}), ('K', 'B', {'RC': 'S'}),
-                           ('I', 'K', {'RC': 'L'}), ('K', 'I', {'RC': 'S'}),
-                           ('F', 'K', {'RC': 'L'}), ('K', 'F', {'RC': 'S'})])
-    hierarchy = {}
-    for node in ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'):
-        hierarchy = mg.MapGraph._add_to_hierarchy.im_func(mock_g, node,
-                                                          hierarchy)
-    nt.assert_equal(hierarchy.keys(), [('J',), ('B',)])
-    nt.assert_equal(hierarchy[('B',)], {('D', 'C'): {('E',): {}},
-                                        ('I',): {('F',): {('K',): {}},
-                                                 ('H', 'G'): {}}})
-    nt.assert_equal(hierarchy[('J',)], {('A',): {}})
-
-
 def test_determine_hierarchies():
-    pass
+    intramap_nodes = set(['A-1', 'A-2', 'B-1', 'C-1'])
+    mapp = mg.MapGraph()
+    nt.assert_equal(mg.MapGraph._determine_hierarchies.im_func(mapp,
+                                                               intramap_nodes),
+                    {'A': {'A-1': {}, 'A-2': {}}, 'B': {'B-1': {}},
+                     'C': {'C-1': {}}})
     
 
 def test_new_attributes_are_better():
@@ -117,10 +183,6 @@ def test_add_edge_and_its_reverse():
                                               'TP': ['D', 'C']}}})
 
     
-def test_add_valid_edge():
-    pass
-    
-
 def test_get_worst_pdc_in_tp():
     mock_g = DiGraph()
     mock_g.add_edges_from([('A', 'B', {'PDC': 0}), ('B', 'C', {'PDC': 5}),
@@ -153,19 +215,3 @@ def test_check_nodes():
                      ['-24'])
     nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
                      ['B-38'])
-
-
-def test_add_edge():
-    pass
-
-
-def test_add_edges_from():
-    pass
-
-
-def test_add_node():
-    pass
-
-
-def test_add_nodes_from():
-    pass

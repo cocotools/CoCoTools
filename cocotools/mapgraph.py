@@ -120,36 +120,40 @@ class MapGraph(nx.DiGraph):
 
         Notes
         -----
-        If there is more than one node to remove, then the nodes are at the
-        lowest level in the hierarchy.  If there is a single node to
-        remove, it's at the second-to-lowest level.
+        In the method that calls this one -- _keep_one_level -- the
+        decision is made whether to remove nodes at the lowest level of the
+        hierarchy or to remove the larger node that contains them.  Thus,
+        if nodes_to_remove has a length greater than one, the nodes are at
+        the lowest level of the hierarchy; otherwise, the single node to
+        remove is at the second-lowest level of the hierarchy (which is the
+        top level of the hierarchy if path is empty).
         """
-        if not path:
-            # There is one node to remove, and it's at the highest
-            # level of the hierarchy.
-            hierarchy.update(hierarchy.pop(nodes_to_remove[0]))
-        elif len(nodes_to_remove) == 1:
-            # There is one node to remove, and it's not at the highest
-            # level of the hierarchy.
-            #
-            # Guess at some lengths path might be.
-            if len(path) == 1:
+        if len(nodes_to_remove) == 1:
+            # This is not an elegant solution, but it's the best one I
+            # could think of.  The assumption is made path will not be
+            # longer than 3 nodes.
+            if not path:
+                hierarchy.update(hierarchy.pop(nodes_to_remove[0]))
+            elif len(path) == 1:
                 key = path[0]
                 node_dict = hierarchy[key]
-                hierarchy[key] = node_dict.pop(nodes_to_remove[0])
+                hierarchy[key].update(node_dict.pop(nodes_to_remove[0]))
             elif len(path) == 2:
                 key1, key2 = path
                 node_dict = hierarchy[key1][key2]
-                hierarchy[key1][key2] = node_dict.pop(nodes_to_remove[0])
+                hierarchy[key1][key2].update(node_dict.pop(nodes_to_remove[0]))
             elif len(path) == 3:
                 key1, key2, key3 = path
                 node_dict = hierarchy[key1][key2][key3]
-                hierarchy[key1][key2][key3] = node_dict.pop(nodes_to_remove[0])
+                hierarchy[key1][key2][key3].update(node_dict.pop(
+                        nodes_to_remove[0]))
             else:
-                raise MapGraphError('path has length greater than 3.')
+                raise MapGraphError('path has length greater than 3: %s.' %
+                                    path)
         else:
-            # There is more than one node to remove, and it's at the
-            # lowest level of the hierarchy.
+            # We know path must have at least one node, as the
+            # decision was made to remove the lowest level of the
+            # hierarchy, not the level above it.
             if len(path) == 1:
                 key = path[0]
                 hierarchy[key] = {}
@@ -160,7 +164,8 @@ class MapGraph(nx.DiGraph):
                 key1, key2, key3 = path
                 hierarchy[key1][key2][key3] = {}
             else:
-                raise MapGraphError('path has length greater than 3.')
+                raise MapGraphError('path has length greater than 3: %s.' %
+                                    path)
         return hierarchy
         
     def _find_bottom_of_hierarchy(self, hierarchy, path):
@@ -250,7 +255,7 @@ class MapGraph(nx.DiGraph):
             # superfluous; removing their mapping information is
             # enough to prevent nodes from playing a role in the
             # translation stage of ORT.
-            if len(larger_connections) > len(smaller_connections):
+            if larger_connections > smaller_connections:
                 self.remove_nodes_from(smaller_nodes)
                 path.append(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
@@ -261,60 +266,46 @@ class MapGraph(nx.DiGraph):
                                                               [larger_node])
         return hierarchy
 
-    def _merge_identical_nodes(self, hierarchy):
-        """Merge identical nodes in hierarchy and in the graph.
+    def _merge_identical_nodes(self, keeper, loser):
+        """Merge loser into keeper.
 
-        The name to keep is chosen arbitrarily.
-
-        As each node is removed, its inter-map edges in this graph and
-        all its edges in self.conn are given to the node being kept.
+        Give keeper loser's inter-map edges and all its edges in self.conn.
+        Remove loser from the graph.
 
         Parameters
         ----------
-        hierarchy : dictionary
-          Larger regions are mapped to smaller regions.  Keys are tuples of
-          identical regions.  All regions are from the same BrainMap.
+        keeper : string
+          A node in the graph.
 
-        Returns
-        -------
-        hierarchy : dictionary
-          Input hierarchy with all but one of the identical nodes in each
-          key tuple removed.  Keys are now strings representing remaining
-          nodes.
+        loser : string
+          Another node in the graph, identical to keeper and from the same
+          map.
         """
-        for top_level_key in hierarchy:
-            if len(top_level_key) == 1:
-                # No node removal necessary.
-                hierarchy[top_level_key[0]] = hierarchy.pop(top_level_key)
-            else:
-                identical_nodes = list(top_level_key)
-                keeper = identical_nodes.pop(0)
-                hierarchy[keeper] = hierarchy.pop(top_level_key)
-                for loser in identical_nodes:
-                    # Give its inter-map edges to keeper and then
-                    # remove it.
-                    neighbors = self.neighbors(loser)
-                    for n in neighbors:
-                        if n.split('-')[0] != keeper.split('-')[0]:
-                            self.add_edge(keeper, n, rc=self[loser][n]['RC'],
-                                          pdc=self[loser][n]['PDC'])
-                    self.remove_node(loser)
-                    # Give loser's conn edges to keeper.  We don't
-                    # need to remove loser from conn because its conn
-                    # edges can't be translated anyway.
-                    try:
-                        predecessors = self.conn.predecessors(loser)
-                        successors = self.conn.successors(loser)
-                    except nx.NetworkXError:
-                        # loser isn't in conn.
-                        continue
-                    for p in predecessors:
-                        attributes = self.conn[p][loser]
-                        self.conn.add_edge(p, keeper, attributes)
-                    for s in successors:
-                        attributes = self.conn[loser][s]
-                        self.conn.add_edge(keeper, s, attributes)
-        return hierarchy
+        # In this graph, we don't need to look up predecessors and
+        # successors separately, because the methods for adding edges
+        # ensure that when an edge is added, its reciprocal is also added.
+        neighbors = self.neighbors(loser)
+        for n in neighbors:
+            if n.split('-')[0] != keeper.split('-')[0]:
+                self.add_edge(keeper, n, rc=self[loser][n]['RC'],
+                              pdc=self[loser][n]['PDC'])
+        self.remove_node(loser)
+        # Give loser's conn edges to keeper.  We don't need to remove
+        # loser or its edges from conn because once removed from the
+        # current graph it is untranslatable.
+        try:
+            predecessors = self.conn.predecessors(loser)
+            successors = self.conn.successors(loser)
+        except nx.NetworkXError:
+            # loser isn't in conn.
+            pass
+        else:
+            for p in predecessors:
+                attributes = self.conn[p][loser]
+                self.conn.add_edge(p, keeper, attributes)
+            for s in successors:
+                attributes = self.conn[loser][s]
+                self.conn.add_edge(keeper, s, attributes)
 
     def _relate_node_to_others(self, node_x, others):
         """Return others to which node_x is related and the corresponding RC.
@@ -329,7 +320,7 @@ class MapGraph(nx.DiGraph):
           A node from the same BrainMap as others.
 
         others : list
-          Tuples of identical nodes from the same BrainMap as node_x.
+          Other nodes from the same BrainMap as node_x.
 
         Returns
         -------
@@ -348,38 +339,26 @@ class MapGraph(nx.DiGraph):
         x_is_larger, L_count = [], 0
         x_is_identical, i_count = [], 0
         x_is_smaller, s_count = [], 0
-        for identical_group in others:
-            rc = []
-            for node in identical_group:
-                try:
-                    rc.append(self[node_x][node]['RC'])
-                except KeyError:
-                    continue
-            # node_x must have the same RC (or lack thereof) with all
-            # members of an identical group.  So, if it has an RC to
-            # one of them, it must have an RC to all of them, and it
-            # must be the same RC.
-            if rc and len(rc) != len(identical_group) and len(set(rc)) != 1:
-                raise MapGraphError("""%s has different RCs to identical nodes
-%s""" % (node_x, identical_group))
-            elif not rc:
+        for node in others:
+            try:
+                rc = self[node_x][node]['RC']
+            except KeyError:
                 continue
-            rc = rc[0]
             if rc == 'O':
                 raise MapGraphError("""%s and %s have an RC of 'O'.
-Intra-map RCs must be 'S', 'I', or 'L'.""" % (node_x, identical_group))
+Intra-map RCs must be 'S', 'I', or 'L'.""" % (node_x, node))
             elif rc == 'L':
                 L_count = 1
-                x_is_larger.append(identical_group)
+                x_is_larger.append(node)
             elif rc == 'I':
                 i_count = 1
-                x_is_identical.append(identical_group)
+                x_is_identical.append(node)
                 if len(x_is_identical) > 1:
                     raise MapGraphError("""%s is identical to multiple
 disjoint nodes in its own map.""" % node_x)
             else:
                 s_count = 1
-                x_is_smaller.append(identical_group)
+                x_is_smaller.append(node)
                 if len(x_is_smaller) > 1:
                     raise MapGraphError("""%s is smaller than multiple
 disjoint nodes in its own map.""" % node_x)
@@ -395,7 +374,7 @@ its own map.""" % node_x)
         return [], 'D'
     
     def _add_to_hierarchy(self, node_x, hierarchy):
-        """Incorporate new BrainSites into a BrainMap's spatial hierarchy.
+        """Incorporate a new BrainSite into a BrainMap's spatial hierarchy.
 
         Raise an error if node_x cannot be placed in hierarchy.
 
@@ -408,22 +387,12 @@ its own map.""" % node_x)
 
         hierarchy : dictionary
           Larger regions are mapped to smaller regions in the same
-          BrainMap.  Keys are tuples of identical regions.
+          BrainMap.
 
         Returns
         -------
         hierarchy : dictionary
           Input hierarchy with node_x added.
-
-        Notes
-        -----
-        This method is persnickety: All relationships between members of
-        hierarchy must be pre-specified in the graph as edges.  If edges
-        are missing, this method will raise an exception or return an
-        erroneous hierarchy.
-
-        Exceptions are also raised if contradictions are detected among
-        suites of intra-map edges.
         """
         related_to_x, rc = self._relate_node_to_others(node_x,
                                                        hierarchy.keys())
@@ -433,18 +402,19 @@ its own map.""" % node_x)
             within_node_x = {}
             for key in related_to_x:
                 within_node_x[key] = hierarchy.pop(key)
-            hierarchy[(node_x,)] = within_node_x
+            hierarchy[node_x] = within_node_x
         elif rc == 'S':
             inner_hierarchy = hierarchy[related_to_x]
             hierarchy[related_to_x] = self._add_to_hierarchy(node_x,
                                                              inner_hierarchy)
         elif rc == 'I':
-            new_key = tuple([node_x] + [node for node in related_to_x])
-            hierarchy[new_key] = hierarchy.pop(related_to_x)
+            # Merge node_x into related_to_x, the identical node
+            # already in the hierarchy.
+            self._merge_identical_nodes(related_to_x, node_x)
         else:
             # node_x is disjoint from all nodes at the highest level
             # of the hierarchy.
-            hierarchy[(node_x,)] = {}
+            hierarchy[node_x] = {}
         return hierarchy
 
     def _determine_hierarchies(self, intramap_nodes):
@@ -836,7 +806,6 @@ deduced.""" % (source, target))
             # Use the hierarchy for each BrainMap to remove all but
             # one level of resolution.
             for hierarchy in map_hierarchies:
-                hierarchy = self._merge_identical_nodes(hierarchy)
                 self._keep_one_level(hierarchy)
 
 #------------------------------------------------------------------------------
@@ -885,5 +854,3 @@ deduced.""" % (source, target))
         """
         self._check_nodes(nodes)
         nx.DiGraph.add_nodes_from.im_func(self, nodes)
-
-                
