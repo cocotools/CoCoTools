@@ -1,5 +1,3 @@
-from itertools import product
-
 from numpy import mean, float64
 from networkx import DiGraph
 
@@ -18,6 +16,42 @@ class ConGraph(DiGraph):
     description codes (PDCs), and degree.
     """
 
+    def _mean_pdcs(self, old_attr, new_attr):
+        """Called by _update_attr."""
+        return [mean((a['PDC_Site_Source'],
+                      a['PDC_Site_Target'],
+                      a['PDC_EC_Source'],
+                      a['PDC_EC_Target'])) for a in (old_attr, new_attr)]
+
+    def _update_attr(self, old_attr, new_attr):
+        """Called by add_edge."""
+        old_value, new_value = self._mean_pdcs(old_attr, new_attr)
+        if old_value < new_value:
+            return old_attr
+        if old_value > new_value:
+            return new_attr
+        return old_attr
+
+    def _assert_valid_attr(self, attr):
+        """Called by add_edge."""
+        for key in ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 'Degree',
+                    'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
+                    'PDC_Density', 'Connection'):
+            value = attr[key]
+            if 'PDC' in key:
+                if not (type(value) in (int, float,
+                                        float64) and 0 <= value <= 18):
+                    raise ConGraphError('PDC is %s, type is %s' %
+                                        (value, type(value)))
+            elif key.split('_')[0] == 'EC':
+                assert value in ('N', 'P', 'X', 'C')
+            elif key == 'Degree':
+                ecs = [attr['EC_Source'][0], attr['EC_Target'][0]]
+                assert ((value == '0' and 'N' in ecs)
+                        or (value in ('1', '2', '3', 'X') and 'N' not in ecs))
+            elif key == 'Connection':
+                assert value in ('Absent', 'Present', 'Unknown')
+                
     def add_edge(self, source, target, new_attr):
         """Add an edge from source to target if it is new and valid.
 
@@ -36,13 +70,16 @@ class ConGraph(DiGraph):
         new_attr : dict
           Dictionary of edge attributes.
         """
-        _assert_valid_attr(new_attr)
+        self._assert_valid_attr(new_attr)
         add_edge = DiGraph.add_edge.im_func
+        if new_attr['Connection'] == 'Unknown':
+            return
         if not self.has_edge(source, target):
             add_edge(self, source, target, new_attr)
         else:
             old_attr = self[source][target]
-            add_edge(self, source, target, _update_attr(old_attr, new_attr))
+            add_edge(self, source, target,
+                     self._update_attr(old_attr, new_attr))
 
     def add_edges_from(self, ebunch):
         """Add the edges in ebunch if they are new and valid.
@@ -59,122 +96,3 @@ class ConGraph(DiGraph):
         for (source, target, new_attr) in ebunch:
             self.add_edge(source, target, new_attr)
 
-    def _get_i_votes(self, old_sources, unique_old_targets):
-        i_votes = {}
-        for t in unique_old_targets:
-            connection_set = set()
-            for s in old_sources['I']:
-                try:
-                    connection_set.add(self[s][t]['Connection'])
-                except KeyError:
-                    pass
-            if len(connection_set) == 3 or (len(connection_set) == 2 and
-                                            'Unknown' not in connection_set):
-                i_votes[t] = 'Unknown'
-            elif 'Present' in connection_set:
-                i_votes[t] = 'Present'
-            else:
-                i_votes[t] = 'Absent'
-        return i_votes
-
-    def _get_L_votes(self, old_sources, unique_old_targets):
-        """If there are no L's, return 'Unknown' connection to each target."""
-        L_votes = {}
-        for t in unique_old_targets:
-            for s in old_sources['L']:
-                try:
-                    connection = self[s][t]['Connection']
-                except KeyError:
-                    continue
-                if connection == 'Absent':
-                    L_votes[t] = connection
-                    break
-            else:
-                L_votes[t] = 'Unknown'
-        return L_votes
-
-    def _get_so_votes(self, old_sources, unique_old_targets):
-        translator = {None: {'S': {'Present': 'Present',
-                                   'Absent': 'Absent',
-                                   'Unknown': 'Unknown'},
-                             'O': {'Present': 'Unknown',
-                                   'Absent': 'Absent',
-                                   'Unknown': 'Unknown'}},
-                      'Absent': {'S': {'Present': 'Present',
-                                       'Absent': 'Absent',
-                                       'Unknown': 'Unknown'},
-                                 'O': {'Present': 'Unknown',
-                                       'Absent': 'Absent',
-                                       'Unknown': 'Unknown'}},
-                      'Unknown': {'S': {'Present': 'Present',
-                                        'Absent': 'Unknown',
-                                        'Unknown': 'Unknown'},
-                                  'O': {'Present': 'Unknown',
-                                        'Absent': 'Unknown',
-                                        'Unknown': 'Unknown'}}}
-        so_votes = {}
-        for t in unique_old_targets:
-            consensus = None
-            for rc in ('S', 'O'):
-                if consensus == 'Present':
-                    break
-                for s in old_sources[rc]:
-                    try:
-                        connection = self[s][t]['Connection']
-                    except KeyError:
-                        connection = 'Unknown'
-                    consensus = translator[consensus][rc][connection]
-                    if consensus == 'Present':
-                        break
-                so_votes[t] = consensus
-        return so_votes
-
-#------------------------------------------------------------------------------
-# Support Functions
-#------------------------------------------------------------------------------
-
-def _update_attr(old_attr, new_attr):
-    """Called by add_edge."""
-    for func in (_mean_pdcs, _ec_points):
-        old_value, new_value = func(old_attr, new_attr)
-        if old_value < new_value:
-            return old_attr
-        if old_value > new_value:
-            return new_attr
-    return old_attr
-
-            
-def _assert_valid_attr(attr):
-    """Called by add_edge."""
-    for key in ('EC_Source', 'PDC_Site_Source', 'PDC_EC_Source', 'Degree',
-                'EC_Target', 'PDC_Site_Target', 'PDC_EC_Target', 
-                'PDC_Density', 'Connection'):
-        value = attr[key]
-        if 'PDC' in key:
-            if not (type(value) in (int, float, float64) and 0 <= value <= 18):
-                raise ConGraphError('PDC is %s, type is %s' %
-                                    (value, type(value)))
-        elif key.split('_')[0] == 'EC':
-            assert value in ('N', 'P', 'X', 'C')
-        elif key == 'Degree':
-            ecs = [attr['EC_Source'][0], attr['EC_Target'][0]]
-            assert ((value == '0' and 'N' in ecs)
-                    or (value in ('1', '2', '3', 'X') and 'N' not in ecs))
-        elif key == 'Connection':
-            assert value in ('Absent', 'Present', 'Unknown')
-    
-            
-def _mean_pdcs(old_attr, new_attr):
-    """Called by _update_attr."""
-    return [mean((a['PDC_Site_Source'],
-                  a['PDC_Site_Target'],
-                  a['PDC_EC_Source'],
-                  a['PDC_EC_Target'],
-                  a['PDC_Density'])) for a in (old_attr, new_attr)]
-
-def _ec_points(old_attr, new_attr):
-    """Called by _update_attr."""
-    # Score it like golf.
-    points = {'C': -4, 'N': -4, 'Nc': -4, 'P': -3, 'X': -2, 'Np': -1, 'Nx': 0}
-    return [sum((points[a['EC_Source'][0]],
-                 points[a['EC_Target'][0]])) for a in (old_attr, new_attr)]
