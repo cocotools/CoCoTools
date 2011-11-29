@@ -533,6 +533,10 @@ its own map.""" % node_x)
                                     PDC=pdc, TP=reversed_tp)
         if source.split('-')[0] == target.split('-')[0]:
             return set([source, target])
+        else:
+            # Returning None would break add_edges_from, which updates
+            # a set with what this method returns.
+            return set()
 
     def _add_valid_edge(self, source, target, rc, pdc, tp):
         """Incorporate supplied valid edge data into graph.
@@ -577,6 +581,10 @@ its own map.""" % node_x)
             return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
         elif self._new_attributes_are_better(source, target, pdc, tp):
             return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
+        else:
+            # This is needed to keep the update calls in
+            # add_edges_from from breaking.
+            return set()
 
     def _get_worst_pdc_in_tp(self, source, tp, target):
         """Return the worst PDC for edges from source to target via tp.
@@ -673,8 +681,8 @@ its own map.""" % node_x)
         nodes : list
         """
         for node in nodes:
-            if not re.match(r'[A-Z]+[0-9]{2}-.+', node):
-                raise MapGraphError('node is not in CoCoMac format.')
+            if not re.match(r'([A-Z]+[0-9]{2})|([GRA]M)-.+', node):
+                raise MapGraphError('%s is not in CoCoMac format.' % node)
 
 #------------------------------------------------------------------------------
 # Core Public Methods
@@ -689,7 +697,8 @@ its own map.""" % node_x)
         tp is supplied, anything supplied for rc or pdc is ignored.  If rc
         and pdc are supplied, anything supplied for tp is ignored.
 
-        Self-loops are not allowed.
+        Self-loops are never allowed, although they do exist in the CoCoMac
+        database.
 
         Parameters
         ----------
@@ -727,7 +736,8 @@ its own map.""" % node_x)
         """
         self._check_nodes([source, target])
         if source == target:
-            raise MapGraphError('source and target are the same node.')
+            # Returning None breaks add_edges_from.
+            return set()
         if not allow_intramap and source.split('-')[0] == target.split('-')[0]:
             raise MapGraphError('%s and %s are from the same BrainMap.' %
                                 (source, target))

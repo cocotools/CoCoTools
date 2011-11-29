@@ -215,3 +215,6 @@ def test_check_nodes():
                      ['-24'])
     nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
                      ['B-38'])
+    nt.assert_equal(mg.MapGraph._check_nodes.im_func(None,
+                                                     ['GM-A', 'PP94-9/46v']),
+                    None)
