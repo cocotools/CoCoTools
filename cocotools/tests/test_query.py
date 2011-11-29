@@ -82,7 +82,7 @@ class ScrubElementTestCase(TestCase):
         with open('cocotools/tests/map_with_C.xml') as xml:
             tree = etree.parse(xml)
         prim_e = tree.find('%sPrimaryRelation' % cq.P)
-        self.assertEqual(cq._scrub_element(prim_e, 'RC'), 'I')
+        self.assertEqual(cq._scrub_element(prim_e, 'RC'), 'L')
 
     def test_from_prim(self):
         self.assertEqual(cq._scrub_element(self.prim_e, 'Degree'), '0')

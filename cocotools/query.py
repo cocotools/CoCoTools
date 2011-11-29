@@ -149,8 +149,14 @@ def _scrub_element(e, attr_tag):
             datum = None
     if 'PDC' in attr_tag:
         return PDC_HIER.index(datum)
-    if attr_tag == 'RC' and datum in ('E', 'C'):
-        return 'I'
+    if attr_tag == 'RC':
+        # Trial and error has shown that a region has an E to its
+        # laminae, and they have a C to it, though this seems like the
+        # opposite of the way it should be.
+        if datum == 'E':
+            return 'L'
+        elif datum == 'C':
+            return 'S'
     return datum
 
 
