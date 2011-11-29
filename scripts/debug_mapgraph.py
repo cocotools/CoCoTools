@@ -11,10 +11,10 @@ with open('results/post_sfn_revisions/failures.txt') as f:
 
 # The first two lines are the heading, and the last bad Mapping map is
 # at index 37.
-bad_mapps = bad_maps[2:38]
+bad_maps = bad_maps[2:38]
 
 mapp_subset = coco.ALLMAPS
-for brain_map in bad_mapps:
+for brain_map in bad_maps:
     mapp_subset.remove(brain_map)
 
 with open('results/post_sfn_revisions/conn1.pck') as f:
