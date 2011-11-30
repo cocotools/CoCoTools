@@ -218,3 +218,5 @@ def test_check_nodes():
     nt.assert_equal(mg.MapGraph._check_nodes.im_func(None,
                                                      ['GM-A', 'PP94-9/46v']),
                     None)
+    nt.assert_equal(mg.MapGraph._check_nodes.im_func(None, ['SP89B-MST']),
+                    None)

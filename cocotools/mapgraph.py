@@ -681,7 +681,7 @@ its own map.""" % node_x)
         nodes : list
         """
         for node in nodes:
-            if not re.match(r'([A-Z]+[0-9]{2})|([GRA]M)-.+', node):
+            if not re.match(r'([A-Z]+[0-9]{2}[A-Z]?-.+)|([GRA]M-.+)', node):
                 raise MapGraphError('%s is not in CoCoMac format.' % node)
 
 #------------------------------------------------------------------------------
@@ -751,8 +751,7 @@ its own map.""" % node_x)
                 # the TP and RC are valid as well.
                 return self._add_valid_edge(source, target, rc, pdc, tp)
             else:
-                raise MapGraphError("""RC between %s and %s cannot be
-deduced.""" % (source, target))
+                return set()
         else:
             if rc not in ('I', 'S', 'L', 'O'):
                 raise MapGraphError('Supplied RC is invalid.')
@@ -815,7 +814,7 @@ deduced.""" % (source, target))
             map_hierarchies = self._determine_hierarchies(intramap_nodes)
             # Use the hierarchy for each BrainMap to remove all but
             # one level of resolution.
-            for hierarchy in map_hierarchies:
+            for hierarchy in map_hierarchies.itervalues():
                 self._keep_one_level(hierarchy)
 
     def deduce_edges(self):
