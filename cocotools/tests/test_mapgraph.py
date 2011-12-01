@@ -4,8 +4,7 @@ from testfixtures import replace
 from networkx import DiGraph
 import nose.tools as nt
 
-import cocotools.mapgraph as mg
-from cocotools import ConGraph
+from cocotools import MapGraph, MapGraphError
 
 
 # Deliberately not tested: _add_valid_edge, add_edge, add_edges_from,
@@ -28,7 +27,7 @@ def test_keep_one_level():
                                        'D': {'E': {}}}}
     mock_conn = DiGraph()
     mock_conn.add_edges_from([('D', 'Z'), ('Y', 'F'), ('J', 'X')])
-    mapp = mg.MapGraph(mock_conn)
+    mapp = MapGraph(mock_conn)
     mapp.add_nodes_from(['A', 'B', 'D', 'E', 'F', 'H', 'I', 'J', 'K',
                          'L'])
     nt.assert_equal(mapp._keep_one_level(hierarchy),
@@ -40,7 +39,7 @@ def test_keep_one_level():
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 def test_add_to_hierarchy():
     # Not mocked: _relate_node_to_others
-    mapp = mg.MapGraph()
+    mapp = MapGraph()
     # Add to an empty hierarchy.
     hierarchy = mapp._add_to_hierarchy('A-1', {})
     nt.assert_equal(hierarchy, {'A-1': {}})
@@ -63,7 +62,7 @@ def test_add_to_hierarchy():
 #------------------------------------------------------------------------------
 
 def test_init():
-    nt.assert_raises(mg.MapGraphError, mg.MapGraph, DiGraph())
+    nt.assert_raises(MapGraphError, MapGraph, DiGraph())
 
 
 class RemoveLevelFromHierarchyTestCase(TestCase):
@@ -72,7 +71,7 @@ class RemoveLevelFromHierarchyTestCase(TestCase):
         self.hierarchy = {'J': {'A': {}},
                           'B': {'I': {'F': {'K': {}, 'L': {}}, 'H': {}},
                                 'D': {'E': {}}}}
-        self.method = mg.MapGraph._remove_level_from_hierarchy.im_func
+        self.method = MapGraph._remove_level_from_hierarchy.im_func
 
     def test_remove_intermediate_level(self):
         result = self.method(None, self.hierarchy, ['B', 'I'], ['F'])
@@ -92,7 +91,7 @@ def test_find_bottom_of_hierarchy():
 
     # The recursion in _find_bottom_of_hierarchy requires that we use an
     # actual MapGraph in this test.
-    mock_mapp = mg.MapGraph()
+    mock_mapp = MapGraph()
     hierarchy = {'J': {'A': {}}}
     path, bottom = mock_mapp._find_bottom_of_hierarchy(hierarchy, [])
     nt.assert_equal(path, [])
@@ -117,7 +116,7 @@ def test_find_bottom_of_hierarchy():
 def test_merge_identical_nodes():
     mock_conn = DiGraph()
     mock_conn.add_edges_from([('A-1', 'A-5'), ('A-4', 'A-1')])
-    mapp = mg.MapGraph(mock_conn)
+    mapp = MapGraph(mock_conn)
     # Here we aren't adding the reciprocals, because add_edges_from
     # has been mocked.  And _merge_identical_nodes is designed only to
     # get a node's neighbors (i.e., its successors), assuming that
@@ -134,7 +133,7 @@ def test_merge_identical_nodes():
 
 def test_relate_node_to_others():
     mock_mapp = DiGraph()
-    relate = mg.MapGraph._relate_node_to_others.im_func
+    relate = MapGraph._relate_node_to_others.im_func
     nt.assert_equal(relate(mock_mapp, 'A-1', ['A-2', 'A-3', 'A-4']),
                     ([], 'D'))
     mock_mapp.add_edge('A-1', 'A-3', RC='I')
@@ -156,8 +155,8 @@ def mock_add_to_hierarchy(self, node, hierarchy):
 @replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
 def test_determine_hierarchies():
     intramap_nodes = set(['A-1', 'A-2', 'B-1', 'C-1'])
-    mapp = mg.MapGraph()
-    nt.assert_equal(mg.MapGraph._determine_hierarchies.im_func(mapp,
+    mapp = MapGraph()
+    nt.assert_equal(MapGraph._determine_hierarchies.im_func(mapp,
                                                                intramap_nodes),
                     {'A': {'A-1': {}, 'A-2': {}}, 'B': {'B-1': {}},
                      'C': {'C-1': {}}})
@@ -166,7 +165,7 @@ def test_determine_hierarchies():
 def test_new_attributes_are_better():
     mock_g = DiGraph()
     mock_g.add_edge('A', 'B', PDC=5, TP=['C', 'D', 'E'])
-    method = mg.MapGraph._new_attributes_are_better.im_func
+    method = MapGraph._new_attributes_are_better.im_func
     nt.assert_true(method(mock_g, 'A', 'B', 18, []))
     nt.assert_true(method(mock_g, 'A', 'B', 2, ['C', 'D', 'E']))
     nt.assert_false(method(mock_g, 'A', 'B', 2, ['C', 'D', 'E', 'F']))
@@ -175,7 +174,7 @@ def test_new_attributes_are_better():
     
 def test_add_edge_and_its_reverse():
     mock_g = DiGraph()
-    mg.MapGraph._add_edge_and_its_reverse.im_func(mock_g, 'A', 'B', 'S', 0,
+    MapGraph._add_edge_and_its_reverse.im_func(mock_g, 'A', 'B', 'S', 0,
                                                   ['C', 'D'])
     nt.assert_equal(mock_g.edge, {'A': {'B': {'RC': 'S', 'PDC': 0,
                                               'TP': ['C', 'D']}},
@@ -188,15 +187,15 @@ def test_get_worst_pdc_in_tp():
     mock_g.add_edges_from([('A', 'B', {'PDC': 0}), ('B', 'C', {'PDC': 5}),
                            ('C', 'D', {'PDC': 7}), ('D', 'E', {'PDC': 17})])
     tp = ['B', 'C', 'D']
-    nt.assert_equal(mg.MapGraph._get_worst_pdc_in_tp.im_func(mock_g, 'A', tp,
+    nt.assert_equal(MapGraph._get_worst_pdc_in_tp.im_func(mock_g, 'A', tp,
                                                              'E'),
                     17)
 
 
 def test_deduce_rc():
-    nt.assert_equal(mg.MapGraph._deduce_rc.im_func(None, 'IIISSSIII'), 'S')
-    nt.assert_equal(mg.MapGraph._deduce_rc.im_func(None, 'LOSL'), None)
-    nt.assert_equal(mg.MapGraph._deduce_rc.im_func(None, 'LOS'), None)
+    nt.assert_equal(MapGraph._deduce_rc.im_func(None, 'IIISSSIII'), 'S')
+    nt.assert_equal(MapGraph._deduce_rc.im_func(None, 'LOSL'), None)
+    nt.assert_equal(MapGraph._deduce_rc.im_func(None, 'LOS'), None)
 
 
 def test_get_rc_chain():
@@ -204,19 +203,19 @@ def test_get_rc_chain():
     mock_g.add_edges_from([('A', 'B', {'RC': 'I'}), ('B', 'C', {'RC': 'S'}),
                            ('C', 'D', {'RC': 'L'}), ('D', 'E', {'RC': 'O'})])
     tp = ['B', 'C', 'D']
-    nt.assert_equal(mg.MapGraph._get_rc_chain.im_func(mock_g, 'A', tp, 'E'),
+    nt.assert_equal(MapGraph._get_rc_chain.im_func(mock_g, 'A', tp, 'E'),
                     'ISLO')
 
 
 def test_check_nodes():
-    nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
+    nt.assert_raises(MapGraphError, MapGraph._check_nodes.im_func, None,
                      ['B'])
-    nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
+    nt.assert_raises(MapGraphError, MapGraph._check_nodes.im_func, None,
                      ['-24'])
-    nt.assert_raises(mg.MapGraphError, mg.MapGraph._check_nodes.im_func, None,
+    nt.assert_raises(MapGraphError, MapGraph._check_nodes.im_func, None,
                      ['B-38'])
-    nt.assert_equal(mg.MapGraph._check_nodes.im_func(None,
+    nt.assert_equal(MapGraph._check_nodes.im_func(None,
                                                      ['GM-A', 'PP94-9/46v']),
                     None)
-    nt.assert_equal(mg.MapGraph._check_nodes.im_func(None, ['SP89B-MST']),
+    nt.assert_equal(MapGraph._check_nodes.im_func(None, ['SP89B-MST']),
                     None)
