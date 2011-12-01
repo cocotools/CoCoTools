@@ -492,6 +492,7 @@ its own map.""" % node_x)
             old_pdc = self[source][target]['PDC']
             if pdc < old_pdc:
                 return True
+        return False
 
     def _add_edge_and_its_reverse(self, source, target, rc, pdc, tp):
         """Add edges from source to target and from target to source.
