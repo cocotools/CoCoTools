@@ -1,4 +1,4 @@
-from networkx import DiGraph
+from networkx import DiGraph, NetworkXError
 import numpy as np
 
 
@@ -159,27 +159,26 @@ def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
     """
     node_map = node.split('-')[0]
     new_nodes = {}
-    for new_node in mapp._translate_node(node, desired_bmap):
-        single_steps, multi_steps = mapp._separate_rcs(new_node, node_map)
+    for new_node in _translate_node(mapp, node, desired_bmap):
+        single_steps, multi_steps = _separate_rcs(mapp, new_node, node_map)
         new_nodes[new_node] = []
         for old_node, rc in single_steps:
             if role == 'Source':
-                new_nodes[new_node].append(conn._single_ec_step(old_node, rc,
-                                                                other, role))
+                new_nodes[new_node].append(_single_ec_step(conn, old_node, rc,
+                                                           other, role))
             else:
-                new_nodes[new_node].append(conn._single_ec_step(other,
-                                                                rc, old_node,
-                                                                role))
+                new_nodes[new_node].append(_single_ec_step(conn, other, rc,
+                                                           old_node, role))
         if multi_steps:
             ec = 'B'
             pdc_sum = 0.0
             for old_node, rc in multi_steps:
                 if role == 'Source':
-                    ec, pdc_sum = conn._multi_ec_step(old_node, rc, other,
-                                                      role, ec, pdc_sum)
+                    ec, pdc_sum = _multi_ec_step(conn, old_node, rc, other,
+                                                 role, ec, pdc_sum)
                 else:
-                    ec, pdc_sum = conn._multi_ec_step(other, rc, old_node,
-                                                      role, ec, pdc_sum)
+                    ec, pdc_sum = _multi_ec_step(conn, other, rc, old_node,
+                                                 role, ec, pdc_sum)
             avg_pdc = pdc_sum / (2 * len(multi_steps))
             new_nodes[new_node].append((ec, avg_pdc))
     return new_nodes
@@ -198,3 +197,210 @@ def _assert_valid_attr(attr):
         raise EndGraphError('Attempted to add PDC = %s' % pdc)
     if attr['Presence-Absence'] not in (1, -1):
         raise EndGraphError('Attempted to add bad Presence-Absence score.')
+
+
+def _separate_rcs(mapp, new_node, original_map):
+    """Return one list for single_steps and one for multi_steps.
+
+    Translate new_node back to original_map.  For each old_node
+    returned from this translation, get its RC with new_node.  RCs
+    of I and L will be used for single-step operations of the
+    algebra of transformation.  RCs of S and O will be used for
+    multi-step operations.
+
+    Notes
+    -----
+    If new_node's map is original_map, new_node is considered
+    identical (i.e., RC='I') to its counterpart in original_map
+    (i.e., itself).
+
+    Returns
+    -------
+    single_steps, multi_steps : lists
+      Lists of (old_node, RC) tuples.
+    """
+    single_steps, multi_steps = [], []
+    for old_node in _translate_node(mapp, new_node, original_map):
+        if old_node == new_node:
+            single_steps.append((old_node, 'I'))
+        else:
+            rc = mapp[old_node][new_node]['RC']
+            if rc in ('I', 'L'):
+                single_steps.append((old_node, rc))
+            elif rc in ('S', 'O'):
+                multi_steps.append((old_node, rc))
+    return single_steps, multi_steps
+            
+
+def _single_ec_step(conn, s, rc, t, node_label):
+    """Perform single-step operation of algebra of transformation.
+
+    Returns
+    -------
+    EC, mean PDC : tuple
+      EC and mean PDC for new node (role indicated by node_label).
+    """
+    process_ec = {'I': {'N': 'N',
+                        'P': 'P',
+                        'X': 'X',
+                        'C': 'C'},
+                  'L': {'N': 'N',
+                        'P': 'U',
+                        'X': 'U',
+                        'C': 'C'}}
+    try:
+        edge_dict = conn[s][t]
+    except KeyError:
+        return 'U', 18
+    return (process_ec[rc][edge_dict['EC_%s' % node_label]],
+            np.mean([edge_dict['PDC_EC_%s' % node_label],
+                     edge_dict['PDC_Site_%s' % node_label]]))
+
+
+def _multi_ec_step(conn, s, rc, t, node_label, ec, pdc_sum):
+    process_ec = {'B': {'S': {'Np': 'Up',
+                              'Nx': 'Up',
+                              'Nc': 'N',
+                              'N': 'N',
+                              'P': 'P',
+                              'X': 'X',
+                              'C': 'C'
+                              },
+                        'O': {'Np': 'Ux',
+                              'Nx': 'Ux',
+                              'Nc': 'N',
+                              'N': 'N',
+                              'P': 'Ux',
+                              'X': 'Ux',
+                              'C': 'C'
+                              }
+                        },
+                  'N': {'S': {'Np': 'Up',
+                              'Nx': 'Up',
+                              'Nc': 'N',
+                              'N': 'N',
+                              'P': 'P',
+                              'X': 'P',
+                              'C': 'P'
+                              },
+                        'O': {'Np': 'Up',
+                              'Nx': 'Up',
+                              'Nc': 'N',
+                              'N': 'N',
+                              'P': 'Up',
+                              'X': 'Up',
+                              'C': 'P'
+                              }
+                        },
+                  'Up': {'S': {'Np': 'Up',
+                               'Nx': 'Up',
+                               'Nc': 'Up',
+                               'N': 'Up',
+                               'P': 'P',
+                               'X': 'P',
+                               'C': 'P'
+                               },
+                         'O': {'Np': 'Up',
+                               'Nx': 'Up',
+                               'Nc': 'Up',
+                               'N': 'Up',
+                               'P': 'Up',
+                               'X': 'Up',
+                               'C': 'P'
+                               }
+                         },
+                  'Ux': {'S': {'Np': 'Up',
+                               'Nx': 'Up',
+                               'Nc': 'Up',
+                               'N': 'Up',
+                               'P': 'P',
+                               'X': 'X',
+                               'C': 'X'
+                               },
+                         'O': {'Np': 'Ux',
+                               'Nx': 'Ux',
+                               'Nc': 'Up',
+                               'N': 'Up',
+                               'P': 'Ux',
+                               'X': 'Ux',
+                               'C': 'X'
+                               }
+                         },
+                  'P': {'S': {'Np': 'P',
+                              'Nx': 'P',
+                              'Nc': 'P',
+                              'N': 'P',
+                              'P': 'P',
+                              'X': 'P',
+                              'C': 'P'
+                              },
+                        'O': {'Np': 'P',
+                              'Nx': 'P',
+                              'Nc': 'P',
+                              'N': 'P',
+                              'P': 'P',
+                              'X': 'P',
+                              'C': 'P'
+                              }
+                        },
+                  'X': {'S': {'Np': 'P',
+                              'Nx': 'P',
+                              'Nc': 'P',
+                              'N': 'P',
+                              'P': 'P',
+                              'X': 'X',
+                              'C': 'X'
+                              },
+                        'O': {'Np': 'X',
+                              'Nx': 'X',
+                              'Nc': 'P',
+                              'N': 'P',
+                              'P': 'X',
+                              'X': 'X',
+                              'C': 'X'
+                              }
+                        },
+                  'C': {'S': {'Np': 'P',
+                              'Nx': 'P',
+                              'Nc': 'P',
+                              'N': 'P',
+                              'P': 'P',
+                              'X': 'X',
+                              'C': 'C'
+                              },
+                        'O': {'Np': 'X',
+                              'Nx': 'X',
+                              'Nc': 'P',
+                              'N': 'P',
+                              'P': 'X',
+                              'X': 'X',
+                              'C': 'C'
+                              }
+                        }
+                  }
+    try:
+        edge_dict = conn[s][t]
+    except KeyError:
+        # The connection from s to t has not been studied.
+        edge_dict = {'EC_Source': 'N',
+                     'EC_Target': 'N',
+                     'PDC_EC_Source': 18,
+                     'PDC_EC_Target': 18,
+                     'PDC_Site_Source': 18,
+                     'PDC_Site_Target': 18}
+    return (process_ec[ec][rc][edge_dict['EC_%s' % node_label]],
+            pdc_sum + edge_dict['PDC_EC_%s' % node_label] +
+            edge_dict['PDC_Site_%s' % node_label])
+
+
+def _translate_node(mapp, node, out_map):
+    """Return list of nodes from out_map coextensive with node."""
+    if node.split('-')[0] == out_map:
+        return [node]
+    neighbors = []
+    for method in (mapp.successors, mapp.predecessors):
+        try:
+            neighbors += method(node)
+        except NetworkXError:
+            pass
+    return [n for n in set(neighbors) if n.split('-')[0] == out_map]

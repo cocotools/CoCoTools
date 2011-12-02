@@ -44,7 +44,9 @@ class ConGraph(DiGraph):
                     raise ConGraphError('PDC is %s, type is %s' %
                                         (value, type(value)))
             elif key.split('_')[0] == 'EC':
-                assert value in ('N', 'P', 'X', 'C')
+                # The last three ECs are used by the classic version
+                # of ORT.
+                assert value in ('N', 'P', 'X', 'C', 'Nc', 'Np', 'Nx')
             elif key == 'Degree':
                 ecs = [attr['EC_Source'][0], attr['EC_Target'][0]]
                 assert ((value == '0' and 'N' in ecs)
