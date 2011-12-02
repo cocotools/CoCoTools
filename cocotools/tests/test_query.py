@@ -55,6 +55,21 @@ def mock_single_map_ebunch(search_type, bmap):
 # Private Function Unit Tests
 #------------------------------------------------------------------------------
 
+def test__reduce_ecs():
+    attr = {'EC_Source': 'X', 'EC_Target': 'N'}
+    nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Unknown',
+                                           'EC_Source': 'X',
+                                           'EC_Target': 'N'})
+    attr = {'EC_Source': 'X', 'EC_Target': 'P'}
+    nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Present',
+                                           'EC_Source': 'X',
+                                           'EC_Target': 'P'})
+    attr = {'EC_Source': 'N', 'EC_Target': 'C'}
+    nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Absent',
+                                           'EC_Source': 'N',
+                                           'EC_Target': 'C'})
+    
+    
 class ScrubElementTestCase(TestCase):
 
     def setUp(self):
@@ -67,7 +82,7 @@ class ScrubElementTestCase(TestCase):
         with open('cocotools/tests/map_with_C.xml') as xml:
             tree = etree.parse(xml)
         prim_e = tree.find('%sPrimaryRelation' % cq.P)
-        self.assertEqual(cq._scrub_element(prim_e, 'RC'), 'I')
+        self.assertEqual(cq._scrub_element(prim_e, 'RC'), 'S')
 
     def test_from_prim(self):
         self.assertEqual(cq._scrub_element(self.prim_e, 'Degree'), '0')
@@ -92,7 +107,7 @@ def test__element2edge():
     with open('cocotools/tests/sample_map.xml') as xml:
         prim_e = etree.parse(xml).find('%sPrimaryRelation' % cq.P)
     nt.assert_true(etree.iselement(prim_e))
-    edge = ('B05-19', 'PP99-19', {'RC': 'X', 'PDC': 'X', 'TP': []})
+    edge = ('B05-19', 'PP99-19', {'RC': 'X', 'PDC': 'X'})
     nt.assert_equal(element2edge(prim_e, 'Mapping'), edge)
     # Connectivity
     with open('cocotools/tests/sample_con.xml') as xml:
@@ -105,7 +120,8 @@ def test__element2edge():
                                     'PDC_Density': 'X',
                                     'PDC_EC_Target': 'X',
                                     'PDC_Site_Source': 'X',
-                                    'PDC_EC_Source': 'X'})
+                                    'PDC_EC_Source': 'X',
+                                    'Connection': 'Present'})
     nt.assert_equal(element2edge(prim_e, 'Connectivity'), edge)
 
 

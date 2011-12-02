@@ -1,126 +1,108 @@
 from testfixtures import replace
-from unittest import TestCase
-
 from networkx import DiGraph
 import nose.tools as nt
 
-import cocotools as coco
-
-#------------------------------------------------------------------------------
-# Integration Tests
-#------------------------------------------------------------------------------
-
-def test_add_translated_edges():
-    m = coco.MapGraph()
-    ebunch = [('A-1', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
-              ('A-2', 'B-1', {'TP': [], 'PDC': 0, 'RC': 'S'}),
-              ('A-4', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
-              ('A-4', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'}),
-              ('A-5', 'B-2', {'TP': [], 'PDC': 0, 'RC': 'O'}),
-              ('A-5', 'B-3', {'TP': [], 'PDC': 0, 'RC': 'O'})]
-    m.add_edges_from(ebunch)
-    c = coco.ConGraph()
-    c.add_edges_from([('A-1', 'A-4', {'EC_Source': 'C',
-                                      'EC_Target': 'C',
-                                      'Degree': '1',
-                                      'PDC_Site_Source': 0,
-                                      'PDC_Site_Target': 0,
-                                      'PDC_EC_Source': 2,
-                                      'PDC_EC_Target': 0,
-                                      'PDC_Density': 4}),
-                      ('A-2', 'A-4', {'EC_Source': 'N',
-                                      'EC_Target': 'Nc',
-                                      'Degree': '0',
-                                      'PDC_Site_Source': 9,
-                                      'PDC_Site_Target': 1,
-                                      'PDC_EC_Source': 4,
-                                      'PDC_EC_Target': 1,
-                                      'PDC_Density': 4}),
-                      # Following connections include regions from
-                      # desired_bmap. 
-                      ('B-3', 'B-4', {'EC_Source': 'C',
-                                      'EC_Target': 'X',
-                                      'Degree': 'X',
-                                      'PDC_Site_Source': 5,
-                                      'PDC_Site_Target': 10,
-                                      'PDC_EC_Source': 10,
-                                      'PDC_EC_Target': 5,
-                                      'PDC_Density': 18}),
-                      ('B-5', 'A-4', {'EC_Source': 'N',
-                                      'EC_Target': 'Nx',
-                                      'Degree': '0',
-                                      'PDC_Site_Source': 0,
-                                      'PDC_Site_Target': 18,
-                                      'PDC_EC_Source': 18,
-                                      'PDC_EC_Target': 18,
-                                      'PDC_Density': 18}),
-                      # Following connection has no mapping info.
-                      ('F-1', 'F-2', {'EC_Source': 'P',
-                                      'EC_Target': 'X',
-                                      'Degree': '2',
-                                      'PDC_Site_Source': 5,
-                                      'PDC_Site_Target': 10,
-                                      'PDC_EC_Source': 10,
-                                      'PDC_EC_Target': 5,
-                                      'PDC_Density': 18})])
-    e = coco.EndGraph()
-    e.add_translated_edges(m, c, 'B')
-    nt.assert_equal(sorted(e.edges()),
-                    [('B-1', 'B-2'), ('B-1', 'B-3'), ('B-3', 'B-4')])
-    nt.assert_equal(e['B-1']['B-2'], {'ECs': ('P', 'P'), 'PDC': 6.375,
-                                      'Presence-Absence': 0})
-    nt.assert_equal(e['B-1']['B-3'], {'ECs': ('P', 'P'), 'PDC': 6.375,
-                                      'Presence-Absence': 0})
-    nt.assert_equal(e['B-3']['B-4'], {'ECs': ('C', 'X'), 'PDC': 7.5,
-                                      'Presence-Absence': 1})
-    # Make sure c hasn't been modified.
-    nt.assert_equal(c.number_of_edges(), 5)
+from cocotools import EndGraph, EndGraphError
 
 
-def test_add_edges_from():
-    g = coco.EndGraph()
-    g.add_edges_from([('A-1', 'A-2', {'ECs': ('X', 'N'), 'PDC': 5,
-                                      'Presence-Absence': -1}),
-                      ('A-1', 'A-2', {'ECs': ('U', 'P'), 'PDC': 9,
-                                      'Presence-Absence': 1}),
-                      ('A-1', 'A-2', {'ECs': ('C', 'C'), 'PDC': 10,
-                                      'Presence-Absence': 1})])
-    nt.assert_equal(g.number_of_edges(), 1)
-    nt.assert_equal(g['A-1']['A-2'], {'ECs': ('X', 'N'), 'PDC': 5,
-                                      'Presence-Absence': 0})
-    
+# Deliberately not tested: add_edge.
+
 #------------------------------------------------------------------------------
 # Unit Tests
 #------------------------------------------------------------------------------
 
-class EvaluateConflictTestCase(TestCase):
-    
-    def test_N_vs_C(self):
-        old = {'ECs': ('N', 'C'), 'PDC': 5, 'Presence-Absence': -4}
-        new = {'ECs': ('C', 'C'), 'PDC': 5, 'Presence-Absence': -4}
-        self.assertEqual(coco.endgraph._evaluate_conflict(old, new, -4),
-                         {'ECs': ('N', 'C'), 'PDC': 5, 'Presence-Absence': -4})
-
-    def test_both_present(self):
-        old = {'ECs': ('P', 'P'), 'PDC': 5, 'Presence-Absence': -4}
-        new = {'ECs': ('C', 'C'), 'PDC': 5, 'Presence-Absence': -4}
-        self.assertEqual(coco.endgraph._evaluate_conflict(old, new, -4),
-                         {'ECs': ('P', 'P'), 'PDC': 5, 'Presence-Absence': -4})
+def test_new_attributes_are_better():
+    mock_endg = DiGraph()
+    mock_endg.add_edge('A', 'B', PDC=5)
+    method = EndGraph._new_attributes_are_better.im_func
+    nt.assert_false(method(mock_endg, 'A', 'B', 18))
+    nt.assert_true(method(mock_endg, 'A', 'B', 2))
+    nt.assert_false(method(mock_endg, 'A', 'B', 5))
 
 
-@replace('cocotools.endgraph._evaluate_conflict', lambda o, n, s: None)
-def test__update_attr():
-    old = {'ECs': ('N', 'C'), 'PDC': 5, 'Presence-Absence': -5}
-    new = {'ECs': ('C', 'C'), 'PDC': 3, 'Presence-Absence': 1}
-    nt.assert_equal(coco.endgraph._update_attr(old, new),
-                    {'ECs': ('C', 'C'), 'PDC': 3, 'Presence-Absence': -4})
+def test_determine_final_ecs():
+    determine = EndGraph._determine_final_ecs.im_func
+    nt.assert_equal(determine(None, set(['Present']), 1, 2), 'XX')
+    nt.assert_equal(determine(None, set(['Present', 'Absent']), 3, 1), 'PX')
+    nt.assert_equal(determine(None, set(['Unknown', 'Absent', 'Present']), 3,
+                              3), 'PP')
+    nt.assert_equal(determine(None, set(['Present', 'Unknown']), 4, 4), 'XX')
+
+
+def test_get_mean_pdc():
+    mock_conn = DiGraph()
+    mock_conn.add_edge('A', 'B', PDC_EC_Source=5, PDC_EC_Target=10,
+                       PDC_Site_Source=7, PDC_Site_Target=4)
+    nt.assert_equal(EndGraph._get_mean_pdc.im_func(None, 'A', 'B', mock_conn),
+                    6.5)
+
+
+def test_translate_connection():
+    translate = EndGraph._translate_connection.im_func
+    nt.assert_equal(translate(None, 'S', 'L', 'Absent'), 'Absent')
+    nt.assert_equal(translate(None, 'L', 'O', 'Present'), 'Unknown')
+
+
+def test_get_rcs():
+    mock_mapp = DiGraph()
+    mock_mapp.add_edge('A-1', 'B-1', RC='S', PDC=4)
+    nt.assert_raises(EndGraphError, EndGraph._get_rcs.im_func, None,
+                     ('B-1', ['A-1']), mock_mapp, [])
+    mock_mapp.add_edge('A-2', 'B-1', RC='O', PDC=6)
+    nt.assert_equal(EndGraph._get_rcs.im_func(None, ('B-1', ['A-1', 'A-2']),
+                                              mock_mapp, []),
+                    (['S', 'O'], [4, 6]))
+    mock_mapp.add_edge('A-3', 'B-1', RC='I', PDC=3)
+    nt.assert_raises(EndGraphError, EndGraph._get_rcs.im_func, None,
+                     ('B-1', ['A-1', 'A-2', 'A-3']), mock_mapp, [])
+
+
+def mock_get_rcs(self, mapping, mapp, pdcs):
+    return ['S'], [3]
+
+
+def mock_translate_connection(self, s_rc, t_rc, connection):
+    return 'Present'
+
+
+def mock_get_mean_pdc(self, source, target, conn):
+    return 6
+
+
+def mock_determine_final_ecs(self, connections, num_sources, num_targets):
+    return 'XX'
+
+
+@replace('cocotools.endgraph.EndGraph._get_rcs', mock_get_rcs)
+@replace('cocotools.endgraph.EndGraph._translate_connection',
+         mock_translate_connection)
+@replace('cocotools.endgraph.EndGraph._get_mean_pdc', mock_get_mean_pdc)
+@replace('cocotools.endgraph.EndGraph._determine_final_ecs',
+         mock_determine_final_ecs)
+def test_translate_attributes():
+    mock_conn = DiGraph()
+    mock_conn.add_edge('B-1', 'B-2', Connection='Present')
+    translate = EndGraph._translate_attributes.im_func
+    # PDCs that get averaged are 3 (RCs), 6 (existent conn edge), and
+    # 18 (non-existent conn edge).
+    nt.assert_equal(translate(EndGraph(), ('A-1', ['B-1', 'B-3']),
+                              ('A-2', ['B-2']), None, mock_conn),
+                    {'Connection': 'XX', 'PDC': 9})
+
     
-    
-@replace('cocotools.endgraph._assert_valid_attr', lambda attr: True)
-def test_add_edge():
+def test_translate_node():
     g = DiGraph()
-    # Ensure self-loops are not added to the graph.
-    coco.EndGraph.add_edge.im_func(g, 'A-1', 'A-1', None)
-    nt.assert_equal(g.number_of_edges(), 0)
-    coco.EndGraph.add_edge.im_func(g, 'A-1', 'A-2', None)
-    nt.assert_equal(g.edges(), [('A-1', 'A-2')])
+    g.add_edges_from([('A-1', 'B-1'), ('A-1', 'C-1'), ('A-1', 'B-2')])
+    translate_node = EndGraph._translate_node.im_func
+    nt.assert_equal(translate_node(None, g, 'A-1', 'B'), ['B-2', 'B-1'])
+
+
+def mock_translate_node(self, mapp, node, brain_map):
+    return ['X']
+
+
+@replace('cocotools.endgraph.EndGraph._translate_node', mock_translate_node)
+def test_make_translation_dict():
+    translate = EndGraph._make_translation_dict.im_func
+    nt.assert_equal(translate(EndGraph(), None, 'A-1', 'B'), {'X': ['X']})
+    nt.assert_equal(translate(EndGraph(), None, 'A-1', 'A'), {'A-1': ['A-1']})

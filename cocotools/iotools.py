@@ -1,8 +1,68 @@
-"""Input/Output utilities: file reading, etc.
-"""
+"""Input/Output utilities: file reading, etc."""
 
 import csv
 from os.path import splitext
+
+from mapgraph import MapGraph, MapGraphError
+
+
+def read_graph_from_text(file_path, conn):
+    """Read a text file created using write_graph_to_text into a MapGraph.
+
+    Parameters
+    ----------
+    file_path : string
+      Full specification of the text file's name, relative to the current
+      directory.
+
+    conn : CoCoTools ConGraph
+      ConGraph associated with the saved MapGraph.
+
+    Returns
+    -------
+    mapp : CoCoTools MapGraph
+      MapGraph with all the edges saved in the text file.
+    """
+    mapp = MapGraph(conn)
+    tp_edges = []
+    with open(file_path) as f:
+        for line in f:
+            source, target, attributes = line.split()
+            tp = attributes['TP']
+            if tp:
+                # We can't add the edge right away, because it depends
+                # on other edges being in the graph.
+                tp_edges.append((source, target, tp))
+            else:
+                rc = attributes['RC']
+                pdc = attributes['PDC']
+                mapp.add_edge(source, target, rc=rc, pdc=pdc)
+    while tp_edges:
+        source, target, tp = tp_edges.pop(0)
+        try:
+            mapp.add_edge(source, target, tp=tp)
+        except MapGraphError:
+            tp_edges.append((source, target, tp))
+    return mapp
+
+
+def write_graph_to_text(g, file_path):
+    """Write graph to a text file.
+
+    Each line in the text file represents an edge in the graph in the
+    following format: 'source' 'target' 'edge attributes'.
+
+    Parameters
+    ----------
+    g : CoCoTools MapGraph, ConGraph, or EndGraph
+
+    file_path : string
+      Full specification of the text file's name, relative to the current
+      directory.
+    """
+    with open(file_path, 'w') as f:
+        for source, target in g.edges_iter():
+            f.write('%s %s %s\n' % (source, target, g[source][target]))
 
 
 def get_coord_dict(g, coord_file, dim='XY'):

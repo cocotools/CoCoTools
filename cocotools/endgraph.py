@@ -1,4 +1,6 @@
-from networkx import DiGraph
+from itertools import product
+
+import networkx as nx
 import numpy as np
 
 
@@ -6,74 +8,351 @@ class EndGraphError(Exception):
     pass
 
 
-class EndGraph(DiGraph):
+class EndGraph(nx.DiGraph):
 
-    """Subclass of the NetworkX DiGraph designed to hold post-ORT data.
+    """Subclass of the NetworkX DiGraph designed to hold post-ORT data."""
 
-    This graph should contain nodes from a particular BrainMap (whose name
-    is held in self.name), and edges representing translated anatomical
-    connections.
-    
-    The DiGraph methods add_edge and add_edges_from have been overridden,
-    to enforce that edges have valid attributes with the highest likelihood
-    of correctness referring to their extension codes (ECs), precision
-    description codes (PDCs), and presence-absence score.  The presence-
-    absence score is the number of original BrainMaps in which the edge
-    was reported absent substracted from the number in which the edge was
-    reported present.
-    """
-    
-    def add_edge(self, source, target, new_attr):
-        """Add an edge from source to target if it is new and valid.
+    def _new_attributes_are_better(self, source, target, new_pdc):
+        """Return True if PDC is an improvement and False otherwise.
 
-        For the edge to be valid, new_attr must contain map/value pairs for
-        ECs, PDCs, and the presence-absence score.
-
-        If an edge from source to target is already present, the set of
-        attributes with the lower PDC is kept.  Ties are resolved using the
-        presence-absence score.
+        The PDC in new_attributes is compared to the one already in the
+        graph for the edge from source to target.
 
         Parameters
         ----------
-        source, target : strings
-          Nodes.
+        source : string
+          BrainSite from the desired BrainMap in CoCoMac format.
 
-        new_attr : dict
-          Dictionary of edge attributes.
+        target : string
+          Another BrainSite from the desired BrainMap in CoCoMac format.
+
+        new_pdc : integer
+          Value between 0 and 18 representing an index in the PDC
+          hierarchy.
+
+        Returns
+        -------
+        bool
+          True if supplied attributes are better than those in the graph.
+          False otherwise.
         """
-        try:
-            _assert_valid_attr(new_attr)
-        except EndGraphError:
+        if new_pdc < self[source][target]['PDC']:
+            return True
+        return False
+
+    def add_edge(self, source, target, attributes):
+        """Add an edge from source to target.
+
+        Self-loops are disallowed.  If the edge is already in the graph,
+        the attributes are updated if the new PDC is better (lesser) than
+        the old one.
+
+        Parameters
+        ----------
+        source : string
+          BrainSite from the desired BrainMap in CoCoMac format.
+
+        target : string
+          Another BrainSite from the desired BrainMap in CoCoMac format.
+
+        attributes : dictionary
+          Has keys and valid values for 'Connection' and 'PDC'.
+        """
+        if source == target or attributes['Connection'] == 'Unknown':
             return
-        add_edge = DiGraph.add_edge.im_func
-        if source == target:
-            return
-        elif not self.has_edge(source, target):
-            add_edge(self, source, target, new_attr)
+        if not self.has_edge(source, target):
+            nx.DiGraph.add_edge.im_func(self, source, target, attributes)
+        elif self._new_attributes_are_better(source, target, attributes['PDC']):
+            nx.DiGraph.add_edge.im_func(self, source, target, attributes)
+
+    def _determine_final_ecs(self, connections, num_sources, num_targets):
+        """Return ECs for the connection in the desired BrainMap.
+
+        Although we did not have EC-level resolution for the original
+        edges, we can get it in the desired BrainMap if the BrainSites in
+        the original BrainMap are smaller than those in the desired
+        BrainMap.  This is because some of the original edges may be
+        present, and some may be absent, generating ECs of P.
+
+        Absent connections are still described as 'Absent'.  This is
+        equivalent to ECs of ('C', 'N') and ('N', 'C').
+
+        Parameters
+        ----------
+        connections : set
+          Unique translated connections for the edges in the original
+          BrainMap.
+
+        num_sources: int
+          Number of original sources contributing to this connection.
+
+        num_targets : int
+          Number of original targets contributing to this connection.
+
+        Returns
+        -------
+        ecs : string
+          'Absent', 'PP', 'XP', 'PX', 'XX', or 'Unknown'.
+        """
+        if len(connections) == 3:
+            if num_sources == 1:
+                # Because we have more than one original edge,
+                # num_targets must be greater than one.
+                return 'XP'
+            if num_targets == 1:
+                # num_sources must be greater than one.
+                return 'PX'
+            return 'PP'
+        if len(connections) == 2:
+            if 'Unknown' in connections:
+                if 'Present' in connections:
+                    # Whatever the numbers of sources and targets,
+                    # neither EC can be labeled P definitively.
+                    return 'XX'
+                # The existence of just one 'Unknown' connection
+                # prevents the summary connection being 'Absent'.
+                return 'Unknown'
+            if num_sources == 1:
+                return 'XP'
+            if num_targets == 1:
+                return 'PX'
+            return 'PP'
+        if connections.pop() == 'Present':
+            return 'XX'
+        if connections.pop() == 'Absent':
+            return 'Absent'
+        return 'Unknown'
+
+    def _get_mean_pdc(self, source, target, conn):
+        """Return the mean of the PDCs associated with an edge in conn.
+
+        Previous computations have ensured the edge from source to target
+        is in conn.
+
+        Parameters
+        ----------
+        source : string
+          A node in conn.
+
+        target : string
+          Another node in conn.
+
+        conn : CoCoTools ConGraph
+
+        Returns
+        -------
+        mean : float
+          The arithmetic mean of the four PDCs associated with the two
+          nodes and their ECs.
+
+        Notes
+        -----
+        The PDC for the edge's density is ignored as density is not
+        reported for all edges and its meaning and importance are unclear.
+        """
+        attributes = conn[source][target]
+        return np.mean([attributes['PDC_EC_Source'],
+                        attributes['PDC_EC_Target'],
+                        attributes['PDC_Site_Source'],
+                        attributes['PDC_Site_Target']])
+
+    def _translate_connection(self, s_rc, t_rc, connection):
+        """Translate a connection between BrainMaps given RCs.
+
+        Parameters
+        ----------
+        s_rc : string
+          RC from the source in the original BrainMap to the source in the
+          BrainMap to which translation is being performed.
+
+        t_rc : string
+          RC from the target in the original BrainMap to the target in the
+          BrainMap to which translation is being performed.
+
+        connection : string
+          'Present', 'Absent', or 'Unknown'.  Describes connection between
+          the source and target in the original BrainMap.
+
+        Returns
+        -------
+        new_connection : string
+          'Present', 'Absent', or 'Unknown'.  Describes connection between
+          the source and target in the desired BrainMap.
+
+        Notes
+        -----
+        'Unknown' is always translated to 'Unknown', and 'Absent' is always
+        translated to 'Absent'.  'Present' is translated to 'Present' if
+        both RCs are 'I' or 'S'; otherwise it is translated to 'Unknown'.
+        """
+        if connection in ('Unknown', 'Absent'):
+            return connection
+        if s_rc in ('I', 'S') and t_rc in ('I', 'S'):
+            return connection
+        return 'Unknown'
+
+    def _get_rcs(self, mapping, mapp, pdcs):
+        """Return the RCs from the original nodes to the new one.
+
+        Also return the associated PDCs.
+
+        Raise an exception if gaps or overlaps are in the original map.
+
+        Parameters
+        ----------
+        mapping : tuple
+          A node in the desired BrainMap and a list of nodes from another
+          BrainMap with which it is coextensive.
+
+        mapp : CoCoTools MapGraph
+          This graph has edges from the node in the desired BrainMap to
+          the nodes in the other BrainMap.
+
+        pdcs : list
+          PDCs.
+
+        Returns
+        -------
+        rcs : list
+          RCs from the nodes in the original BrainMap to the node in the
+          desired one.
+
+        pdcs : list
+          PDCs associated with the edges for which RCs were obtained.
+        """
+        new, originals = mapping
+        if len(originals) == 1:
+            orig = originals[0]
+            if new == orig:
+                return ['I']
+            rc = mapp[orig][new]['RC']
+            if rc not in ('I', 'L'):
+                raise EndGraphError("""mapp does not have full coverage
+around %s""" % orig)
+            pdcs.append(mapp[orig][new]['PDC'])
+            return [rc], pdcs
         else:
-            old_attr = self[source][target]
-            add_edge(self, source, target, _update_attr(old_attr, new_attr))
+            rcs = []
+            for orig in originals:
+                rc = mapp[orig][new]['RC']
+                if rc not in ('S', 'O'):
+                    raise EndGraphError('%s are not disjoint' % originals)
+                rcs.append(rc)
+                pdcs.append(mapp[orig][new]['PDC'])
+            return rcs, pdcs
 
-    def add_edges_from(self, ebunch):
-        """Add the edges in ebunch if they are new and valid.
-
-        The docstring for add_edge explains what is meant by valid and how
-        attributes for the same source and target are updated.
+    def _translate_attributes(self, s_mapping, t_mapping, mapp, conn):
+        """Determine edge attributes based on edges from another BrainMap.
 
         Parameters
         ----------
-        ebunch : container of edges
-          Edges must be provided as (source, target, new_attr) tuples; they
-          are added using add_edge.
+        s_mapping : tuple
+          A node in the desired BrainMap (the source for the desired edge)
+          and a list of nodes from another BrainMap with which it is
+          coextensive.
+
+        t_mapping : tuple
+          A different node in the desired BrainMap (the target for the
+          desired edge) and a list of nodes from the same other BrainMap
+          with which it is coextensive.
+
+        mapp : CoCoTools MapGraph
+
+        conn : CoCoTools ConGraph
+
+        Returns
+        -------
+        attr : dictionary
+          Edge attributes for the edge between the nodes in the desired
+          BrainMap.
         """
-        for (source, target, new_attr) in ebunch:
-            self.add_edge(source, target, new_attr)
+        pdcs = []
+        source_rcs, pdcs = self._get_rcs(s_mapping, mapp, pdcs)
+        target_rcs, pdcs = self._get_rcs(t_mapping, mapp, pdcs)
+        new_source, original_sources = s_mapping
+        new_target, original_targets = t_mapping
+        votes = []
+        for i_s, original_s in enumerate(original_sources):
+            for i_t, original_t in enumerate(original_targets):
+                try:
+                    c = conn[original_s][original_t]['Connection']
+                except KeyError:
+                    votes.append('Unknown')
+                    pdcs.append(18)
+                else:
+                    votes.append(self._translate_connection(source_rcs[i_s],
+                                                            target_rcs[i_t],
+                                                            c))
+                    pdcs.append(self._get_mean_pdc(original_s, original_t,
+                                                   conn))
+        return {'Connection': self._determine_final_ecs(set(votes),
+                                                        len(original_sources),
+                                                        len(original_targets)),
+                # Note that each original mapp edge and each original
+                # conn edge gets a single entry in pdcs, and thus are
+                # weighted equally.
+                'PDC': np.mean(pdcs)}
 
-    def add_translated_edges(self, mapp, conn, desired_bmap):
-        """Perform the ORT algebra of transformation.
+    def _translate_node(self, mapp, node, other_map):
+        """Return list of nodes from other_map coextensive with node.
 
-        Using spatial relationships in mapp, translate the anatomical
-        connections in conn into the nomenclature of desired_bmap.
+        Parameters
+        ----------
+        mapp : CoCoTools MapGraph
+
+        node : string
+          A node in self.conn, from a BrainMap other than other_map.
+
+        other_map : string
+          A BrainMap.
+
+        Returns
+        -------
+        node_list : list
+          Nodes from other_map coextensive with node.
+        """
+        # mapp is designed to have an edge from t to s for every edge
+        # from s to t, so we only need to look at neighbors (i.e.,
+        # successors).
+        try:
+            neighbors = mapp.neighbors(node)
+        except nx.NetworkXError:
+            # node isn't in mapp.  We took node from conn, so its
+            # absence from mapp is a possibility.
+            return []
+        return [n for n in neighbors if n.split('-')[0] == other_map]
+
+    def _make_translation_dict(self, mapp, original_node, desired_map):
+        """Map regions in desired_bmap to regions in node's map.
+
+        Parameters
+        ----------
+        mapp : CoCoTools MapGraph
+
+        original_node : string
+          A node in self.conn.
+
+        desired_map : string
+          The BrainMap to which translation of edges is being performed.
+
+        Returns
+        -------
+        translation_dict : dictionary
+          Nodes in desired_bmap are mapped to lists of nodes in the
+          BrainMap node is from.
+        """
+        original_map = original_node.split('-')[0]
+        if original_map == desired_map:
+            # No translation is needed.
+            return {original_node: [original_node]}
+        translation_dict = {}
+        for new_node in self._translate_node(mapp, original_node, desired_map):
+            translation_dict[new_node] = self._translate_node(mapp, new_node,
+                                                              original_map)
+        return translation_dict
+
+    def add_translated_edges(self, mapp, conn, desired_map):
+        """Translate edges in conn to nomenclature of desired_bmap.
 
         Parameters
         ----------
@@ -84,117 +363,16 @@ class EndGraph(DiGraph):
         conn : ConGraph
           Graph of anatomical connections between BrainSites.
 
-        desired_bmap : string
+        desired_map : string
           Name of BrainMap to which translation will be performed.
         """
-        for s, t in conn.edges_iter():
-            new_sources = _translate_one_side(mapp, conn, desired_bmap, s,
-                                              'Source', t)
-            new_targets = _translate_one_side(mapp, conn, desired_bmap, t,
-                                              'Target', s)
-            for new_s, s_values in new_sources.iteritems():
-                for new_t, t_values in new_targets.iteritems():
-                    for s_value in s_values:
-                        for t_value in t_values:
-                            s_ec, t_ec = s_value[0], t_value[0]
-                            ns = ('N', 'Nc', 'Np', 'Nx')
-                            if s_ec in ns or t_ec in ns:
-                                present = -1
-                            else:
-                                present = 1
-                            self.add_edge(new_s, new_t,
-                                          {'ECs': (s_ec, t_ec),
-                                           'PDC': np.mean([s_value[1],
-                                                           t_value[1]]),
-                                           'Presence-Absence': present})
-
-
-def _evaluate_conflict(old_attr, new_attr, updated_score):
-    """Called by _update_attr."""
-    ns = ('N', 'Nc', 'Np', 'Nx')
-    for age in ('old', 'new'):
-        exec 's_ec, t_ec = %s_attr["ECs"]' % age
-        if s_ec in ns or t_ec in ns:
-            exec '%s_score = -1' % age
-        else:
-            exec '%s_score = 1' % age
-    if old_score == new_score:
-        return old_attr
-    elif updated_score > 0:
-        if old_score > new_score:
-            return old_attr
-        else:
-            return new_attr
-    elif updated_score < 0:
-        if old_score > new_score:
-            return new_attr
-        else:
-            return old_attr
-    else:
-        return old_attr
-
-                
-def _update_attr(old_attr, new_attr):
-
-    """Called by add_edge."""
-
-    updated_score = old_attr['Presence-Absence'] + new_attr['Presence-Absence']
-    new_attr['Presence-Absence'] = updated_score
-    old_attr['Presence-Absence'] = updated_score
-
-    new_pdc = new_attr['PDC']
-    old_pdc = old_attr['PDC']
-    if new_pdc < old_pdc:
-        return new_attr
-    elif old_pdc < new_pdc:
-        return old_attr
-    else:
-        return _evaluate_conflict(old_attr, new_attr, updated_score)
-
-
-def _translate_one_side(mapp, conn, desired_bmap, node, role, other):
-    """Returns dict mapping each new node to a list of (EC, PDC) tuples.
-
-    Called by add_translated_edges.
-    """
-    node_map = node.split('-')[0]
-    new_nodes = {}
-    for new_node in mapp._translate_node(node, desired_bmap):
-        single_steps, multi_steps = mapp._separate_rcs(new_node, node_map)
-        new_nodes[new_node] = []
-        for old_node, rc in single_steps:
-            if role == 'Source':
-                new_nodes[new_node].append(conn._single_ec_step(old_node, rc,
-                                                                other, role))
-            else:
-                new_nodes[new_node].append(conn._single_ec_step(other,
-                                                                rc, old_node,
-                                                                role))
-        if multi_steps:
-            ec = 'B'
-            pdc_sum = 0.0
-            for old_node, rc in multi_steps:
-                if role == 'Source':
-                    ec, pdc_sum = conn._multi_ec_step(old_node, rc, other,
-                                                      role, ec, pdc_sum)
-                else:
-                    ec, pdc_sum = conn._multi_ec_step(other, rc, old_node,
-                                                      role, ec, pdc_sum)
-            avg_pdc = pdc_sum / (2 * len(multi_steps))
-            new_nodes[new_node].append((ec, avg_pdc))
-    return new_nodes
-        
-
-def _assert_valid_attr(attr):
-    """Check that attr has valid ECs, PDCs, and presence-absence score.
-
-    Called by add_edge.
-    """
-    for ec in attr['ECs']:
-        if ec not in ('N', 'Nc', 'Np', 'Nx', 'C', 'P', 'X'):
-            raise EndGraphError('Attempted to add EC = %s' % ec)
-    pdc = attr['PDC']
-    if not (type(pdc) in (float, int, np.float64) and 0 <= pdc <= 18):
-        raise EndGraphError('Attempted to add PDC = %s' % pdc)
-    if attr['Presence-Absence'] not in (1, -1):
-        raise EndGraphError('Attempted to add bad Presence-Absence score.')
+        for original_s, original_t in conn.edges_iter():
+            s_dict = self._make_translation_dict(mapp, original_s, desired_map)
+            t_dict = self._make_translation_dict(mapp, original_t, desired_map)
+            for s_mapping in s_dict.iteritems():
+                for t_mapping in t_dict.iteritems():
+                    attr = self._translate_attributes(s_mapping, t_mapping,
+                                                      mapp, conn)
+                    # The first element in each mapping is the node in
+                    # desired_map.
+                    self.add_edge(s_mapping[0], t_mapping[0], attr)
