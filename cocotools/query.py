@@ -146,6 +146,13 @@ def _element2edge(prim_e, search_type):
                 edge_attr[attr_tag] = datum
     if search_type == 'Connectivity':
         edge_attr = _reduce_ecs(edge_attr)
+        # The next five lines put the ECs in a form needed by the
+        # classic version of ORT.
+        ec_s, ec_t = edge_attr['EC_Source'], edge_attr['EC_Target']
+        if ec_s == 'N':
+            ec_t = 'N%s' % ec_t.lower()
+        if ec_t == 'N':
+            ec_s = 'N%s' % ec_s.lower()
     site_ids = prim_e.findall('%sID_BrainSite' % P)
     return site_ids[0].text.upper(), site_ids[1].text.upper(), edge_attr
 
