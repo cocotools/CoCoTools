@@ -12,7 +12,7 @@ class EndGraph(nx.DiGraph):
 
     """Subclass of the NetworkX DiGraph designed to hold post-ORT data."""
 
-    def _new_attributes_are_better(self, source, target, new_attributes):
+    def _new_attributes_are_better(self, source, target, new_pdc):
         """Return True if PDC is an improvement and False otherwise.
 
         The PDC in new_attributes is compared to the one already in the
@@ -26,8 +26,9 @@ class EndGraph(nx.DiGraph):
         target : string
           Another BrainSite from the desired BrainMap in CoCoMac format.
 
-        attributes : dictionary
-          Has keys and valid values for 'Connection' and 'PDC'.
+        new_pdc : integer
+          Value between 0 and 18 representing an index in the PDC
+          hierarchy.
 
         Returns
         -------
@@ -35,8 +36,7 @@ class EndGraph(nx.DiGraph):
           True if supplied attributes are better than those in the graph.
           False otherwise.
         """
-        old_pdc = self[source][target]['PDC']
-        if pdc < old_pdc:
+        if new_pdc < self[source][target]['PDC']:
             return True
         return False
 
@@ -58,11 +58,11 @@ class EndGraph(nx.DiGraph):
         attributes : dictionary
           Has keys and valid values for 'Connection' and 'PDC'.
         """
-        if source == target:
+        if source == target or attributes['Connection'] == 'Unknown':
             return
         if not self.has_edge(source, target):
             nx.DiGraph.add_edge.im_func(self, source, target, attributes)
-        elif self._new_attributes_are_better(source, target, attributes):
+        elif self._new_attributes_are_better(source, target, attributes['PDC']):
             nx.DiGraph.add_edge.im_func(self, source, target, attributes)
 
     def _determine_final_ecs(self, connections, num_sources, num_targets):
@@ -124,11 +124,37 @@ class EndGraph(nx.DiGraph):
         return 'Unknown'
 
     def _get_mean_pdc(self, source, target, conn):
+        """Return the mean of the PDCs associated with an edge in conn.
+
+        Previous computations have ensured the edge from source to target
+        is in conn.
+
+        Parameters
+        ----------
+        source : string
+          A node in conn.
+
+        target : string
+          Another node in conn.
+
+        conn : CoCoTools ConGraph
+
+        Returns
+        -------
+        mean : float
+          The arithmetic mean of the four PDCs associated with the two
+          nodes and their ECs.
+
+        Notes
+        -----
+        The PDC for the edge's density is ignored as density is not
+        reported for all edges and its meaning and importance are unclear.
+        """
         attributes = conn[source][target]
-        return np.mean(attributes['PDC_EC_Source'],
-                       attributes['PDC_EC_Target'],
-                       attributes['PDC_Site_Source'],
-                       attributes['PDC_Site_Target'])
+        return np.mean([attributes['PDC_EC_Source'],
+                        attributes['PDC_EC_Target'],
+                        attributes['PDC_Site_Source'],
+                        attributes['PDC_Site_Target']])
 
     def _translate_connection(self, s_rc, t_rc, connection):
         """Translate a connection between BrainMaps given RCs.
@@ -192,7 +218,7 @@ class EndGraph(nx.DiGraph):
           desired one.
 
         pdcs : list
-          
+          PDCs associated with the edges for which RCs were obtained.
         """
         new, originals = mapping
         if len(originals) == 1:
@@ -210,7 +236,7 @@ around %s""" % orig)
             for orig in originals:
                 rc = mapp[orig][new]['RC']
                 if rc not in ('S', 'O'):
-                    raise EndGraphError('% are not disjoint' % originals)
+                    raise EndGraphError('%s are not disjoint' % originals)
                 rcs.append(rc)
                 pdcs.append(mapp[orig][new]['PDC'])
             return rcs, pdcs
@@ -241,8 +267,8 @@ around %s""" % orig)
           BrainMap.
         """
         pdcs = []
-        source_rcs, pdcs = self.get_rcs(s_mapping, mapp, pdcs)
-        target_rcs, pdcs = self.get_rcs(t_mapping, mapp, pdcs)
+        source_rcs, pdcs = self._get_rcs(s_mapping, mapp, pdcs)
+        target_rcs, pdcs = self._get_rcs(t_mapping, mapp, pdcs)
         new_source, original_sources = s_mapping
         new_target, original_targets = t_mapping
         votes = []
@@ -321,7 +347,7 @@ around %s""" % orig)
             return {original_node: [original_node]}
         translation_dict = {}
         for new_node in self._translate_node(mapp, original_node, desired_map):
-            translation_dict[new_node] = self._translate_node(new_node,
+            translation_dict[new_node] = self._translate_node(mapp, new_node,
                                                               original_map)
         return translation_dict
 
