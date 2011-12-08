@@ -236,7 +236,8 @@ around %s""" % orig)
             for orig in originals:
                 rc = mapp[orig][new]['RC']
                 if rc not in ('S', 'O'):
-                    raise EndGraphError('%s are not disjoint' % originals)
+                    raise EndGraphError("""RCs from %s to %s indicate the
+latter are not disjoint""" % (new, originals))
                 rcs.append(rc)
                 pdcs.append(mapp[orig][new]['PDC'])
             return rcs, pdcs

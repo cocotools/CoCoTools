@@ -829,8 +829,8 @@ its own map.""" % node_x)
             ebunch = []
             for p in self.predecessors(node):
                 for s in self.successors(node):
-                    if p.split('-')[0] != s.split('-')[0]:
-                        tp = self[p][node]['TP'] + [node] + self[node][s]['TP']
+                    tp = self[p][node]['TP'] + [node] + self[node][s]['TP']
+                    if self._from_different_maps(tp):
                         ebunch.append((p, s, {'TP': tp}))
             self.add_edges_from(ebunch)
 
