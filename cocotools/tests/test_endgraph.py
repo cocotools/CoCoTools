@@ -41,7 +41,7 @@ def test_get_mean_pdc():
 
 def test_translate_connection():
     translate = EndGraph._translate_connection.im_func
-    nt.assert_equal(translate(None, 'S', 'L', 'Absent'), 'Absent')
+    nt.assert_equal(translate(None, 'S', 'L', 'Absent'), 'Unknown')
     nt.assert_equal(translate(None, 'L', 'O', 'Present'), 'Unknown')
 
 

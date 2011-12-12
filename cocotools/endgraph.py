@@ -157,16 +157,15 @@ class EndGraph(nx.DiGraph):
         new_connection : string
           'Present', 'Absent', or 'Unknown'.  Describes connection between
           the source and target in the desired BrainMap.
-
-        Notes
-        -----
-        'Unknown' is always translated to 'Unknown', and 'Absent' is always
-        translated to 'Absent'.  'Present' is translated to 'Present' if
-        both RCs are 'I' or 'S'; otherwise it is translated to 'Unknown'.
         """
-        if connection in ('Unknown', 'Absent'):
+        # We cannot assume that a collection of smaller regions fully
+        # cover the region in the desired BrainMap, as we are not
+        # enforcing that BrainMaps have whole-brain coverage.
+        if connection == 'Absent' and s_rc in ('I', 'L') and t_rc in ('I',
+                                                                      'L'):
             return connection
-        if s_rc in ('I', 'S') and t_rc in ('I', 'S'):
+        if connection == 'Present' and s_rc in ('I', 'S') and t_rc in ('I',
+                                                                       'S'):
             return connection
         return 'Unknown'
 
