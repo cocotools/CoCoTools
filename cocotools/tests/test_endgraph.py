@@ -20,14 +20,16 @@ def test_new_attributes_are_better():
     nt.assert_false(method(mock_endg, 'A', 'B', 5))
 
 
-def test_determine_final_ecs():
-    determine = EndGraph._determine_final_ecs.im_func
-    nt.assert_equal(determine(None, set(['Present']), 1, 2), 'XX')
-    nt.assert_equal(determine(None, set(['Present', 'Absent']), 3, 1), 'PX')
-    nt.assert_equal(determine(None, set(['Unknown', 'Absent', 'Present']), 3,
-                              3), 'PP')
-    nt.assert_equal(determine(None, set(['Present', 'Unknown']), 4, 4), 'XX')
-
+def test_resolve_connections():
+    resolve = EndGraph._resolve_connections.im_func
+    nt.assert_equal(resolve(None, set(['Present'])), 'Present')
+    nt.assert_equal(resolve(None, set(['Present', 'Absent'])), 'Present')
+    nt.assert_equal(resolve(None, set(['Unknown', 'Absent', 'Present'])),
+                    'Present')
+    nt.assert_equal(resolve(None, set(['Present', 'Unknown'])), 'Present')
+    nt.assert_equal(resolve(None, set(['Absent'])), 'Absent')
+    nt.assert_equal(resolve(None, set(['Unknown'])), 'Unknown')
+    
 
 def test_get_mean_pdc():
     mock_conn = DiGraph()
@@ -44,10 +46,11 @@ def test_translate_connection():
 
 
 def test_get_rcs():
+    nt.assert_equal(EndGraph._get_rcs.im_func(None, ('B-1', ['B-1']), None,
+                                              [3]),
+                    (['I'], [3, 0]))
     mock_mapp = DiGraph()
     mock_mapp.add_edge('A-1', 'B-1', RC='S', PDC=4)
-    nt.assert_raises(EndGraphError, EndGraph._get_rcs.im_func, None,
-                     ('B-1', ['A-1']), mock_mapp, [])
     mock_mapp.add_edge('A-2', 'B-1', RC='O', PDC=6)
     nt.assert_equal(EndGraph._get_rcs.im_func(None, ('B-1', ['A-1', 'A-2']),
                                               mock_mapp, []),
@@ -69,16 +72,16 @@ def mock_get_mean_pdc(self, source, target, conn):
     return 6
 
 
-def mock_determine_final_ecs(self, connections, num_sources, num_targets):
-    return 'XX'
+def mock_resolve_connections(self, connections):
+    return 'Present'
 
 
 @replace('cocotools.endgraph.EndGraph._get_rcs', mock_get_rcs)
 @replace('cocotools.endgraph.EndGraph._translate_connection',
          mock_translate_connection)
 @replace('cocotools.endgraph.EndGraph._get_mean_pdc', mock_get_mean_pdc)
-@replace('cocotools.endgraph.EndGraph._determine_final_ecs',
-         mock_determine_final_ecs)
+@replace('cocotools.endgraph.EndGraph._resolve_connections',
+         mock_resolve_connections)
 def test_translate_attributes():
     mock_conn = DiGraph()
     mock_conn.add_edge('B-1', 'B-2', Connection='Present')
@@ -87,7 +90,7 @@ def test_translate_attributes():
     # 18 (non-existent conn edge).
     nt.assert_equal(translate(EndGraph(), ('A-1', ['B-1', 'B-3']),
                               ('A-2', ['B-2']), None, mock_conn),
-                    {'Connection': 'XX', 'PDC': 9})
+                    {'Connection': 'Present', 'PDC': 9})
 
     
 def test_translate_node():

@@ -65,17 +65,8 @@ class EndGraph(nx.DiGraph):
         elif self._new_attributes_are_better(source, target, attributes['PDC']):
             nx.DiGraph.add_edge.im_func(self, source, target, attributes)
 
-    def _determine_final_ecs(self, connections, num_sources, num_targets):
-        """Return ECs for the connection in the desired BrainMap.
-
-        Although we did not have EC-level resolution for the original
-        edges, we can get it in the desired BrainMap if the BrainSites in
-        the original BrainMap are smaller than those in the desired
-        BrainMap.  This is because some of the original edges may be
-        present, and some may be absent, generating ECs of P.
-
-        Absent connections are still described as 'Absent'.  This is
-        equivalent to ECs of ('C', 'N') and ('N', 'C').
+    def _resolve_connections(self, connections):
+        """Return Connection value for the edge in the desired BrainMap.
 
         Parameters
         ----------
@@ -83,43 +74,31 @@ class EndGraph(nx.DiGraph):
           Unique translated connections for the edges in the original
           BrainMap.
 
-        num_sources: int
-          Number of original sources contributing to this connection.
-
-        num_targets : int
-          Number of original targets contributing to this connection.
-
         Returns
         -------
-        ecs : string
-          'Absent', 'PP', 'XP', 'PX', 'XX', or 'Unknown'.
+        Connection : string
+          'Absent', 'Present', or 'Unknown'.
+
+        Notes
+        -----
+        If the regions in the original BrainMap were smaller than those in
+        the desired BrainMap, and if the original BrainMap fully covered
+        the area encompassed by the regions in the desired BrainMap, we
+        could resolve complete from partial connections.  But because we
+        are not requiring full coverage between BrainMaps -- as many
+        BrainMaps deliberately fail to cover the entire brain -- we
+        cannot get resolution better than present versus absent.
         """
-        if len(connections) == 3:
-            if num_sources == 1:
-                # Because we have more than one original edge,
-                # num_targets must be greater than one.
-                return 'XP'
-            if num_targets == 1:
-                # num_sources must be greater than one.
-                return 'PX'
-            return 'PP'
-        if len(connections) == 2:
-            if 'Unknown' in connections:
-                if 'Present' in connections:
-                    # Whatever the numbers of sources and targets,
-                    # neither EC can be labeled P definitively.
-                    return 'XX'
-                # The existence of just one 'Unknown' connection
-                # prevents the summary connection being 'Absent'.
-                return 'Unknown'
-            if num_sources == 1:
-                return 'XP'
-            if num_targets == 1:
-                return 'PX'
-            return 'PP'
-        if connections.pop() == 'Present':
-            return 'XX'
-        if connections.pop() == 'Absent':
+        if len(connections) > 1:
+            if 'Present' in connections:
+                return 'Present'
+            # The existence of just one 'Unknown' connection prevents
+            # the summary connection being 'Absent'.
+            return 'Unknown'
+        sole_entry = connections.pop()
+        if sole_entry == 'Present':
+            return 'Present'
+        if sole_entry == 'Absent':
             return 'Absent'
         return 'Unknown'
 
@@ -224,11 +203,13 @@ class EndGraph(nx.DiGraph):
         if len(originals) == 1:
             orig = originals[0]
             if new == orig:
-                return ['I']
+                pdcs.append(0)
+                return ['I'], pdcs
             rc = mapp[orig][new]['RC']
-            if rc not in ('I', 'L'):
-                raise EndGraphError("""mapp does not have full coverage
-around %s""" % orig)
+            # We are not enforcing that the original map must fully
+            # cover the area encompassed by the region from the target
+            # map currently being processed (new).  Not all BrainMaps
+            # have whole-brain coverage.
             pdcs.append(mapp[orig][new]['PDC'])
             return [rc], pdcs
         else:
@@ -236,7 +217,7 @@ around %s""" % orig)
             for orig in originals:
                 rc = mapp[orig][new]['RC']
                 if rc not in ('S', 'O'):
-                    raise EndGraphError("""RCs from %s to %s indicate the
+                    raise EndGraphError("""RCs from %s to %s indicate the \
 latter are not disjoint""" % (new, originals))
                 rcs.append(rc)
                 pdcs.append(mapp[orig][new]['PDC'])
@@ -286,9 +267,7 @@ latter are not disjoint""" % (new, originals))
                                                             c))
                     pdcs.append(self._get_mean_pdc(original_s, original_t,
                                                    conn))
-        return {'Connection': self._determine_final_ecs(set(votes),
-                                                        len(original_sources),
-                                                        len(original_targets)),
+        return {'Connection': self._resolve_connections(set(votes)),
                 # Note that each original mapp edge and each original
                 # conn edge gets a single entry in pdcs, and thus are
                 # weighted equally.
