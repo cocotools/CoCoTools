@@ -81,24 +81,28 @@ CONN_FAILURES = ['AB89', 'ABMR98', 'ABP80', 'AF42', 'AF45', 'B09', 'B81',
                  'AC80', 'W58', 'RB80b', 'MW87', 'AP00', 'AP34', 'L33']
 
 
-# Read these guys to figure out why they have 'O' RCs.
-INTRAMAP_O_RELATIONS = ['UD86a', 'BF95', 'SP89b', 'DU86', 'RAP87', 'SP89a',
-                        'SMKB95']
+INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
 
 
-# Before you read, get their CoCoMac edges and identify the confusion.
-PRINT_AND_READ = ['CP99', 'AHGWU00']
+# The spatial hierarchy within these maps cannot be determined based
+# on the reported RCs.
+PROBLEMATIC = ['CP99', 'AHGWU00',
+               # Are RT and R disjoint?
+               'HSK98a',
+               # This map's hierarchy is fine, but its RCs to other
+               # maps are erroneous. 
+               'R00']
 
 
 MAPP_SUCCESSES = [brain_map for brain_map in ALLMAPS if brain_map not in
-                  MAPP_FAILURES and brain_map not in INTRAMAP_O_RELATIONS and
-                  brain_map not in PRINT_AND_READ]
+                  MAPP_FAILURES and brain_map not in INTRAMAP_O_RCS and
+                  brain_map not in PROBLEMATIC]
 
 
 CONN_SUCCESSES = [brain_map for brain_map in ALLMAPS if brain_map not in
                   CONN_FAILURES and brain_map not in MAPP_FAILURES and
-                  brain_map not in INTRAMAP_O_RELATIONS and brain_map not in
-                  PRINT_AND_READ]
+                  brain_map not in INTRAMAP_O_RCS and brain_map not in
+                  PROBLEMATIC]
 
 
 # Only one edge for each pair of regions is needed; the reciprocal
@@ -187,6 +191,9 @@ MISSING_MAPP_EDGES = [('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
                       ('HSK98A-BELT', 'HSK98A-ML', {'RC': 'L', 'PDC': 0}),
                       ('HSK98A-BELT', 'HSK98A-RTL', {'RC': 'L', 'PDC': 0}),
                       ('HSK98A-BELT', 'HSK98A-AL', {'RC': 'L', 'PDC': 0}),
+                      ('HSK98A-BELT', 'HSK98A-CM', {'RC': 'L', 'PDC': 0}),
+                      ('HSK98A-BELT', 'HSK98A-RM', {'RC': 'L', 'PDC': 0}),
+                      ('HSK98A-BELT', 'HSK98A-RTM', {'RC': 'L', 'PDC': 0}),
                       # This is implied, but is it true?
                       ('IAC87A-29L', 'IAC87A-29M', {'RC': 'L', 'PDC': 0}),
                       ('GCSC00-PUL', 'GCSC00-PML', {'RC': 'L', 'PDC': 0}),

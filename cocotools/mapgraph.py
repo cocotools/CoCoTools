@@ -761,9 +761,15 @@ its own map.""" % node_x)
           the same BrainMap and the edge and its reciprocal are
           successfully added to the graph.  Such addition only occurs if
           allow_intramap is set to True.
+
+        Notes
+        -----
+        Edges involving the BrainMap R00 are rejected silently, as they
+        have been found to be erroneous.
         """
         self._check_nodes([source, target])
-        if source == target:
+        if source == target or 'R00' in (source.split('-')[0],
+                                         target.split('-')[0]):
             # Returning None breaks add_edges_from.
             return set()
         if not allow_intramap and source.split('-')[0] == target.split('-')[0]:
