@@ -219,3 +219,11 @@ def test_check_nodes():
                     None)
     nt.assert_equal(MapGraph._check_nodes.im_func(None, ['SP89B-MST']),
                     None)
+
+
+def test_from_different_maps():
+    method = MapGraph._from_different_maps.im_func
+    nt.assert_true(method(None, 'A-1', ['B-1', 'C-1'], 'D-1'))
+    nt.assert_false(method(None, 'A-1', ['B-1', 'D-1'], 'D-1'))
+                   
+                                                         

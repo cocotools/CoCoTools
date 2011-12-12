@@ -685,6 +685,33 @@ its own map.""" % node_x)
             if not re.match(r'([A-Z]+[0-9]{2}[A-Z]?-.+)|([GRA]M-.+)', node):
                 raise MapGraphError('%s is not in CoCoMac format.' % node)
 
+    def _from_different_maps(self, source, tp, target):
+        """Return True if no two nodes are from the same BrainMap.
+
+        Parameters
+        ----------
+        source : string
+          A node in the graph.
+
+        tp : list
+          Transformation path from source to target.
+
+        target : string
+          Another node in the graph.
+
+        Returns
+        -------
+        True or False : boolean
+        """
+        map_list = []
+        nodes = tp + [source, target]
+        for n in nodes:
+            brain_map = n.split('-')[0]
+            if brain_map in map_list:
+                return False
+            map_list.append(brain_map)
+        return True
+
 #------------------------------------------------------------------------------
 # Core Public Methods
 #------------------------------------------------------------------------------
@@ -830,7 +857,7 @@ its own map.""" % node_x)
             for p in self.predecessors(node):
                 for s in self.successors(node):
                     tp = self[p][node]['TP'] + [node] + self[node][s]['TP']
-                    if self._from_different_maps(tp):
+                    if self._from_different_maps(p, tp, s):
                         ebunch.append((p, s, {'TP': tp}))
             self.add_edges_from(ebunch)
 
