@@ -5,7 +5,7 @@ import nose.tools as nt
 from cocotools import EndGraph, EndGraphError
 
 
-# Deliberately not tested: add_edge.
+# Deliberately not tested: add_edge, add_translated_edges.
 
 #------------------------------------------------------------------------------
 # Unit Tests
@@ -43,6 +43,7 @@ def test_translate_connection():
     translate = EndGraph._translate_connection.im_func
     nt.assert_equal(translate(None, 'S', 'L', 'Absent'), 'Unknown')
     nt.assert_equal(translate(None, 'L', 'O', 'Present'), 'Unknown')
+    nt.assert_equal(translate(None, 'L', 'I', 'Absent'), 'Absent')
 
 
 def test_get_rcs():
