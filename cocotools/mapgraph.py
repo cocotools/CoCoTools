@@ -112,7 +112,8 @@ class MapGraph(nx.DiGraph):
         -------
         worst_pdc : integer
         """
-        worst_pdc = self[node][lo_neighbors.pop()]['PDC']
+        # Initialize worst_pdc to a value smaller than the lowest possible.
+        worst_pdc = -1
         for neighbor in lo_neighbors:
             pdc = self[node][neighbor]['PDC']
             if pdc > worst_pdc:
@@ -146,8 +147,8 @@ class MapGraph(nx.DiGraph):
         In the event of a tie for the best PDC, the neighbor with an RC of
         'I' among those tied, if one is present, is returned.
         """
-        best_is = is_neighbors.pop()
-        best_pdc = self[node][best_is]['PDC']
+        # Initialize best_pdc to a value above the greatest possible.
+        best_pdc = 19
         for neighbor in is_neighbors:
             pdc = self[node][neighbor]['PDC']
             if pdc < best_pdc or (pdc == best_pdc and
