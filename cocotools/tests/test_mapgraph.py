@@ -8,8 +8,8 @@ from cocotools import MapGraph, MapGraphError
 
 
 # Not tested: _add_valid_edge, add_edge, add_edges_from, add_node,
-# add_nodes_from, deduce_edges, remove_edge, remove_edges_from,
-# resolve_contradiction, eliminate_contradictions.
+# add_nodes_from, deduce_edges, resolve_contradiction,
+# eliminate_contradictions.
 
 #------------------------------------------------------------------------------
 # Integration Tests
@@ -18,6 +18,22 @@ from cocotools import MapGraph, MapGraphError
 def mock_init(self, conn):
     DiGraph.__init__.im_func(self)
     self.conn = conn
+
+
+@replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
+@replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
+def test_edge_removal():
+    # Test for remove_edge and remove_edges_from.
+    mock_mapp = MapGraph(None)
+    mock_mapp.add_edges_from([('A-1', 'B-1', {'TP': []}),
+                              ('B-1', 'A-1', {'TP': []}),
+                              ('C-1', 'D-1', {'TP': ['E-1', 'A-1', 'B-1']}),
+                              ('D-1', 'C-1', {'TP': ['B-1', 'A-1', 'E-1']}),
+                              ('E-1', 'F-1', {'TP': ['D-1', 'C-1', 'G-1']}),
+                              ('F-1', 'E-1', {'TP': ['G-1', 'C-1', 'D-1']}),
+                              ('G-1', 'H-1', {'TP': []})])
+    mock_mapp.remove_edges_from([('A-1', 'B-1')])
+    nt.assert_equal(mock_mapp.edges(), [('G-1', 'H-1')])
 
 
 @replace('cocotools.mapgraph.MapGraph.__init__', mock_init)

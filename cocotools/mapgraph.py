@@ -876,7 +876,7 @@ its own map.""" % node_x)
 # Core Public Methods
 #------------------------------------------------------------------------------
 
-    def remove_edge(source, target):
+    def remove_edge(self, source, target):
         """Remove edges between these nodes, as well as edges they support.
 
         Supported edges are those with an edge between source and target in
@@ -912,7 +912,7 @@ its own map.""" % node_x)
                         edges_with_bad_tp.append((s, t))
         self.remove_edges_from(edges_with_bad_tp)
 
-    def remove_edges_from(edges):
+    def remove_edges_from(self, edges):
         """Remove edges from the graph, using self.remove_edge.
 
         Parameters
