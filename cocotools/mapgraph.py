@@ -1,5 +1,6 @@
 import re
 import copy
+from itertools import product
 
 import networkx as nx
 
@@ -90,6 +91,165 @@ class MapGraph(nx.DiGraph):
         if not isinstance(conn, ConGraph):
             raise MapGraphError('conn must be a ConGraph instance.')
         self.conn = conn
+
+#------------------------------------------------------------------------------
+# Methods for Eliminating Post-Deduction Contradictions
+#------------------------------------------------------------------------------
+
+    def _get_worst_pdc(self, node, lo_neighbors):
+        """Return worst PDC associated with edges from node to lo_neighbors.
+
+        Parameters
+        ----------
+        node : string
+          A node in the graph.
+
+        lo_neighbors : list
+          Nodes from the same BrainMap to which node has an RC of 'L' or
+          'O'.
+
+        Returns
+        -------
+        worst_pdc : integer
+        """
+        worst_pdc = self[node][lo_neighbors.pop()]['PDC']
+        for neighbor in lo_neighbors:
+            pdc = self[node][neighbor]['PDC']
+            if pdc > worst_pdc:
+                worst_pdc = pdc
+        return worst_pdc
+
+    def _get_best_is(self, node, is_neighbors):
+        """Find the neighbor with the best PDC and return both.
+
+        The relevant edges are those from node to each of is_neighbors.
+
+        Parameters
+        ----------
+        node : string
+          A node in the graph.
+
+        is_neighbors : list
+          Nodes from the same BrainMap to which node has an RC of 'I' or
+          'S'.
+
+        Returns
+        -------
+        best_is : string
+          Member of is_neighbors with the best PDC to node.
+        
+        best_pdc : integer
+          The PDC corresponding to the edge from node to best_is.
+
+        Notes
+        -----
+        In the event of a tie for the best PDC, the neighbor with an RC of
+        'I' among those tied, if one is present, is returned.
+        """
+        best_is = is_neighbors.pop()
+        best_pdc = self[node][best_is]['PDC']
+        for neighbor in is_neighbors:
+            pdc = self[node][neighbor]['PDC']
+            if pdc < best_pdc or (pdc == best_pdc and
+                                  self[node][neighbor]['RC'] == 'I'):
+                best_is = neighbor
+                best_pdc = pdc
+        return best_is, best_pdc
+        
+    def _resolve_contradiction(self, node, neighbors_by_rc):
+        """Determine which set of edges between node and neighbors to keep.
+
+        The entire collection of edges erroneously implies that the
+        neighbors are not disjoint from each other.  One or more edges must
+        be removed to resolve this error.
+
+        Parameters
+        ----------
+        node : string
+          A node in the graph.
+
+        neighbors_by_rc : dictionary
+          Maps 'IS' and 'LO' to lists of neighbors for which node has one
+          of the associated RCs.
+        """
+        is_neighbors = neighbors_by_rc['IS']
+        lo_neighbors = neighbors_by_rc['LO']
+        # We would not be here if there weren't an edge from node to
+        # one of the neighbors with an RC of 'I' or 'S'.
+        best_is, best_pdc = self._get_best_is(node, is_neighbors)
+        if lo_neighbors and self._get_worst_pdc(node, lo_neighbors) < best_pdc:
+            self.remove_edges_from(product([node], is_neighbors))
+        else:
+            all_neighbors = is_neighbors + lo_neighbors
+            all_neighbors.remove(best_is)
+            self.remove_edges_from(product([node], all_neighbors))
+
+    def _organize_by_rc(self, node, neighbors):
+        """Return neighbors grouped by their RC with node.
+
+        It is assumed that node has edges to all of neighbors.
+
+        Parameters
+        ----------
+        node : string
+          A node in the graph.
+
+        neighbors : list
+          Neighbors of node, all from the same BrainMap (different from
+          node's BrainMap).
+
+        Returns
+        -------
+        neighbors_by_rc : dictionary
+          Maps 'IS' and 'LO' to lists of neighbors for which node has one
+          of the associated RCs.
+        """
+        neighbors_by_rc = {'IS': [], 'LO': []}
+        for n in neighbors:
+            if self[node][n]['RC'] in ('I', 'S'):
+                neighbors_by_rc['IS'].append(n)
+            else:
+                neighbors_by_rc['LO'].append(n)
+        return neighbors_by_rc
+
+    def _organize_neighbors_by_map(self, node):
+        """Create a dictionary mapping BrainMaps to regions within them.
+
+        All regions in the dictionary are neighbors of node.
+
+        Parameters
+        ----------
+        node : string
+          A node in the graph.
+
+        Returns
+        -------
+        neighbors_by_map : dictionary
+          Maps BrainMaps of node's neighbors to the neighbors themselves.
+        """
+        neighbors_by_map = {}
+        for neighbor in self.neighbors(node):
+            brain_map = neighbor.split('-')[0]
+            if not neighbors_by_map.has_key(brain_map):
+                neighbors_by_map[brain_map] = [neighbor]
+            else:
+                neighbors_by_map[brain_map].append(neighbor)
+        return neighbors_by_map
+
+    def _eliminate_contradictions(self):
+        """Remove edges that imply overlap of regions in the same BrainMap.
+
+        It is assumed overlap does not genuinely exist, but has resulted
+        from one or more errors in the deduction of relationships absent
+        from the original literature (using self.deduce_edges).
+        """
+        for node in self.nodes_iter():
+            neighbors_by_map = self._organize_neighbors_by_map(node)
+            for brain_map, neighbors in neighbors_by_map.iteritems():
+                if len(neighbors) > 1:
+                    neighbors_by_rc = self._organize_by_rc(node, neighbors)
+                    if neighbors_by_rc['IS']:
+                        self._resolve_contradiction(node, neighbors_by_rc)
 
 #------------------------------------------------------------------------------
 # Methods for Removing Nodes
@@ -716,6 +876,53 @@ its own map.""" % node_x)
 # Core Public Methods
 #------------------------------------------------------------------------------
 
+    def remove_edge(source, target):
+        """Remove edges between these nodes, as well as edges they support.
+
+        Supported edges are those with an edge between source and target in
+        their TP.
+
+        Parameters
+        ----------
+        source : string
+          A node in the graph.
+
+        target : string
+          Another node in the graph.
+        """
+        nx.DiGraph.remove_edge.im_func(self, source, target)
+        nx.DiGraph.remove_edge.im_func(self, target, source)
+        edges_with_bad_tp = []
+        for s, t in self.edges_iter():
+            if (t, s) in edges_with_bad_tp:
+                # Reciprocals are taken care of by self.remove_edges_from.
+                continue
+            tp = self[s][t]['TP']
+            for i, node in enumerate(tp):
+                if node == source:
+                    if i != 0:
+                        before = tp[i - 1]
+                    else:
+                        before = None
+                    try:
+                        after = tp[i + 1]
+                    except IndexError:
+                        after = None
+                    if target in (before, after):
+                        edges_with_bad_tp.append((s, t))
+        self.remove_edges_from(edges_with_bad_tp)
+
+    def remove_edges_from(edges):
+        """Remove edges from the graph, using self.remove_edge.
+
+        Parameters
+        ----------
+        edges : iterable
+          Tuples of the form (source, target).
+        """
+        for source, target in edges:
+            self.remove_edge(source, target)
+
     def add_edge(self, source, target, rc=None, pdc=None, tp=None,
                  allow_intramap=False):
         """Add edges between source and target to the graph.
@@ -866,6 +1073,7 @@ its own map.""" % node_x)
                     if self._from_different_maps(p, tp, s):
                         ebunch.append((p, s, {'TP': tp}))
             self.add_edges_from(ebunch)
+        self._eliminate_contradictions()
 
 #------------------------------------------------------------------------------
 # Other Public Methods

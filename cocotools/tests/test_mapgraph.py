@@ -7,8 +7,9 @@ import nose.tools as nt
 from cocotools import MapGraph, MapGraphError
 
 
-# Deliberately not tested: _add_valid_edge, add_edge, add_edges_from,
-# add_node, add_nodes_from, deduce_edges.
+# Not tested: _add_valid_edge, add_edge, add_edges_from, add_node,
+# add_nodes_from, deduce_edges, remove_edge, remove_edges_from,
+# resolve_contradiction, eliminate_contradictions.
 
 #------------------------------------------------------------------------------
 # Integration Tests
@@ -63,6 +64,45 @@ def test_add_to_hierarchy():
 
 def test_init():
     nt.assert_raises(MapGraphError, MapGraph, DiGraph())
+
+
+def test_get_worst_pdc():
+    mock_mapp = DiGraph()
+    mock_mapp.add_edges_from([('A-1', 'B-1', {'RC': 'L', 'PDC': 5}),
+                              ('A-1', 'B-2', {'RC': 'O', 'PDC': 7}),
+                              ('A-1', 'B-3', {'RC': 'L', 'PDC': 15})])
+    result = MapGraph._get_worst_pdc.im_func(mock_mapp, 'A-1',
+                                             ['B-1', 'B-2', 'B-3'])
+    nt.assert_equal(result, 15)
+
+
+def test_get_best_is():
+    mock_mapp = DiGraph()
+    mock_mapp.add_edges_from([('A-1', 'B-1', {'RC': 'I', 'PDC': 5}),
+                              ('A-1', 'B-2', {'RC': 'I', 'PDC': 7}),
+                              ('A-1', 'B-3', {'RC': 'S', 'PDC': 5})])
+    result = MapGraph._get_best_is.im_func(mock_mapp, 'A-1',
+                                           ['B-1', 'B-2', 'B-3'])
+    nt.assert_equal(result, ('B-1', 5))
+
+
+def test_organize_by_rc():
+    mock_mapp = DiGraph()
+    mock_mapp.add_edges_from([('A-1', 'B-1', {'RC': 'I'}),
+                              ('A-1', 'B-2', {'RC': 'L'}),
+                              ('A-1', 'C-3', {'RC': 'O'})])
+    result = MapGraph._organize_by_rc.im_func(mock_mapp, 'A-1', ['B-1', 'B-2'])
+    nt.assert_equal(result, {'IS': ['B-1'], 'LO': ['B-2']})
+    result = MapGraph._organize_by_rc.im_func(mock_mapp, 'A-1', ['C-3'])
+    nt.assert_equal(result, {'IS': [], 'LO': ['C-3']})
+
+
+def test_organize_neighbors_by_map():
+    mock_mapp = DiGraph()
+    mock_mapp.add_edges_from([('A-1', 'B-1'), ('A-1', 'B-2'), ('A-1', 'C-3'),
+                              ('A-1', 'D-3')])
+    result = MapGraph._organize_neighbors_by_map.im_func(mock_mapp, 'A-1')
+    nt.assert_equal(result, {'B': ['B-2', 'B-1'], 'C': ['C-3'], 'D': ['D-3']})
 
 
 class RemoveLevelFromHierarchyTestCase(TestCase):
