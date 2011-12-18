@@ -61,8 +61,7 @@ class ConGraph(DiGraph):
         ECs, degree, and PDCs for the nodes, ECs, and PDCs.
 
         If an edge from source to target is already present, the set of
-        attributes with the lower PDC is kept.  Ties are resolved using the
-        following EC preferences: C, N, Nc > P > X > Np > Nx.
+        attributes with the lower PDC is kept.
 
         Parameters
         ----------
