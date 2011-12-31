@@ -81,6 +81,19 @@ CONN_FAILURES = ['AB89', 'ABMR98', 'ABP80', 'AF42', 'AF45', 'B09', 'B81',
                  'AC80', 'W58', 'RB80b', 'MW87', 'AP00', 'AP34', 'L33']
 
 
+# The following intra-map O relations have been found:
+# ('BF95-1', 'BF95-SI_TRNK'), ('BF95-3B', 'BF95-SI_TRNK'),
+# ('BF95-SI_TRNK', 'BF95-3B'), ('BF95-SI_TRNK', 'BF95-1'),
+# ('DU86-DMZ', 'DU86-MTP'), ('DU86-DMZ', 'DU86-MST'),
+# ('DU86-MST', 'DU86-DMZ'), ('DU86-MTP', 'DU86-DMZ'),
+# ('RAP87-SIM', 'RAP87-VP'), ('RAP87-VP', 'RAP87-SIM'),
+# ('SP89A-MST', 'SP89A-PGA'), ('SP89A-MST', 'SP89A-TPO'),
+# ('SP89A-PGA', 'SP89A-MST'), ('SP89A-TPO', 'SP89A-MST'),
+# ('SP89B-MST', 'SP89B-TPO'), ('SP89B-MST', 'SP89B-PGA'),
+# ('SP89B-PGA', 'SP89B-MST'), ('SP89B-TPO', 'SP89B-MST'),
+# ('DU86-DMZ', 'DU86-MTP'), ('DU86-DMZ', 'DU86-MST'),
+# ('DU86-MST', 'DU86-DMZ'), ('DU86-MTP', 'DU86-DMZ'),
+# ('UD86A-DMZ', 'UD86A-MTP'), ('UD86A-MTP', 'UD86A-DMZ')
 INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
 
 
