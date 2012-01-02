@@ -1080,6 +1080,36 @@ its own map.""" % node_x)
 # Other Public Methods
 #------------------------------------------------------------------------------
 
+    def find_partial_coverage(self):
+        """Find all cases in which one map does not fully cover another.
+
+        That is, return information about situations in which there is only
+        one RC from an entire map to one region from another map, and the
+        RC is S or O.
+
+        Returns
+        -------
+        partial_coverage_instances : list
+          (A, B) tuples, where A is the only region in its map with an RC
+          to B, which is a region from a different map.
+        """
+        partial_coverage_instances = []
+        for node in self.nodes_iter():
+            neighbors_by_map = {}
+            # Remember, all edges are bi-directional.
+            for neighbor in self.neighbors(node):
+                n_map = neighbor.split('-')[0]
+                if neighbors_by_map.has_key(n_map):
+                    neighbors_by_map[n_map].append(neighbor)
+                else:
+                    neighbors_by_map[n_map] = [neighbor]
+            for map_list in neighbors_by_map.values():
+                if len(map_list) == 1:
+                    neighbor = map_list[0]
+                    if self[neighbor][node]['RC'] in ('S', 'O'):
+                        partial_coverage_instances.append((neighbor, node))
+        return partial_coverage_instances
+
     def add_node(self, node):
         """Add a node to the graph.
 

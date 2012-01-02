@@ -281,5 +281,18 @@ def test_from_different_maps():
     method = MapGraph._from_different_maps.im_func
     nt.assert_true(method(None, 'A-1', ['B-1', 'C-1'], 'D-1'))
     nt.assert_false(method(None, 'A-1', ['B-1', 'D-1'], 'D-1'))
-                   
-                                                         
+
+
+def test_find_partial_coverage():
+    mock_g = DiGraph()
+    mock_g.add_edges_from([('A-1', 'B-1', {'RC': 'S'}),
+                           ('B-1', 'A-1', {'RC': 'L'}),
+                           ('C-1', 'B-1', {'RC': 'I'}),
+                           ('B-1', 'C-1', {'RC': 'I'}),
+                           ('D-1', 'B-1', {'RC': 'S'}),
+                           ('B-1', 'D-1', {'RC': 'L'}),
+                           ('D-2', 'B-1', {'RC': 'O'}),
+                           ('B-1', 'D-2', {'RC': 'O'})])
+    # A has partial coverage of B, and B has partial coverage of D.
+    nt.assert_equal(MapGraph.find_partial_coverage.im_func(mock_g),
+                    [('B-1', 'D-2'), ('A-1', 'B-1')])
