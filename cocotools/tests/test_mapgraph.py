@@ -9,7 +9,7 @@ from cocotools import MapGraph, MapGraphError
 
 # Not tested: _add_valid_edge, add_edge, add_edges_from, add_node,
 # add_nodes_from, deduce_edges, _resolve_contradiction,
-# _eliminate_contradictions.
+# _eliminate_contradictions, remove_nodes_from.
 
 #------------------------------------------------------------------------------
 # Integration Tests
@@ -157,6 +157,15 @@ class RemoveLevelFromHierarchyTestCase(TestCase):
         self.assertEqual(result, {'J': {'A': {}},
                                   'B': {'I': {'F': {}, 'H': {}},
                                         'D': {'E': {}}}})
+
+
+def test_remove_node():
+    mock_mapp = DiGraph()
+    mock_mapp.add_node('X')
+    mock_mapp.add_edges_from([('A', 'B', {'TP': ['X']}),
+                              ('B', 'C', {'TP': ['Y']})])
+    MapGraph.remove_node.im_func(mock_mapp, 'X')
+    nt.assert_equal(mock_mapp.edges(), [('B', 'C')])
                        
 
 @replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
@@ -186,6 +195,7 @@ def test_find_bottom_of_hierarchy():
 @replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
 @replace('cocotools.mapgraph.MapGraph.add_edge', DiGraph.add_edge)
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
+@replace('cocotools.mapgraph.MapGraph.remove_node', DiGraph.remove_node)
 def test_merge_identical_nodes():
     mock_conn = DiGraph()
     mock_conn.add_edges_from([('A-1', 'A-5'), ('A-4', 'A-1')])

@@ -338,10 +338,10 @@ class MapGraph(nx.DiGraph):
         node : string
           A node in the graph.
         """
-        nx.DiGraph.im_func.remove_node(self, node)
+        nx.DiGraph.remove_node.im_func(self, node)
         edges_to_remove = []
-        for source, target, attributes in self.edges_iter():
-            if node in attributes['TP']:
+        for source, target in self.edges_iter():
+            if node in self[source][target]['TP']:
                 edges_to_remove.append((source, target))
         self.remove_edges_from(edges_to_remove)
 
