@@ -82,19 +82,11 @@ CONN_FAILURES = ['AB89', 'ABMR98', 'ABP80', 'AF42', 'AF45', 'B09', 'B81',
 
 
 # The following intra-map O relations have been found:
-# ('BF95-1', 'BF95-SI_TRNK'), ('BF95-3B', 'BF95-SI_TRNK'),
-# ('BF95-SI_TRNK', 'BF95-3B'), ('BF95-SI_TRNK', 'BF95-1'),
 # ('DU86-DMZ', 'DU86-MTP'), ('DU86-DMZ', 'DU86-MST'),
-# ('DU86-MST', 'DU86-DMZ'), ('DU86-MTP', 'DU86-DMZ'),
-# ('RAP87-SIM', 'RAP87-VP'), ('RAP87-VP', 'RAP87-SIM'),
+# ('RAP87-SIM', 'RAP87-VP')
 # ('SP89A-MST', 'SP89A-PGA'), ('SP89A-MST', 'SP89A-TPO'),
-# ('SP89A-PGA', 'SP89A-MST'), ('SP89A-TPO', 'SP89A-MST'),
 # ('SP89B-MST', 'SP89B-TPO'), ('SP89B-MST', 'SP89B-PGA'),
-# ('SP89B-PGA', 'SP89B-MST'), ('SP89B-TPO', 'SP89B-MST'),
-# ('DU86-DMZ', 'DU86-MTP'), ('DU86-DMZ', 'DU86-MST'),
-# ('DU86-MST', 'DU86-DMZ'), ('DU86-MTP', 'DU86-DMZ'),
-# ('UD86A-DMZ', 'UD86A-MTP'), ('UD86A-MTP', 'UD86A-DMZ')
-INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
+# ('UD86A-DMZ', 'UD86A-MTP')
 # Implicit ones:
 # [('FV91-VOT', 'FV91-V4'), mediator = GSG88-V4
 #  ('PHT00-32', 'PHT00-9/32'), mediator = PP94-32
@@ -103,9 +95,7 @@ INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
 #  ('PHT00-2/1', 'PHT00-2'), mediator = B09-2
 #  ('PHT00-8/32', 'PHT00-32'), mediator = PP94-32
 #  ('PHT00-31', 'PHT00-PGM/31'), mediator = VPR87-31
-#  ('PHT00-PGM/31', 'PHT00-31'), mediator = VPR87-31
 #  ('PHT00-PGM/31', 'PHT00-PGM'), mediator = PS82-PGM
-#  ('PHT00-9/32', 'PHT00-32'), mediator = PP94-32
 #  ('SA90-36/TF/TE', 'SA90-TE'), mediator = IAC87A-TE
 #  ('LV00A-TPT', 'LV00A-TOC'), mediator = PG91B-TPT
 #  ('L34-PROS.B', 'L34-SUB.'), mediator = RV87-SUB
@@ -113,17 +103,14 @@ INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
 #  ('PHT00-23C', 'PHT00-24/23C'), mediator = VPR87-23C
 #  ('PHT00-23B', 'PHT00-24/23B'), mediator = VPR87-23B
 #  ('BB47-TEO', 'BB47-OA'), mediator = B09-19
-#  ('PHT00-1', 'PHT00-2/1'), mediator = B09-1
-#  ('PHT00-2', 'PHT00-2/1'), mediator = B09-2
-#  ('FV91-V4', 'FV91-VOT'), mediator = GSG88-V4
-#  ('L34-SUB.', 'L34-PROS.B'), mediator = RV87-SUB
 #  ('BB47-OA', 'BB47-TEO'), mediator = B09-19
-#  ('LV00A-TOC', 'LV00A-TPT'), mediator = PG91B-TPT
-#  ('PHT00-24/23A', 'PHT00-23A'), mediator = VPR87-23A
-#  ('PHT00-24/23C', 'PHT00-23C'), mediator = VPR87-23C
-#  ('PHT00-24/23B', 'PHT00-23B'), mediator = VPR87-23B
-#  ('PHT00-PGM', 'PHT00-PGM/31'), mediator = PS82-PGM
-#  ('SA90-TE', 'SA90-36/TF/TE')] mediator = IAC87A-TE
+
+# In BF95, following earlier papers, 1 and 3b are defined based on
+# cytoarchitecture and various receptive fields that seem to overlap
+# these are defined based on physiological properties.  Before we can
+# use this paper, we need to read the papers cited within it that
+# guide its definitions.
+INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
 
 
 # The spatial hierarchy within these maps cannot be determined based
