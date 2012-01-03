@@ -72,7 +72,7 @@ class MapGraph(nx.DiGraph):
 
     Redundant nodes within a map are merged into a single node in this
     graph and in the associated ConGraph.  A name for the node is chosen
-    from the list of redundant ones arbitrarily
+    from the list of redundant ones arbitrarily.
 
     New spatial relationships are deduced using an enhanced version of
     Objective Relational Transformation (ORT) with the deduce_edges method.
@@ -214,7 +214,7 @@ class MapGraph(nx.DiGraph):
         return neighbors_by_rc
 
     def _organize_neighbors_by_map(self, node):
-        """Create a dictionary mapping BrainMaps to regions within them.
+        """Create a dictionary mapping brain maps to regions within them.
 
         All regions in the dictionary are neighbors of node.
 
@@ -241,8 +241,7 @@ class MapGraph(nx.DiGraph):
         """Remove edges that imply overlap of regions in the same BrainMap.
 
         It is assumed overlap does not genuinely exist, but has resulted
-        from one or more errors in the deduction of relationships absent
-        from the original literature (using self.deduce_edges).
+        from one or more errors in the original literature.
         """
         for node in self.nodes_iter():
             neighbors_by_map = self._organize_neighbors_by_map(node)
@@ -328,6 +327,37 @@ class MapGraph(nx.DiGraph):
                 raise MapGraphError('path has length greater than 3: %s.' %
                                     path)
         return hierarchy
+
+    def remove_node(self, node):
+        """Remove node from the graph.
+
+        Also remove edges that node mediates (as a member of the TP).
+
+        Parameters
+        ----------
+        node : string
+          A node in the graph.
+        """
+        nx.DiGraph.im_func.remove_node(self, node)
+        edges_to_remove = []
+        for source, target, attributes in self.edges_iter():
+            if node in attributes['TP']:
+                edges_to_remove.append((source, target))
+        self.remove_edges_from(edges_to_remove)
+
+    def remove_nodes_from(self, nodes):
+        """Remove nodes from the graph.
+
+        Also remove edges that removed nodes mediate (as members of the
+        TP).
+
+        Parameters
+        ----------
+        nodes : list
+          Nodes to be removed.
+        """
+        for node in nodes:
+            self.remove_node(node)
         
     def _find_bottom_of_hierarchy(self, hierarchy, path):
         """Return nodes at the lowest level and a node that maps to them.
@@ -603,6 +633,45 @@ its own map.""" % node_x)
             hierarchies[brain_map] = self._add_to_hierarchy(node, hierarchy)
         return hierarchies
 
+    def _get_intramap_edges(self, node, neighbors):
+        """Return list of edges between all neighbors mediated by node.
+
+        Parameters
+        ----------
+        node : string
+          A region from a map different from that of neighbors.
+        
+        neighbors : list
+          Regions from the same map.
+
+        Returns
+        -------
+        edges : list
+          Edges between all pairs of neighbors, each specified as (source,
+          target, [node]).  The last item in each tuple is the TP.
+        """
+        # This will include self-loops and may include other invalid
+        # edges, but these will be weeded out by add_edge.
+        return [(s, t, [node]) for s, t in product(neighbors, repeat=2)]
+
+    def _find_implied_intramap_edges(self):
+        """Identify implied intra-map spatial relationships.
+
+        Returns
+        -------
+        edges : list
+          Intra-map edges, each specified as (source, target, TP).
+        """
+        edges = []
+        for node in self.nodes_iter():
+            neighbors_by_map = self._organize_neighbors_by_map(node)
+            for brain_map, neighbors in neighbors_by_map.iteritems():
+                if len(neighbors) > 1:
+                    neighbors_by_rc = self._organize_by_rc(node, neighbors)
+                    if neighbors_by_rc['IS']:
+                        edges += self._get_intramap_edges(node, neighbors)
+        return edges
+        
 #------------------------------------------------------------------------------
 # Methods for Adding Edges
 #------------------------------------------------------------------------------
@@ -928,13 +997,11 @@ its own map.""" % node_x)
                  allow_intramap=False):
         """Add edges between source and target to the graph.
 
-        Either rc and pdc or tp must be supplied.  Users should only
-        supply rc and pdc; tp is supplied by the deduce_edges method.  If
-        tp is supplied, anything supplied for rc or pdc is ignored.  If rc
-        and pdc are supplied, anything supplied for tp is ignored.
+        Either rc and pdc or tp must be supplied.  If tp is supplied,
+        anything supplied for rc or pdc is ignored.  If rc and pdc are
+        supplied, anything supplied for tp is ignored.
 
-        Self-loops are never allowed, although they do exist in the CoCoMac
-        database.
+        Self-loops are never allowed.
 
         Parameters
         ----------
@@ -1009,9 +1076,8 @@ its own map.""" % node_x)
         and attributes being a dictionary of valid edge attributes.
 
         A valid edge attribute dictionary contains either an RC and a PDC
-        or a TP.  Users should specify only RCs and PDCs; the TP property
-        is used by the deduce_edges method.  Edges received from functions
-        in the query module are in the correct format.
+        or a TP.  Edges received from functions in the query module are in
+        the correct format.
 
         If intra-map edges are supplied, it is important that there be
         enough edges for add_edges_from to make out distinct levels of
@@ -1034,14 +1100,10 @@ its own map.""" % node_x)
         self.conn) is kept; in the event of a tie, the finest level of
         resolution is kept.  Identical intra-map nodes are merged into a
         single node whose name is chosen arbitrarily.
-        
-        This method assumes all edges have empty TPs, so do not call it
-        after deduce_edges.  If this method is called after deduce_edges,
-        and nodes are removed, edges in whose TPs the removed nodes play
-        a role will not be removed.
         """
         # intramap_nodes will hold nodes with intra-map edges.
         intramap_nodes = set()
+        # Add the edges, keeping track of intra-map ones.
         for source, target, attributes in edges:
             if attributes.has_key('TP'):
                 intramap_nodes.update(self.add_edge(source, target,
@@ -1052,6 +1114,10 @@ its own map.""" % node_x)
                                                     rc=attributes['RC'],
                                                     pdc=attributes['PDC'],
                                                     allow_intramap=True))
+        # Add intra-map edges implied by but absent from those supplied.
+        for source, target, TP in self._find_implied_intramap_edges():
+            intramap_nodes.update(self.add_edge(source, target, tp=TP,
+                                                allow_intramap=True))
         if intramap_nodes:
             map_hierarchies = self._determine_hierarchies(intramap_nodes)
             # Use the hierarchy for each BrainMap to remove all but
@@ -1095,14 +1161,7 @@ its own map.""" % node_x)
         """
         partial_coverage_instances = []
         for node in self.nodes_iter():
-            neighbors_by_map = {}
-            # Remember, all edges are bi-directional.
-            for neighbor in self.neighbors(node):
-                n_map = neighbor.split('-')[0]
-                if neighbors_by_map.has_key(n_map):
-                    neighbors_by_map[n_map].append(neighbor)
-                else:
-                    neighbors_by_map[n_map] = [neighbor]
+            neighbors_by_map = self._organize_neighbors_by_map(node)
             for map_list in neighbors_by_map.values():
                 if len(map_list) == 1:
                     neighbor = map_list[0]

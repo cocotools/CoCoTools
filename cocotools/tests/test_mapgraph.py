@@ -8,8 +8,8 @@ from cocotools import MapGraph, MapGraphError
 
 
 # Not tested: _add_valid_edge, add_edge, add_edges_from, add_node,
-# add_nodes_from, deduce_edges, resolve_contradiction,
-# eliminate_contradictions.
+# add_nodes_from, deduce_edges, _resolve_contradiction,
+# _eliminate_contradictions.
 
 #------------------------------------------------------------------------------
 # Integration Tests
@@ -73,6 +73,23 @@ def test_add_to_hierarchy():
                          ('A-4', 'A-1', {'RC': 'L'})])
     hierarchy = mapp._add_to_hierarchy('A-4', hierarchy)
     nt.assert_equal(hierarchy, {'A-3': {'A-4': {'A-1': {}}, 'A-2': {}}})
+
+
+@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)    
+@replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
+def test_find_partial_coverage():
+    mapp = MapGraph()
+    mapp.add_edges_from([('A-1', 'B-1', {'RC': 'S'}),
+                         ('B-1', 'A-1', {'RC': 'L'}),
+                         ('C-1', 'B-1', {'RC': 'I'}),
+                         ('B-1', 'C-1', {'RC': 'I'}),
+                         ('D-1', 'B-1', {'RC': 'S'}),
+                         ('B-1', 'D-1', {'RC': 'L'}),
+                         ('D-2', 'B-1', {'RC': 'O'}),
+                         ('B-1', 'D-2', {'RC': 'O'})])
+    # A has partial coverage of B, and B has partial coverage of D.
+    nt.assert_equal(MapGraph.find_partial_coverage.im_func(mapp),
+                    [('B-1', 'D-2'), ('A-1', 'B-1')])
         
 #------------------------------------------------------------------------------
 # Unit Tests
@@ -218,6 +235,14 @@ def test_determine_hierarchies():
                      'C': {'C-1': {}}})
     
 
+def test_get_intramap_edges():
+    neighbors = ['A', 'B', 'C']
+    nt.assert_equal(MapGraph._get_intramap_edges.im_func(None, 'X', neighbors),
+                    [('A', 'A', ['X']), ('A', 'B', ['X']), ('A', 'C', ['X']),
+                     ('B', 'A', ['X']), ('B', 'B', ['X']), ('B', 'C', ['X']),
+                     ('C', 'A', ['X']), ('C', 'B', ['X']), ('C', 'C', ['X'])])
+
+
 def test_new_attributes_are_better():
     mock_g = DiGraph()
     mock_g.add_edge('A', 'B', PDC=5, TP=['C', 'D', 'E'])
@@ -281,18 +306,3 @@ def test_from_different_maps():
     method = MapGraph._from_different_maps.im_func
     nt.assert_true(method(None, 'A-1', ['B-1', 'C-1'], 'D-1'))
     nt.assert_false(method(None, 'A-1', ['B-1', 'D-1'], 'D-1'))
-
-
-def test_find_partial_coverage():
-    mock_g = DiGraph()
-    mock_g.add_edges_from([('A-1', 'B-1', {'RC': 'S'}),
-                           ('B-1', 'A-1', {'RC': 'L'}),
-                           ('C-1', 'B-1', {'RC': 'I'}),
-                           ('B-1', 'C-1', {'RC': 'I'}),
-                           ('D-1', 'B-1', {'RC': 'S'}),
-                           ('B-1', 'D-1', {'RC': 'L'}),
-                           ('D-2', 'B-1', {'RC': 'O'}),
-                           ('B-1', 'D-2', {'RC': 'O'})])
-    # A has partial coverage of B, and B has partial coverage of D.
-    nt.assert_equal(MapGraph.find_partial_coverage.im_func(mock_g),
-                    [('B-1', 'D-2'), ('A-1', 'B-1')])
