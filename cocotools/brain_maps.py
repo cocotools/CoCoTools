@@ -81,57 +81,12 @@ CONN_FAILURES = ['AB89', 'ABMR98', 'ABP80', 'AF42', 'AF45', 'B09', 'B81',
                  'AC80', 'W58', 'RB80b', 'MW87', 'AP00', 'AP34', 'L33']
 
 
-# The following intra-map O relations have been found:
-# ('DU86-DMZ', 'DU86-MTP'), ('DU86-DMZ', 'DU86-MST'),
-# ('RAP87-SIM', 'RAP87-VP')
-# ('SP89A-MST', 'SP89A-PGA'), ('SP89A-MST', 'SP89A-TPO'),
-# ('SP89B-MST', 'SP89B-TPO'), ('SP89B-MST', 'SP89B-PGA'),
-# ('UD86A-DMZ', 'UD86A-MTP')
-# Implicit ones:
-# [('FV91-VOT', 'FV91-V4'), mediator = GSG88-V4
-#  ('PHT00-32', 'PHT00-9/32'), mediator = PP94-32
-#  ('PHT00-32', 'PHT00-8/32'), mediator = PP94-32
-#  ('PHT00-2/1', 'PHT00-1'), mediator = B09-1
-#  ('PHT00-2/1', 'PHT00-2'), mediator = B09-2
-#  ('PHT00-8/32', 'PHT00-32'), mediator = PP94-32
-#  ('PHT00-31', 'PHT00-PGM/31'), mediator = VPR87-31
-#  ('PHT00-PGM/31', 'PHT00-PGM'), mediator = PS82-PGM
-#  ('SA90-36/TF/TE', 'SA90-TE'), mediator = IAC87A-TE
-#  ('LV00A-TPT', 'LV00A-TOC'), mediator = PG91B-TPT
-#  ('L34-PROS.B', 'L34-SUB.'), mediator = RV87-SUB
-#  ('PHT00-23A', 'PHT00-24/23A'), mediator = VPR87-23A
-#  ('PHT00-23C', 'PHT00-24/23C'), mediator = VPR87-23C
-#  ('PHT00-23B', 'PHT00-24/23B'), mediator = VPR87-23B
-#  ('BB47-TEO', 'BB47-OA'), mediator = B09-19
-#  ('BB47-OA', 'BB47-TEO'), mediator = B09-19
-
-# In BF95, following earlier papers, 1 and 3b are defined based on
-# cytoarchitecture and various receptive fields that seem to overlap
-# these are defined based on physiological properties.  Before we can
-# use this paper, we need to read the papers cited within it that
-# guide its definitions.
-INTRAMAP_O_RCS = ['DU86', 'UD86a', 'BF95', 'SP89b', 'RAP87', 'SP89a', 'SMKB95']
-
-
-# The spatial hierarchy within these maps cannot be determined based
-# on the reported RCs.
-PROBLEMATIC = ['CP99', 'AHGWU00',
-               # Are RT and R disjoint?
-               'HSK98a',
-               # This map's hierarchy is fine, but its RCs to other
-               # maps are erroneous. 
-               'R00']
-
-
 MAPP_SUCCESSES = [brain_map for brain_map in ALLMAPS if brain_map not in
-                  MAPP_FAILURES and brain_map not in INTRAMAP_O_RCS and
-                  brain_map not in PROBLEMATIC]
+                  MAPP_FAILURES]
 
 
 CONN_SUCCESSES = [brain_map for brain_map in ALLMAPS if brain_map not in
-                  CONN_FAILURES and brain_map not in MAPP_FAILURES and
-                  brain_map not in INTRAMAP_O_RCS and brain_map not in
-                  PROBLEMATIC]
+                  CONN_FAILURES and brain_map not in MAPP_FAILURES]
 
 
 # Only one edge for each pair of regions is needed; the reciprocal

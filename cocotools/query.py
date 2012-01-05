@@ -1,3 +1,4 @@
+import copy
 import sqlite3
 import os
 import errno
@@ -83,6 +84,83 @@ WHERE bmap = ? AND type = ?
 #------------------------------------------------------------------------------
 # Private Functions
 #------------------------------------------------------------------------------
+
+def _clean_mapping_edges(edges):
+    """Remove erroneous data from a list of edges.
+
+    Parameters
+    ----------
+    edges : list
+      (source, target, attributes) tuples.
+
+    Returns
+    -------
+    cleaned_edges : list
+      Input edges with erroneous entries removed.
+    """
+    cleaned_edges = copy.deepcopy(edges)
+    for source, target, attributes in edges:
+        # In BF95, following earlier papers, 1 and 3b are defined based on
+        # cytoarchitecture and various receptive fields that seem to overlap
+        # these are defined based on physiological properties.  Before we can
+        # use this paper, we need to read the papers cited within it that
+        # guide its definitions.
+        if 'BF95' in (source.split('-')[0], target.split('-')[0]):
+            cleaned_edges.remove((source, target, attributes))
+            continue
+        # Remove FV91-VOT <-O-> GSG88-V4.  There is no evidence this edge
+        # exists per FV91, the source of this edge's entry in CoCoMac.
+        nodes = set([source, target])
+        if nodes == set(['FV91-VOT', 'GSG88-V4']):
+            cleaned_edges.remove((source, target, attributes))
+        # LV00a-Tpt and LV00a-Toc are clearly disjoint.  Although
+        # LV00a uses PG91B's criteria to define Tpt, the best
+        # conclusion is that LV00A-Tpt -S-> PG91B-Tpt, because LV00a
+        # identifies a new area Toc that overlaps what PG91B called
+        # Tpt.
+        elif nodes == set(['LV00A-TPT', 'PG91B-TPT']):
+            cleaned_edges.remove((source, target, attributes))
+            # It doesn't matter which of the pair of directed edges we add.
+            cleaned_edges.append(('LV00A-TPT', 'PG91B-TPT', {'RC': 'S',
+                                                             'PDC': 15}))
+        # In both DU86 and UD86a, DMZ partially overlaps MTp and MST.  A
+        # reasonable solution is to remove DMZ from our graph.
+        elif 'DU86-DMZ' in nodes or 'UD86A-DMZ' in nodes:
+            cleaned_edges.remove((source, target, attributes))
+        # SP89b (and therefore SP89a) does not include MST; this region is
+        # mentioned only as part of specific other parcellation
+        # schemes.
+        elif 'SP89B-MST' in nodes or 'SP89A-MST' in nodes:
+            cleaned_edges.remove((source, target, attributes))
+        # There are many literature statements claiming BB47-OA is identical
+        # to B09-19, but there is only one, from BB47, claiming BB47-TEO
+        # overlaps B09-19.  Therefore, eliminate the latter claim to keep OA
+        # and TEO disjoint.
+        elif nodes == set(['BB47-TEO', 'B09-19']):
+            cleaned_edges.remove((source, target, attributes))
+        # In RAP87, VP is stated to be a part of SIm (p. 202), specifically
+        # the rostral part (p. 178), so SIm -L-> VP.
+        elif nodes == set(['RAP87-VP', 'RAP87-SIM']):
+            cleaned_edges.remove((source, target, attributes))
+            cleaned_edges.append(('RAP87-VP', 'RAP87-SIM', {'RC': 'S',
+                                                            'PDC': 2}))
+        # SA90 does not define its own area TE; it uses that of IAC87A.
+        elif 'SA90-TE' in nodes:
+            cleaned_edges.remove((source, target, attributes))
+        # Intra-map O RCs that have yet to be resolved:
+        # ('PHT00-31', 'PHT00-PGM/31'), mediator = VPR87-31
+        # ('PHT00-23A', 'PHT00-24/23A'), mediator = VPR87-23A
+        # ('PHT00-23C', 'PHT00-24/23C'), mediator = VPR87-23C
+        # ('PHT00-23B', 'PHT00-24/23B'), mediator = VPR87-23B
+        # ('PHT00-PGM/31', 'PHT00-PGM'), mediator = PS82-PGM
+        # ('PHT00-32', 'PHT00-9/32'), mediator = PP94-32
+        # ('PHT00-32', 'PHT00-8/32'), mediator = PP94-32
+        # ('PHT00-8/32', 'PHT00-32'), mediator = PP94-32
+        # ('PHT00-2/1', 'PHT00-1'), mediator = B09-1
+        # ('PHT00-2/1', 'PHT00-2'), mediator = B09-2
+        # ('L34-PROS.B', 'L34-SUB.'), mediator = RV87-SUB
+    return cleaned_edges
+
     
 def _scrub_element(e, attr_tag):
     datum_e = e.find('%s%s' % (P, attr_tag))
@@ -314,7 +392,10 @@ def single_map_ebunch(search_type, bmap):
             ebunch.append(_element2edge(prim, search_type))
         if not ebunch:
             query_cocomac.remove_entry(search_type, bmap)
-        return ebunch
+        if search_type == 'Mapping':
+            return _clean_mapping_edges(ebunch)
+        else:
+            return ebunch
 
 
 def multi_map_ebunch(search_type, subset=False):
