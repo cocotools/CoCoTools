@@ -9,7 +9,8 @@ from cocotools import MapGraph, MapGraphError
 
 # Not tested: _add_valid_edge, add_edge, add_edges_from, add_node,
 # add_nodes_from, deduce_edges, _resolve_contradiction,
-# _eliminate_contradictions, remove_nodes_from, clean_data.
+# _eliminate_contradictions, remove_nodes_from, clean_data,
+# keep_only_one_level_of_resolution.
 
 #------------------------------------------------------------------------------
 # Integration Tests

@@ -1257,6 +1257,16 @@ its own map.""" % node_x)
             if source in nodes or target in nodes:
                 self.add_edge(source, target, attributes)
 
+    def keep_only_one_level_of_resolution(self):
+        """Determine each map's hierarchy and keep only one level."""
+        intramap_nodes = set()
+        for source, target in self.edges_iter():
+            if source.split('-')[0] == target.split('-')[0]:
+                intramap_nodes.update([source, target])
+        map_hierarchies = self._determine_hierarchies(intramap_nodes)
+        for hierarchy in map_hierarchies.itervalues():
+            self._keep_one_level(hierarchy)
+
     def deduce_edges(self):
         """Deduce new edges based on those in the graph and add them.
 
