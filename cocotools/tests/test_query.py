@@ -55,13 +55,6 @@ def mock_single_map_ebunch(search_type, bmap):
 # Private Function Unit Tests
 #------------------------------------------------------------------------------
 
-def test_clean_mapping_edges():
-    edges = [('A', 'B', 'whatever'), ('LV00A-TPT', 'PG91B-TPT', 'thing')]
-    nt.assert_equal(cq._clean_mapping_edges(edges),
-                    ([('A', 'B', 'whatever'), ('LV00A-TPT', 'PG91B-TPT',
-                                               {'RC': 'S', 'PDC': 15})]))
-    
-    
 def test__reduce_ecs():
     attr = {'EC_Source': 'X', 'EC_Target': 'N'}
     nt.assert_equal(cq._reduce_ecs(attr), {'Connection': 'Unknown',

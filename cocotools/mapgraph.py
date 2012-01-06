@@ -745,12 +745,6 @@ its own map.""" % node_x)
         tp : list
           Nodes in path between source and target on the basis of which
           this edge has been deduced.
-
-        Returns
-        -------
-        intramap_nodes : set
-          source and target are put in this set only if they are from the
-          same BrainMap.
         """
         nx.DiGraph.add_edge.im_func(self, source, target, RC=rc, PDC=pdc,
                                     TP=tp)
@@ -762,12 +756,6 @@ its own map.""" % node_x)
         reversed_tp.reverse()
         nx.DiGraph.add_edge.im_func(self, target, source, RC=reverse_rc[rc],
                                     PDC=pdc, TP=reversed_tp)
-        if source.split('-')[0] == target.split('-')[0]:
-            return set([source, target])
-        else:
-            # Returning None would break add_edges_from, which updates
-            # a set with what this method returns.
-            return set()
 
     def _add_valid_edge(self, source, target, rc, pdc, tp):
         """Incorporate supplied valid edge data into graph.
@@ -795,13 +783,6 @@ its own map.""" % node_x)
           Nodes in path between source and target on the basis of which
           this edge has been deduced.
 
-        Returns
-        -------
-        intramap_nodes : set
-          source and target are put in this set only if they are from the
-          same BrainMap, and only if new data are added for the edges
-          between them.
-
         Notes
         -----
         This method is called by add_edge only after the validity of the
@@ -809,13 +790,9 @@ its own map.""" % node_x)
         are made here.
         """
         if not self.has_edge(source, target):
-            return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
+            self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
         elif self._new_attributes_are_better(source, target, pdc, tp):
-            return self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
-        else:
-            # This is needed to keep the update calls in
-            # add_edges_from from breaking.
-            return set()
+            self._add_edge_and_its_reverse(source, target, rc, pdc, tp)
 
     def _get_worst_pdc_in_tp(self, source, tp, target):
         """Return the worst PDC for edges from source to target via tp.
@@ -993,15 +970,14 @@ its own map.""" % node_x)
         for source, target in edges:
             self.remove_edge(source, target)
 
-    def add_edge(self, source, target, rc=None, pdc=None, tp=None,
-                 allow_intramap=False):
+    def add_edge(self, source, target, rc=None, pdc=None, tp=None):
         """Add edges between source and target to the graph.
 
         Either rc and pdc or tp must be supplied.  If tp is supplied,
         anything supplied for rc or pdc is ignored.  If rc and pdc are
         supplied, anything supplied for tp is ignored.
 
-        Self-loops are never allowed.
+        Self-loops are disallowed.
 
         Parameters
         ----------
@@ -1021,35 +997,8 @@ its own map.""" % node_x)
         tp : list (optional)
           Nodes in path between source and target on the basis of which
           this edge has been deduced.
-
-        allow_intramap : bool (optional)
-          True or False.  States whether edges between BrainSites in the
-          same map should be allowed.  Note that setting this to True may
-          cause serious problems for attempts to deduce new spatial
-          relationships or translate anatomical connections between
-          BrainMaps.  allow_intramap is set to False by default.
-
-        Returns
-        -------
-        intramap_nodes : set
-          source and target are returned in this set only if they are from
-          the same BrainMap and the edge and its reciprocal are
-          successfully added to the graph.  Such addition only occurs if
-          allow_intramap is set to True.
-
-        Notes
-        -----
-        Edges involving the BrainMap R00 are rejected silently, as they
-        have been found to be erroneous.
         """
         self._check_nodes([source, target])
-        if source == target or 'R00' in (source.split('-')[0],
-                                         target.split('-')[0]):
-            # Returning None breaks add_edges_from.
-            return set()
-        if not allow_intramap and source.split('-')[0] == target.split('-')[0]:
-            raise MapGraphError('%s and %s are from the same BrainMap.' %
-                                (source, target))
         if tp:
             rc = self._deduce_rc(self._get_rc_chain(source, tp, target))
             if rc:
@@ -1058,15 +1007,13 @@ its own map.""" % node_x)
                 # already in the graph, and there is no way to put an
                 # invalid one in the graph.  And since we got this far,
                 # the TP and RC are valid as well.
-                return self._add_valid_edge(source, target, rc, pdc, tp)
-            else:
-                return set()
+                self._add_valid_edge(source, target, rc, pdc, tp)
         else:
             if rc not in ('I', 'S', 'L', 'O'):
                 raise MapGraphError('Supplied RC is invalid.')
             if not isinstance(pdc, int) and not 0 <= pdc <= 18:
                 raise MapGraphError('Supplied PDC is invalid.')
-            return self._add_valid_edge(source, target, rc, pdc, [])
+            self._add_valid_edge(source, target, rc, pdc, [])
         
     def add_edges_from(self, edges):
         """Add edges to the graph.
@@ -1079,51 +1026,236 @@ its own map.""" % node_x)
         or a TP.  Edges received from functions in the query module are in
         the correct format.
 
-        If intra-map edges are supplied, it is important that there be
-        enough edges for add_edges_from to make out distinct levels of
-        resolution in the BrainMap and sensibly choose between them (see
-        Notes).  If insufficient information is supplied, an error will be
-        raised.
+        Intra-map edges implied by but absent from those supplied are also
+        added.
 
         Parameters
         ----------
         edges : list
           (source, target, attributes) tuples to be added as edges to the
           graph.
+        """
+        for source, target, attributes in edges:
+            if attributes.has_key('TP'):
+                self.add_edge(source, target, tp=attributes['TP'])
+            else:
+                self.add_edge(source, target, rc=attributes['RC'],
+                              pdc=attributes['PDC'])
+        # Add intra-map edges implied by but absent from those supplied.
+        for source, target, TP in self._find_implied_intramap_edges():
+            self.add_edge(source, target, tp=TP)
+
+    def clean_data(self):
+        """Remove errors and add missing data.
+
+        See comments for more information.
 
         Notes
         -----
-        Unlike the default for add_edge, this method adds intra-map edges
-        to the graph.  However, before returning, it removes nodes at all
-        but one level of resolution for each BrainMap from the graph.  The
-        level with the most anatomical connections (i.e., edges in
-        self.conn) is kept; in the event of a tie, the finest level of
-        resolution is kept.  Identical intra-map nodes are merged into a
-        single node whose name is chosen arbitrarily.
+        Intra-map O RCs that have yet to be resolved:
+        ('PHT00-31', 'PHT00-PGM/31'), mediator = VPR87-31
+        ('PHT00-23A', 'PHT00-24/23A'), mediator = VPR87-23A
+        ('PHT00-23C', 'PHT00-24/23C'), mediator = VPR87-23C
+        ('PHT00-23B', 'PHT00-24/23B'), mediator = VPR87-23B
+        ('PHT00-PGM/31', 'PHT00-PGM'), mediator = PS82-PGM
+        ('PHT00-32', 'PHT00-9/32'), mediator = PP94-32
+        ('PHT00-32', 'PHT00-8/32'), mediator = PP94-32
+        ('PHT00-8/32', 'PHT00-32'), mediator = PP94-32
+        ('PHT00-2/1', 'PHT00-1'), mediator = B09-1
+        ('PHT00-2/1', 'PHT00-2'), mediator = B09-2
+        ('L34-PROS.B', 'L34-SUB.'), mediator = RV87-SUB
         """
-        # intramap_nodes will hold nodes with intra-map edges.
-        intramap_nodes = set()
-        # Add the edges, keeping track of intra-map ones.
-        for source, target, attributes in edges:
-            if attributes.has_key('TP'):
-                intramap_nodes.update(self.add_edge(source, target,
-                                                    tp=attributes['TP'],
-                                                    allow_intramap=True))
-            else:
-                intramap_nodes.update(self.add_edge(source, target,
-                                                    rc=attributes['RC'],
-                                                    pdc=attributes['PDC'],
-                                                    allow_intramap=True))
-        # Add intra-map edges implied by but absent from those supplied.
-        for source, target, TP in self._find_implied_intramap_edges():
-            intramap_nodes.update(self.add_edge(source, target, tp=TP,
-                                                allow_intramap=True))
-        if intramap_nodes:
-            map_hierarchies = self._determine_hierarchies(intramap_nodes)
-            # Use the hierarchy for each BrainMap to remove all but
-            # one level of resolution.
-            for hierarchy in map_hierarchies.itervalues():
-                self._keep_one_level(hierarchy)
+        # In BF95, following earlier papers, 1 and 3b are defined based on
+        # cytoarchitecture and various receptive fields that seem to overlap
+        # these are defined based on physiological properties.  Before we can
+        # use this paper, we need to read the papers cited within it that
+        # guide its definitions.
+        bf95_nodes = []
+        for node in self.nodes_iter():
+            if node.split('-')[0] == 'BF95':
+                bf95_nodes.append(node)
+        self.remove_nodes_from(bf95_nodes)
+        # In both DU86 and UD86a, DMZ partially overlaps MTp and MST.  A
+        # reasonable solution is to remove DMZ from our graph.
+
+        # SP89b (and therefore SP89a) does not include MST; this region is
+        # mentioned only as part of specific other parcellation
+        # schemes.
+
+        # SA90 does not define its own area TE; it uses that of IAC87A.
+        # Really, we should be renaming SA90-TE IAC87A-TE, but we'll
+        # leave this for the future.
+        self.remove_nodes_from(['DU86-DMZ', 'UD86A-DMZ', 'SP89B-MST',
+                                'SP89A-MST', 'SA90-TE'])
+        # Although CoCoMac contains the following edges, they are not
+        # supported by the original papers.
+        self.remove_edges_from([('FV91-VOT', 'GSG88-V4'),
+                                # There are many literature statements
+                                # claiming BB47-OA is identical to
+                                # B09-19, but there is only one, from
+                                # BB47, claiming BB47-TEO overlaps
+                                # B09-19.
+                                ('BB47-TEO', 'B09-19')])
+        # The following edges have incorrect RCs associated with them
+        # in CoCoMac.
+        for source, target, rc1, pdc, rc2 in [
+            # Although LV00a uses PG91B's criteria to define Tpt, the
+            # best conclusion is that LV00A-Tpt -S-> PG91B-Tpt, because
+            # LV00a identifies a new area Toc that overlaps what PG91B
+            # called Tpt.  CoCoMac has LV00A-Tpt <-I-> PG91B-Tpt.
+            ('LV00A-TPT', 'PG91B-TPT', 'S', 15, 'L'),
+            # In RAP87, VP is stated to be a part of SIm (p. 202),
+            # specifically the rostral part (p. 178), so SIm -L-> VP.
+            ('RAP87-VP', 'RAP87-SIM', 'S', 2, 'L')
+            ]:
+            if self.has_edge(source, target):
+                self[source][target]['RC'] = rc1
+                self[source][target]['PDC'] = pdc
+                self[target][source]['RC'] = rc2
+                self[target][source]['PDC'] = pdc
+        # Add edges missing from CoCoMac:
+        missing_edges = [('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
+                         ('SMKB95-LIPD+LIPV', 'SMKB95-LIP', {'RC': 'I',
+                                                             'PDC': 15}),
+                         ('SR88-28', 'SR88-PR1-I', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-PR1-II', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-PR1-III', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-PR1-IV', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-PR1-V', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-PR1-VI', {'RC': 'L', 'PDC': 0}),
+                         ('J49-APM', 'J49-APMMACM', {'RC': 'L', 'PDC': 0}),
+                         ('J49-APM', 'J49-APMMACL', {'RC': 'L', 'PDC': 0}),
+                         ('BJ76-MG', 'BJ76-MGAD', {'RC': 'L', 'PDC': 2}),
+                         ('BJ76-MG', 'BJ76-MGPD', {'RC': 'L', 'PDC': 2}),
+                         ('BP89-46', 'BP89-V46C', {'RC': 'L', 'PDC': 1}),
+                         ('BP89-46', 'BP89-V46R', {'RC': 'L', 'PDC': 1}),
+                         ('AIC87-36', 'AIC87-36C-I', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36C-II', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36C-III', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36C-IV', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36C-V', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36C-VI', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36R-I', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36R-II', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36R-III', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36R-IV', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36R-V', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-36', 'AIC87-36R-VI', {'RC': 'L', 'PDC': 0}),
+                         ('ST96-TE', 'ST96-TEAV', {'RC': 'L', 'PDC': 0}),
+                         ('ST96-TE', 'ST96-TEAD', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28L-I', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28L-II', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28L-III', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28L-IV', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28L-V', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28L-VI', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28M-I', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28M-II', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28M-III', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28M-IV', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28M-V', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28M-VI', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28I-I', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28I-II', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28I-III', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28I-IV', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28I-V', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28I-VI', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28S-I', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28S-II', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28S-III', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28S-IV', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28S-V', {'RC': 'L', 'PDC': 0}),
+                         ('SR88-28', 'SR88-28S-VI', {'RC': 'L', 'PDC': 0}),
+                         ('HW72-STRIATEC', 'HW72-17_I', {'RC': 'L', 'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17_II', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17_III', {'RC': 'L',
+                                                           'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17_IV', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17_IVA', {'RC': 'L',
+                                                           'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17_IVB', {'RC': 'L',
+                                                           'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17_IVC', {'RC': 'L',
+                                                           'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17-V', {'RC': 'L', 'PDC': 15}),
+                         ('HW72-STRIATEC', 'HW72-17-VI', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('MV92-24', 'MV92-24C-D', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-24', 'MV92-24C-L', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-24', 'MV92-24C-M', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-24', 'MV92-24C-V', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-M3', 'MV92-24C-D', {'RC': 'L', 'PDC': 2}),
+                         ('MV92-M3', 'MV92-24C-L', {'RC': 'L', 'PDC': 2}),
+                         ('MV92-M3', 'MV92-24C-M', {'RC': 'L', 'PDC': 2}),
+                         ('MV92-M3', 'MV92-24C-V', {'RC': 'L', 'PDC': 2}),
+                         ('MV92-23', 'MV92-M3', {'RC': 'L', 'PDC': 2}),
+                         ('MV92-23', 'MV92-23C-D', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-23', 'MV92-23C-L', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-23', 'MV92-23C-M', {'RC': 'L', 'PDC': 0}),
+                         ('MV92-23', 'MV92-23C-V', {'RC': 'L', 'PDC': 0}),
+                         ('GYC95-PUL', 'GYC95-PIC', {'RC': 'L', 'PDC': 0}),
+                         ('GYC95-PUL', 'GYC95-PIL', {'RC': 'L', 'PDC': 0}),
+                         ('GYC95-PUL', 'GYC95-PIL-S', {'RC': 'L', 'PDC': 2}),
+                         ('GYC95-PUL', 'GYC95-PIM', {'RC': 'L', 'PDC': 0}),
+                         ('GYC95-PUL', 'GYC95-PIP', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-CL', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-ML', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-RTL', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-AL', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-CM', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-RM', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98A-BELT', 'HSK98A-RTM', {'RC': 'L', 'PDC': 0}),
+                         # This is implied, but is it true?
+                         ('IAC87A-29L', 'IAC87A-29M', {'RC': 'L', 'PDC': 0}),
+                         ('GCSC00-PUL', 'GCSC00-PML', {'RC': 'L', 'PDC': 0}),
+                         ('GCSC00-PUL', 'GCSC00-PMM', {'RC': 'L', 'PDC': 0}),
+                         ('GCSC00-PUL', 'GCSC00-PMM-C', {'RC': 'L', 'PDC': 0}),
+                         ('J49-APIMAC', 'J49-APIMACDL', {'RC': 'L', 'PDC': 4}),
+                         ('J49-APIMAC', 'J49-APIMACDM', {'RC': 'L', 'PDC': 4}),
+                         ('BK98-PUL', 'BK98-PICL', {'RC': 'L', 'PDC': 2}),
+                         ('BK98-PUL', 'BK98-PICM', {'RC': 'L', 'PDC': 2}),
+                         ('BK98-PUL', 'BK98-PIM', {'RC': 'L', 'PDC': 2}),
+                         ('BK98-PUL', 'BK98-PIP', {'RC': 'L', 'PDC': 2}),
+                         ('NK78-LGN', 'NK78-LGN_PE', {'RC': 'L', 'PDC': 0}),
+                         ('NK78-LGN', 'NK78-LGN_PI', {'RC': 'L', 'PDC': 0}),
+                         ('NK78-LGN', 'NK78-LGN_3', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN', 'NK78-LGN_5', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN_PC', 'NK78-LGN_3', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN_PC', 'NK78-LGN_5', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN', 'NK78-LGN_4', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN', 'NK78-LGN_6', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN_PC', 'NK78-LGN_4', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN_PC', 'NK78-LGN_6', {'RC': 'L', 'PDC': 1}),
+                         ('AB89-PAC', 'AB89-PACS-I', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PACS-II', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PACS-III', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PAC2-I', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PAC2-II', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PAC2-III', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PAC3-I', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PAC3-II', {'RC': 'L', 'PDC': 0}),
+                         ('AB89-PAC', 'AB89-PAC3-III', {'RC': 'L', 'PDC': 0}),
+                         ('A85-AMG', 'A85-CEMC', {'RC': 'L', 'PDC': 5}),
+                         ('GGC99-PUL', 'GGC99-PIC', {'RC': 'L', 'PDC': 2}),
+                         ('GGC99-PUL', 'GGC99-PIL', {'RC': 'L', 'PDC': 2}),
+                         ('GGC99-PUL', 'GGC99-PIL-S', {'RC': 'L', 'PDC': 2}),
+                         ('GGC99-PUL', 'GGC99-PIM', {'RC': 'L', 'PDC': 2}),
+                         ('GGC99-PUL', 'GGC99-PIP', {'RC': 'L', 'PDC': 2}),
+                         ('SMKB95-TEO+TE+TE3', 'SMKB95-TEO+TE', {'RC': 'L',
+                                                                 'PDC': 15}),
+                         ('DS91-6', 'DS91-CMAD', {'RC': 'L', 'PDC': 2}),
+                         ('WA91-HF', 'WA91-CA1-SLM', {'RC': 'L', 'PDC': 5}),
+                         ('NHYM96-24', 'NHYM96-CMAC', {'RC': 'L', 'PDC': 18}),
+                         ('NHYM96-24', 'NHYM96-CMAR', {'RC': 'L', 'PDC': 18}),
+                         ('SA00-PH', 'SA00-TFL', {'RC': 'L', 'PDC': 0}),
+                         ('SA00-PH', 'SA00-TFM', {'RC': 'L', 'PDC': 0})]
+        nodes = self.nodes()
+        for source, target, attributes in missing_edges:
+            if source in nodes or target in nodes:
+                self.add_edge(source, target, attributes)
 
     def deduce_edges(self):
         """Deduce new edges based on those in the graph and add them.
