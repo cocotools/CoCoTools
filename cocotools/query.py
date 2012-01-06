@@ -9,7 +9,7 @@ import xml.etree.ElementTree as etree
 from cStringIO import StringIO
 from socket import timeout
 
-from brain_maps import ALLMAPS
+from brain_maps import MAPPING_SOURCES, CONNECTIVITY_SOURCES
 
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
@@ -434,7 +434,10 @@ def multi_map_ebunch(search_type, subset=False):
     and primary relations are returned for Mapping queries.
     """
     if not subset:
-        bmaps = ALLMAPS
+        if search_type == 'Mapping':
+            bmaps = MAPPING_SOURCES
+        elif search_type == 'Connectivity':
+            bmaps = CONNECTIVITY_SOURCES
     elif isinstance(subset, str):
         bmaps = [line.strip() for line in open(subset).readlines()]
     else:
