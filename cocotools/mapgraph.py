@@ -15,13 +15,6 @@ class MapGraph(nx.DiGraph):
 
     """Subclass of the NetworkX DiGraph designed to hold CoCoMac Mapping data.
 
-    Parameters
-    ----------
-    conn : CoCoTools.ConGraph
-      Graph containing all available connectivity data.
-
-    Notes
-    -----
     Each node must be specified in CoCoMac format as a string:
     'BrainMap-BrainSite'.  Nodes not in this format are rejected.  Node
     attributes are not allowed.
@@ -61,14 +54,10 @@ class MapGraph(nx.DiGraph):
     identified, one or more regions must be excluded from the MapGraph
     until all remaining are disjoint.
 
-    MapGraph has been designed such that when a user attempts to add an
-    edge using the add_edge method, an error is raised by default if the
-    nodes supplied are in the same map.  If the user calls add_edges_from
-    instead, intra-map edges are added to the graph; however, before the
-    method returns, all but one level of resolution is removed from the
-    graph.  The level with the most anatomical connections (i.e., edges
-    in conn) is chosen; in the event of a tie, the finest level of
-    resolution is chosen.
+    When keep_only_one_level_of_resolution is called, all but one level of
+    resolution is removed from the graph.  The level with the most
+    anatomical connections (i.e., edges in cong) is chosen; in the event of
+    a tie, the finest level of resolution is chosen.
 
     Redundant nodes within a map are merged into a single node in this
     graph and in the associated ConGraph.  A name for the node is chosen
@@ -86,11 +75,8 @@ class MapGraph(nx.DiGraph):
     spatial overlap between regions in the same map.
     """
 
-    def __init__(self, conn):
+    def __init__(self):
         nx.DiGraph.__init__.im_func(self)
-        if not isinstance(conn, ConGraph):
-            raise MapGraphError('conn must be a ConGraph instance.')
-        self.conn = conn
 
 #------------------------------------------------------------------------------
 # Methods for Eliminating Post-Deduction Contradictions
@@ -1257,15 +1243,30 @@ its own map.""" % node_x)
             if source in nodes or target in nodes:
                 self.add_edge(source, target, attributes)
 
-    def keep_only_one_level_of_resolution(self):
-        """Determine each map's hierarchy and keep only one level."""
+    def keep_only_one_level_of_resolution(self, cong):
+        """Determine each map's hierarchy and keep only one level.
+
+        Parameters
+        ----------
+        cong : ConGraph instance
+          Associated Connectivity data.
+
+        Returns
+        -------
+        cong : ConGraph instance
+          Updated Connectivity data.
+        """
         intramap_nodes = set()
         for source, target in self.edges_iter():
             if source.split('-')[0] == target.split('-')[0]:
                 intramap_nodes.update([source, target])
         map_hierarchies = self._determine_hierarchies(intramap_nodes)
+        self.conn = cong
         for hierarchy in map_hierarchies.itervalues():
             self._keep_one_level(hierarchy)
+        cong = self.conn
+        del self.conn
+        return cong
 
     def deduce_edges(self):
         """Deduce new edges based on those in the graph and add them.
