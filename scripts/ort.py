@@ -11,6 +11,8 @@ if response == 'a':
         subset.remove(brain_map)
     con_edges, con_failures = coco.multi_map_ebunch('Connectivity', subset)
     assert(len(con_failures) == 0)
+    with open('results/post_sfn_revisions/con_edges.pck', 'w') as f:
+        pickle.dump(con_edges, f)
 elif response == 's':
     with open('results/post_sfn_revisions/con_edges.pck') as f:
         con_edges = pickle.load(f)
@@ -27,13 +29,15 @@ elif response == 'o':
         cong = pickle.load(f)
 
 # map_edges.pck
-response = raw_input('Acquire connectivity edges or use saved ones (a/s)? ')
+response = raw_input('Acquire mapping edges or use saved ones (a/s)? ')
 if response == 'a':
     subset = coco.MAPPING_SOURCES
     for brain_map in coco.MAPPING_TIMEOUTS:
         subset.remove(brain_map)
     map_edges, map_failures = coco.multi_map_ebunch('Mapping', subset)
     assert(len(map_failures) == 0)
+    with open('results/post_sfn_revisions/map_edges.pck', 'w') as f:
+        pickle.dump(map_edges, f)
 elif response == 's':
     with open('results/post_sfn_revisions/map_edges.pck') as f:
         map_edges = pickle.load(f)
@@ -62,7 +66,7 @@ elif response == 'y':
 # mapg3.pck and cong2.pck
 response = raw_input('Have hierarchies been removed (y/n)? ')
 if response == 'n':
-    cong = mapg.keep_only_one_level_of_resolution()
+    cong = mapg.keep_only_one_level_of_resolution(cong)
     with open('results/post_sfn_revisions/mapg3.pck', 'w') as f:
         pickle.dump(mapg, f)
     with open('results/post_sfn_revisions/cong2.pck', 'w') as f:

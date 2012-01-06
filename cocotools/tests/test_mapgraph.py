@@ -16,16 +16,10 @@ from cocotools import MapGraph, MapGraphError
 # Integration Tests
 #------------------------------------------------------------------------------
 
-def mock_init(self, conn):
-    DiGraph.__init__.im_func(self)
-    self.conn = conn
-
-
-@replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 def test_edge_removal():
     # Test for remove_edge and remove_edges_from.
-    mock_mapp = MapGraph(None)
+    mock_mapp = MapGraph()
     mock_mapp.add_edges_from([('A-1', 'B-1', {'TP': []}),
                               ('B-1', 'A-1', {'TP': []}),
                               ('C-1', 'D-1', {'TP': ['E-1', 'A-1', 'B-1']}),
@@ -37,7 +31,6 @@ def test_edge_removal():
     nt.assert_equal(mock_mapp.edges(), [('G-1', 'H-1')])
 
 
-@replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
 @replace('cocotools.mapgraph.MapGraph.add_nodes_from', DiGraph.add_nodes_from)
 def test_keep_one_level():
     # Not mocked: _find_bottom_of_hierarchy, _remove_level_from_hierarchy.
@@ -45,38 +38,36 @@ def test_keep_one_level():
                                        'D': {'E': {}}}}
     mock_conn = DiGraph()
     mock_conn.add_edges_from([('D', 'Z'), ('Y', 'F'), ('J', 'X')])
-    mapp = MapGraph(mock_conn)
+    mapp = MapGraph()
     mapp.add_nodes_from(['A', 'B', 'D', 'E', 'F', 'H', 'I', 'J', 'K',
                          'L'])
-    nt.assert_equal(mapp._keep_one_level(hierarchy),
-                    {'D': {}, 'F': {}, 'J': {}, 'H': {}})
+    updated_conn = mapp._keep_one_level(hierarchy, mock_conn)
+    nt.assert_equal(updated_conn.edges(), [('D', 'Z'), ('J', 'X'), ('Y', 'F')])
     nt.assert_equal(mapp.nodes(), ['D', 'F', 'H', 'J'])
 
 
-@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 def test_add_to_hierarchy():
     # Not mocked: _relate_node_to_others
     mapp = MapGraph()
     # Add to an empty hierarchy.
-    hierarchy = mapp._add_to_hierarchy('A-1', {})
+    hierarchy, cong = mapp._add_to_hierarchy('A-1', {}, None)
     nt.assert_equal(hierarchy, {'A-1': {}})
     # RC = D.
-    hierarchy = mapp._add_to_hierarchy('A-2', hierarchy)
+    hierarchy, cong = mapp._add_to_hierarchy('A-2', hierarchy, None)
     nt.assert_equal(hierarchy, {'A-1': {}, 'A-2': {}})
     # RC = L.
     mapp.add_edges_from([('A-3', 'A-1', {'RC': 'L'}),
                          ('A-3', 'A-2', {'RC': 'L'})])
-    hierarchy = mapp._add_to_hierarchy('A-3', hierarchy)
+    hierarchy, cong = mapp._add_to_hierarchy('A-3', hierarchy, None)
     nt.assert_equal(hierarchy, {'A-3': {'A-1': {}, 'A-2': {}}})
     # RC = S for the first round, then RC = L.
     mapp.add_edges_from([('A-4', 'A-3', {'RC': 'S'}),
                          ('A-4', 'A-1', {'RC': 'L'})])
-    hierarchy = mapp._add_to_hierarchy('A-4', hierarchy)
+    hierarchy, cong = mapp._add_to_hierarchy('A-4', hierarchy, None)
     nt.assert_equal(hierarchy, {'A-3': {'A-4': {'A-1': {}}, 'A-2': {}}})
 
 
-@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)    
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 def test_find_partial_coverage():
     mapp = MapGraph()
@@ -95,10 +86,6 @@ def test_find_partial_coverage():
 #------------------------------------------------------------------------------
 # Unit Tests
 #------------------------------------------------------------------------------
-
-def test_init():
-    nt.assert_raises(MapGraphError, MapGraph, DiGraph())
-
 
 def test_get_worst_pdc():
     mock_mapp = DiGraph()
@@ -169,7 +156,6 @@ def test_remove_node():
     nt.assert_equal(mock_mapp.edges(), [('B', 'C')])
                        
 
-@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
 def test_find_bottom_of_hierarchy():
 
     # The recursion in _find_bottom_of_hierarchy requires that we use an
@@ -193,14 +179,13 @@ def test_find_bottom_of_hierarchy():
     nt.assert_equal(bottom, [])
 
 
-@replace('cocotools.mapgraph.MapGraph.__init__', mock_init)
 @replace('cocotools.mapgraph.MapGraph.add_edge', DiGraph.add_edge)
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 @replace('cocotools.mapgraph.MapGraph.remove_node', DiGraph.remove_node)
 def test_merge_identical_nodes():
     mock_conn = DiGraph()
     mock_conn.add_edges_from([('A-1', 'A-5'), ('A-4', 'A-1')])
-    mapp = MapGraph(mock_conn)
+    mapp = MapGraph()
     # Here we aren't adding the reciprocals, because add_edges_from
     # has been mocked.  And _merge_identical_nodes is designed only to
     # get a node's neighbors (i.e., its successors), assuming that
@@ -209,8 +194,8 @@ def test_merge_identical_nodes():
                          ('A-1', 'B-1', {'RC': 'I', 'PDC': 7}),
                          ('A-1', 'C-1', {'RC': 'L', 'PDC': 10}),
                          ('A-1', 'A-2', {'RC': 'I', 'PDC': 12})])
-    mapp._merge_identical_nodes('A-2', 'A-1')
-    nt.assert_equal(mapp.conn.edges(), [('A-1', 'A-5'), ('A-2', 'A-5'),
+    mapp._merge_identical_nodes('A-2', 'A-1', mock_conn)
+    nt.assert_equal(mock_conn.edges(), [('A-1', 'A-5'), ('A-2', 'A-5'),
                                         ('A-4', 'A-1'), ('A-4', 'A-2')])
     nt.assert_equal(mapp.edges(), [('A-2', 'B-1'), ('A-2', 'C-1')])
 
@@ -229,19 +214,19 @@ def test_relate_node_to_others():
                     (['A-3', 'A-4'], 'L'))
 
 
-def mock_add_to_hierarchy(self, node, hierarchy):
+def mock_add_to_hierarchy(self, node, hierarchy, cong):
     hierarchy[node] = {}
-    return hierarchy
+    return hierarchy, cong
     
 
 @replace('cocotools.mapgraph.MapGraph._add_to_hierarchy',
          mock_add_to_hierarchy)
-@replace('cocotools.mapgraph.MapGraph.__init__', DiGraph.__init__)
 def test_determine_hierarchies():
     intramap_nodes = set(['A-1', 'A-2', 'B-1', 'C-1'])
     mapp = MapGraph()
     nt.assert_equal(MapGraph._determine_hierarchies.im_func(mapp,
-                                                               intramap_nodes),
+                                                            intramap_nodes,
+                                                            None)[0],
                     {'A': {'A-1': {}, 'A-2': {}}, 'B': {'B-1': {}},
                      'C': {'C-1': {}}})
     
