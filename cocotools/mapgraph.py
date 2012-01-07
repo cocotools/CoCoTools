@@ -1111,7 +1111,11 @@ its own map.""" % node_x)
                                 # B09-19, but there is only one, from
                                 # BB47, claiming BB47-TEO overlaps
                                 # B09-19.
-                                ('BB47-TEO', 'B09-19')])
+                                ('BB47-TEO', 'B09-19'),
+                                # Kotter et al. want this edge, but it
+                                # causes R00-PFCORB to overlap
+                                # R00-PFCPOL.
+                                ('R00-PFCORB', 'W40-10')])
         # The following edges have incorrect RCs associated with them
         # in CoCoMac.
         for source, target, rc1, pdc, rc2 in [
