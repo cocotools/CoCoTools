@@ -1048,9 +1048,6 @@ its own map.""" % node_x)
         or a TP.  Edges received from functions in the query module are in
         the correct format.
 
-        Intra-map edges implied by but absent from those supplied are also
-        added.
-
         Parameters
         ----------
         edges : list
@@ -1063,9 +1060,6 @@ its own map.""" % node_x)
             else:
                 self.add_edge(source, target, rc=attributes['RC'],
                               pdc=attributes['PDC'])
-        # Add intra-map edges implied by but absent from those supplied.
-        for source, target, TP in self._find_implied_intramap_edges():
-            self.add_edge(source, target, tp=TP)
 
     def clean_data(self):
         """Remove errors and add missing data.
@@ -1285,6 +1279,9 @@ its own map.""" % node_x)
         for source, target, attr in missing_edges:
             if source in nodes or target in nodes:
                 self.add_edge(source, target, rc=attr['RC'], pdc=attr['PDC'])
+        # Add intra-map edges implied by but absent from those supplied.
+        for source, target, TP in self._find_implied_intramap_edges():
+            self.add_edge(source, target, tp=TP)
 
     def keep_only_one_level_of_resolution(self, cong):
         """Determine each map's hierarchy and keep only one level.
