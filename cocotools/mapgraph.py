@@ -1135,6 +1135,10 @@ its own map.""" % node_x)
                 self[target][source]['PDC'] = pdc
         # Add edges missing from CoCoMac:
         missing_edges = [('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
+                         ('CP99-BELT_SM', 'CP99-BELT_S', {'RC': 'L',
+                                                          'PDC': 4}),
+                         ('CP99-BELT_SM', 'CP99-BELT_S_PP', {'RC': 'L',
+                                                             'PDC': 4}),
                          ('SMKB95-LIPD+LIPV', 'SMKB95-LIP', {'RC': 'I',
                                                              'PDC': 15}),
                          ('SR88-28', 'SR88-PR1-I', {'RC': 'L', 'PDC': 0}),
