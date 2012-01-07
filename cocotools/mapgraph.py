@@ -1018,6 +1018,8 @@ its own map.""" % node_x)
           Nodes in path between source and target on the basis of which
           this edge has been deduced.
         """
+        if source == target:
+            return
         self._check_nodes([source, target])
         if tp:
             rc = self._deduce_rc(self._get_rc_chain(source, tp, target))
@@ -1126,7 +1128,10 @@ its own map.""" % node_x)
             ('LV00A-TPT', 'PG91B-TPT', 'S', 15, 'L'),
             # In RAP87, VP is stated to be a part of SIm (p. 202),
             # specifically the rostral part (p. 178), so SIm -L-> VP.
-            ('RAP87-VP', 'RAP87-SIM', 'S', 2, 'L')
+            ('RAP87-VP', 'RAP87-SIM', 'S', 2, 'L'),
+            # This is based on speculation, but avoids the incorrect
+            # conclusion that BB47-FBA shares area with BB47-FB.
+            ('BB47-FB', 'B05-6', 'S', 15, 'L')
             ]:
             if self.has_edge(source, target):
                 self[source][target]['RC'] = rc1
