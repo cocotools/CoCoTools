@@ -1065,21 +1065,6 @@ its own map.""" % node_x)
         """Remove errors and add missing data.
 
         See comments for more information.
-
-        Notes
-        -----
-        Intra-map O RCs that have yet to be resolved:
-        ('PHT00-31', 'PHT00-PGM/31'), mediator = VPR87-31
-        ('PHT00-23A', 'PHT00-24/23A'), mediator = VPR87-23A
-        ('PHT00-23C', 'PHT00-24/23C'), mediator = VPR87-23C
-        ('PHT00-23B', 'PHT00-24/23B'), mediator = VPR87-23B
-        ('PHT00-PGM/31', 'PHT00-PGM'), mediator = PS82-PGM
-        ('PHT00-32', 'PHT00-9/32'), mediator = PP94-32
-        ('PHT00-32', 'PHT00-8/32'), mediator = PP94-32
-        ('PHT00-8/32', 'PHT00-32'), mediator = PP94-32
-        ('PHT00-2/1', 'PHT00-1'), mediator = B09-1
-        ('PHT00-2/1', 'PHT00-2'), mediator = B09-2
-        ('L34-PROS.B', 'L34-SUB.'), mediator = RV87-SUB
         """
         # In BF95, following earlier papers, 1 and 3b are defined based on
         # cytoarchitecture and various receptive fields that seem to overlap
