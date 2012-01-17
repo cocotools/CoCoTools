@@ -91,7 +91,7 @@ elif response == 'y':
 response = raw_input('Make new EndGraph (y/n)? ')
 if response == 'y':
     endg = coco.EndGraph()
-    endg.add_translated_edges(mapp, cong, 'PHT00')
+    endg.add_translated_edges(mapg, cong, 'PHT00')
     with open('results/post_sfn_revisions/endg.pck', 'w') as f:
         pickle.dump(endg, f)
 elif response == 'n':

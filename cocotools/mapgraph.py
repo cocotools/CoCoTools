@@ -1086,8 +1086,12 @@ its own map.""" % node_x)
         # SA90 does not define its own area TE; it uses that of IAC87A.
         # Really, we should be renaming SA90-TE IAC87A-TE, but we'll
         # leave this for the future.
+
+        # The removal of MCSGP04-M3 gets rid of some internal 'O' RCs,
+        # but we haven't read the original paper.
         self.remove_nodes_from(['DU86-DMZ', 'UD86A-DMZ', 'SP89B-MST',
-                                'SP89A-MST', 'SA90-TE'])
+                                'SP89A-MST', 'SA90-TE', 'MCSGP04-M3',
+                                'MV92-M3', 'AHGWU00-P1'])
         # Although CoCoMac contains the following edges, they are not
         # supported by the original papers.
         self.remove_edges_from([('FV91-VOT', 'GSG88-V4'),
@@ -1100,7 +1104,10 @@ its own map.""" % node_x)
                                 # Kotter et al. want this edge, but it
                                 # causes R00-PFCORB to overlap
                                 # R00-PFCPOL.
-                                ('R00-PFCORB', 'W40-10')])
+                                ('R00-PFCORB', 'W40-10'),
+                                # The rest are guesses.
+                                ('L34-PROS.B', 'RV87-SUB'),
+                                ('BB47-TH', 'IAC87A-E')])
         # The following edges have incorrect RCs associated with them
         # in CoCoMac.
         for source, target, rc1, pdc, rc2 in [
@@ -1114,8 +1121,27 @@ its own map.""" % node_x)
             ('RAP87-VP', 'RAP87-SIM', 'S', 2, 'L'),
             # This is based on speculation, but avoids the incorrect
             # conclusion that BB47-FBA shares area with BB47-FB.
-            ('BB47-FB', 'B05-6', 'S', 15, 'L')
-            ]:
+            ('BB47-FB', 'B05-6', 'S', 15, 'L'),
+            # The regions in PHT00 are smaller than those of the same
+            # name defined previously, as PHT00 assign parts of those
+            # former areas to transitional zones.
+            ('VPR87-23A', 'PHT00-23A', 'L', 15, 'S'),
+            ('VPR87-23A', 'PHT00-24/23A', 'O', 15, 'O'),
+            ('VPR87-23C', 'PHT00-23C', 'L', 15, 'S'),
+            ('VPR87-23C', 'PHT00-24/23C', 'O', 15, 'O'),
+            ('VPR87-23B', 'PHT00-23B', 'L', 15, 'S'),
+            ('VPR87-23B', 'PHT00-24/23B', 'O', 15, 'O'),
+            ('VPR87-31', 'PHT00-31', 'L', 15, 'S'),
+            ('VPR87-31', 'PHT00-PGM/31', 'O', 15, 'O'),
+            ('PS82-PGM', 'PHT00-PGM', 'L', 15, 'S'),
+            ('PS82-PGM', 'PHT00-PGM/31', 'O', 15, 'O'),
+            ('PP94-32', 'PHT00-32', 'L', 15, 'S'),
+            ('PP94-32', 'PHT00-9/32', 'O', 15, 'O'),
+            ('PP94-32', 'PHT00-8/32', 'O', 15, 'O'),
+            ('B09-1', 'PHT00-1', 'L', 15, 'S'),
+            ('B09-1', 'PHT00-2/1', 'O', 15, 'O'),
+            ('B09-2', 'PHT00-2', 'L', 15, 'S'),
+            ('B09-2', 'PHT00-2/1', 'O', 15, 'O')]:
             if self.has_edge(source, target):
                 self[source][target]['RC'] = rc1
                 self[source][target]['PDC'] = pdc
@@ -1127,6 +1153,8 @@ its own map.""" % node_x)
                                                           'PDC': 4}),
                          ('CP99-BELT_SM', 'CP99-BELT_S_PP', {'RC': 'L',
                                                              'PDC': 4}),
+                         ('CP99-ROOT_SM', 'CP99-ROOT_S', {'RC': 'L',
+                                                          'PDC': 4}),
                          ('SMKB95-LIPD+LIPV', 'SMKB95-LIP', {'RC': 'I',
                                                              'PDC': 15}),
                          ('SR88-28', 'SR88-PR1-I', {'RC': 'L', 'PDC': 0}),
@@ -1199,11 +1227,6 @@ its own map.""" % node_x)
                          ('MV92-24', 'MV92-24C-L', {'RC': 'L', 'PDC': 0}),
                          ('MV92-24', 'MV92-24C-M', {'RC': 'L', 'PDC': 0}),
                          ('MV92-24', 'MV92-24C-V', {'RC': 'L', 'PDC': 0}),
-                         ('MV92-M3', 'MV92-24C-D', {'RC': 'L', 'PDC': 2}),
-                         ('MV92-M3', 'MV92-24C-L', {'RC': 'L', 'PDC': 2}),
-                         ('MV92-M3', 'MV92-24C-M', {'RC': 'L', 'PDC': 2}),
-                         ('MV92-M3', 'MV92-24C-V', {'RC': 'L', 'PDC': 2}),
-                         ('MV92-23', 'MV92-M3', {'RC': 'L', 'PDC': 2}),
                          ('MV92-23', 'MV92-23C-D', {'RC': 'L', 'PDC': 0}),
                          ('MV92-23', 'MV92-23C-L', {'RC': 'L', 'PDC': 0}),
                          ('MV92-23', 'MV92-23C-M', {'RC': 'L', 'PDC': 0}),
@@ -1213,6 +1236,7 @@ its own map.""" % node_x)
                          ('GYC95-PUL', 'GYC95-PIL-S', {'RC': 'L', 'PDC': 2}),
                          ('GYC95-PUL', 'GYC95-PIM', {'RC': 'L', 'PDC': 0}),
                          ('GYC95-PUL', 'GYC95-PIP', {'RC': 'L', 'PDC': 0}),
+                         ('HSK98B-MG', 'HSK98B-MGD', {'RC': 'L', 'PDC': 15}),
                          ('HSK98A-BELT', 'HSK98A-CL', {'RC': 'L', 'PDC': 0}),
                          ('HSK98A-BELT', 'HSK98A-ML', {'RC': 'L', 'PDC': 0}),
                          ('HSK98A-BELT', 'HSK98A-RTL', {'RC': 'L', 'PDC': 0}),
@@ -1234,7 +1258,9 @@ its own map.""" % node_x)
                          ('NK78-LGN', 'NK78-LGN_PE', {'RC': 'L', 'PDC': 0}),
                          ('NK78-LGN', 'NK78-LGN_PI', {'RC': 'L', 'PDC': 0}),
                          ('NK78-LGN', 'NK78-LGN_3', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN', 'NK78-LGN_1', {'RC': 'L', 'PDC': 4}),
                          ('NK78-LGN', 'NK78-LGN_5', {'RC': 'L', 'PDC': 1}),
+                         ('NK78-LGN', 'NK78-LGN_2', {'RC': 'L', 'PDC': 4}),
                          ('NK78-LGN_PC', 'NK78-LGN_3', {'RC': 'L', 'PDC': 1}),
                          ('NK78-LGN_PC', 'NK78-LGN_5', {'RC': 'L', 'PDC': 1}),
                          ('NK78-LGN', 'NK78-LGN_4', {'RC': 'L', 'PDC': 1}),
@@ -1263,7 +1289,17 @@ its own map.""" % node_x)
                          ('NHYM96-24', 'NHYM96-CMAC', {'RC': 'L', 'PDC': 18}),
                          ('NHYM96-24', 'NHYM96-CMAR', {'RC': 'L', 'PDC': 18}),
                          ('SA00-PH', 'SA00-TFL', {'RC': 'L', 'PDC': 0}),
-                         ('SA00-PH', 'SA00-TFM', {'RC': 'L', 'PDC': 0})]
+                         ('SA00-PH', 'SA00-TFM', {'RC': 'L', 'PDC': 0}),
+                         ('MM82A-INS', 'MM82A-OFA-P', {'RC': 'L', 'PDC': 15}),
+                         # This seems suspect.
+                         ('BB47-PEM', 'BB47-PEP', {'RC': 'L', 'PDC': 15}),
+                         ('UD86A-MT*', 'UD86A-MTP', {'RC': 'L', 'PDC': 2}),
+                         ('APPC92-PAC', 'APPC92-COA', {'RC': 'L', 'PDC': 15}),
+                         ('APPC92-PAC', 'APPC92-COP', {'RC': 'L', 'PDC': 15}),
+                         ('J85-SG', 'J85-POI', {'RC': 'L', 'PDC': 2}),
+                         ('J85-SG', 'J85-POL', {'RC': 'L', 'PDC': 2}),
+                         ('J85-SG', 'J85-POM', {'RC': 'L', 'PDC': 2}),
+                         ('MCSGP04-23', 'MCSGP04-M4', {'RC': 'L', 'PDC': 1})]
         nodes = self.nodes()
         for source, target, attr in missing_edges:
             if source in nodes or target in nodes:
