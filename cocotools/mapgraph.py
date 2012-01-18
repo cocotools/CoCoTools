@@ -646,27 +646,6 @@ its own map.""" % node_x)
                                                                   cong)
         return hierarchies, cong
 
-    def _get_intramap_edges(self, node, neighbors):
-        """Return list of edges between all neighbors mediated by node.
-
-        Parameters
-        ----------
-        node : string
-          A region from a map different from that of neighbors.
-        
-        neighbors : list
-          Regions from the same map.
-
-        Returns
-        -------
-        edges : list
-          Edges between all pairs of neighbors, each specified as (source,
-          target, [node]).  The last item in each tuple is the TP.
-        """
-        # This will include self-loops and may include other invalid
-        # edges, but these will be weeded out by add_edge.
-        return [(s, t, [node]) for s, t in product(neighbors, repeat=2)]
-
     def _find_implied_intramap_edges(self):
         """Identify implied intra-map spatial relationships.
 
@@ -682,7 +661,11 @@ its own map.""" % node_x)
                 if len(neighbors) > 1:
                     neighbors_by_rc = self._organize_by_rc(node, neighbors)
                     if neighbors_by_rc['IS']:
-                        edges += self._get_intramap_edges(node, neighbors)
+                        # This will include self-loops and may include
+                        # other invalid edges, but these will be
+                        # weeded out by add_edge.
+                        edges += [(s, t, [node]) for s, t in
+                                  product(neighbors, repeat=2)]
         return edges
         
 #------------------------------------------------------------------------------
@@ -994,8 +977,7 @@ its own map.""" % node_x)
         """Add edges between source and target to the graph.
 
         Either rc and pdc or tp must be supplied.  If tp is supplied,
-        anything supplied for rc or pdc is ignored.  If rc and pdc are
-        supplied, anything supplied for tp is ignored.
+        anything supplied for rc or pdc is ignored.
 
         Self-loops are disallowed.
 
@@ -1045,8 +1027,9 @@ its own map.""" % node_x)
         and attributes being a dictionary of valid edge attributes.
 
         A valid edge attribute dictionary contains either an RC and a PDC
-        or a TP.  Edges received from functions in the query module are in
-        the correct format.
+        or a TP.  If a TP is found, any RC and PDC present are ignored.
+        Edges received from functions in the query module are in the
+        correct format.
 
         Parameters
         ----------
@@ -1067,7 +1050,7 @@ its own map.""" % node_x)
         See comments for more information.
         """
         # In BF95, following earlier papers, 1 and 3b are defined based on
-        # cytoarchitecture and various receptive fields that seem to overlap
+        # cytoarchitecture, and various receptive fields that seem to overlap
         # these are defined based on physiological properties.  Before we can
         # use this paper, we need to read the papers cited within it that
         # guide its definitions.
