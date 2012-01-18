@@ -645,28 +645,6 @@ its own map.""" % node_x)
                                                                   hierarchy,
                                                                   cong)
         return hierarchies, cong
-
-    def _find_implied_intramap_edges(self):
-        """Identify implied intra-map spatial relationships.
-
-        Returns
-        -------
-        edges : list
-          Intra-map edges, each specified as (source, target, TP).
-        """
-        edges = []
-        for node in self.nodes_iter():
-            neighbors_by_map = self._organize_neighbors_by_map(node)
-            for brain_map, neighbors in neighbors_by_map.iteritems():
-                if len(neighbors) > 1:
-                    neighbors_by_rc = self._organize_by_rc(node, neighbors)
-                    if neighbors_by_rc['IS']:
-                        # This will include self-loops and may include
-                        # other invalid edges, but these will be
-                        # weeded out by add_edge.
-                        edges += [(s, t, [node]) for s, t in
-                                  product(neighbors, repeat=2)]
-        return edges
         
 #------------------------------------------------------------------------------
 # Methods for Adding Edges
@@ -1074,7 +1052,7 @@ its own map.""" % node_x)
         # but we haven't read the original paper.
         self.remove_nodes_from(['DU86-DMZ', 'UD86A-DMZ', 'SP89B-MST',
                                 'SP89A-MST', 'SA90-TE', 'MCSGP04-M3',
-                                'MV92-M3', 'AHGWU00-P1'])
+                                'MV92-M3', 'AHGWU00-P1', 'SMKB95-45A+8AR'])
         # Although CoCoMac contains the following edges, they are not
         # supported by the original papers.
         self.remove_edges_from([('FV91-VOT', 'GSG88-V4'),
@@ -1132,12 +1110,60 @@ its own map.""" % node_x)
                 self[target][source]['PDC'] = pdc
         # Add edges missing from CoCoMac:
         missing_edges = [('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
+                         ('SSA96-36', 'SSA96-36RL', {'RC': 'L', 'PDC': 0}),
+                         ('SSA96-36', 'SSA96-36RM', {'RC': 'L', 'PDC': 0}),
+                         ('AHGWU00-PL', 'AHGWU00-P2', {'RC': 'L', 'PDC': 12}),
+                         ('PP94-8', 'PP94-8AD', {'RC': 'L', 'PDC': 2}),
+                         ('PP94-8', 'PP94-8AV', {'RC': 'L', 'PDC': 2}),
+                         ('GC97-PUL', 'GC97-PIC', {'RC': 'L', 'PDC': 2}),
+                         ('GC97-PUL', 'GC97-PIL', {'RC': 'L', 'PDC': 2}),
+                         ('GC97-PUL', 'GC97-PIL-S', {'RC': 'L', 'PDC': 2}),
+                         ('GC97-PUL', 'GC97-PIM', {'RC': 'L', 'PDC': 2}),
+                         ('GC97-PUL', 'GC97-PIP', {'RC': 'L', 'PDC': 2}),
+                         ('CP99-CORE_SM', 'CP99-3B', {'RC': 'L',
+                                                      'PDC': 13}),
+                         ('CP99-CORE_SM', 'CP99-3A', {'RC': 'L',
+                                                      'PDC': 13}),
+                         ('CP99-CORE_S', 'CP99-3B', {'RC': 'L',
+                                                     'PDC': 13}),
+                         ('CP99-CORE_S', 'CP99-3A', {'RC': 'L',
+                                                     'PDC': 13}),
+                         ('CP99-CORE_SM', 'CP99-CORE_S_PC', {'RC': 'L',
+                                                             'PDC': 0}),
+                         ('CP99-CORE_SM', 'CP99-CORE_S', {'RC': 'L',
+                                                          'PDC': 0}),
+                         ('CP99-CORE_SM', 'CP99-CORE_S_DPC', {'RC': 'L',
+                                                              'PDC': 0}),
+                         ('CP99-CORE_SM', 'CP99-CORE_S_MPC', {'RC': 'L',
+                                                              'PDC': 0}),
+                         ('CP99-CORE_SM', 'CP99-CORE_S_V', {'RC': 'L',
+                                                            'PDC': 0}),
                          ('CP99-BELT_SM', 'CP99-BELT_S', {'RC': 'L',
                                                           'PDC': 4}),
                          ('CP99-BELT_SM', 'CP99-BELT_S_PP', {'RC': 'L',
                                                              'PDC': 4}),
+                         ('CP99-BELT_SM', 'CP99-BELT_S_PC', {'RC': 'L',
+                                                             'PDC': 4}),
+                         ('CP99-BELT_SM', 'CP99-BELT_S_PIC', {'RC': 'L',
+                                                             'PDC': 4}),
+                         ('CP99-BELT_SM', 'CP99-BELT_S_RPC', {'RC': 'L',
+                                                             'PDC': 4}),
                          ('CP99-ROOT_SM', 'CP99-ROOT_S', {'RC': 'L',
                                                           'PDC': 4}),
+                         ('CP99-ROOT_SM', 'CP99-ROOT_S_C', {'RC': 'L',
+                                                            'PDC': 4}),
+                         ('CP99-ROOT_SM', 'CP99-ROOT_S_CO', {'RC': 'L',
+                                                             'PDC': 4}),
+                         ('CP99-ROOT_SM', 'CP99-ROOT_S_M', {'RC': 'L',
+                                                            'PDC': 4}),
+                         ('CP99-ROOT_SM', 'CP99-ROOT_S_PC', {'RC': 'L',
+                                                             'PDC': 4}),
+                         ('CP99-BELT_SM', 'CP99-6D', {'RC': 'L',
+                                                             'PDC': 0}),
+                         ('CP99-BELT_SM', 'CP99-6VD', {'RC': 'L',
+                                                             'PDC': 0}),
+                         ('CP99-BELT_SM', 'CP99-6VV', {'RC': 'L',
+                                                             'PDC': 0}),
                          ('SMKB95-LIPD+LIPV', 'SMKB95-LIP', {'RC': 'I',
                                                              'PDC': 15}),
                          ('SR88-28', 'SR88-PR1-I', {'RC': 'L', 'PDC': 0}),
@@ -1148,6 +1174,10 @@ its own map.""" % node_x)
                          ('SR88-28', 'SR88-PR1-VI', {'RC': 'L', 'PDC': 0}),
                          ('J49-APM', 'J49-APMMACM', {'RC': 'L', 'PDC': 0}),
                          ('J49-APM', 'J49-APMMACL', {'RC': 'L', 'PDC': 0}),
+                         ('J49-API', 'J49-APIMACD', {'RC': 'L', 'PDC': 4}),
+                         ('J49-API', 'J49-APIMACDL', {'RC': 'L', 'PDC': 4}),
+                         ('J49-API', 'J49-APIMACDM', {'RC': 'L', 'PDC': 4}),
+                         ('J49-API', 'J49-APIMACV', {'RC': 'L', 'PDC': 0}),
                          ('BJ76-MG', 'BJ76-MGAD', {'RC': 'L', 'PDC': 2}),
                          ('BJ76-MG', 'BJ76-MGPD', {'RC': 'L', 'PDC': 2}),
                          ('BP89-46', 'BP89-V46C', {'RC': 'L', 'PDC': 1}),
@@ -1229,6 +1259,12 @@ its own map.""" % node_x)
                          ('HSK98A-BELT', 'HSK98A-RTM', {'RC': 'L', 'PDC': 0}),
                          # This is implied, but is it true?
                          ('IAC87A-29L', 'IAC87A-29M', {'RC': 'L', 'PDC': 0}),
+                         ('IAC87A-36', 'IAC87A-36PL', {'RC': 'L', 'PDC': 0}),
+                         ('IAC87A-36', 'IAC87A-36PM', {'RC': 'L', 'PDC': 0}),
+                         ('SK97-PUL', 'SK97-PICL', {'RC': 'L', 'PDC': 2}),
+                         ('SK97-PUL', 'SK97-PICM', {'RC': 'L', 'PDC': 2}),
+                         ('SK97-PUL', 'SK97-PIM', {'RC': 'L', 'PDC': 2}),
+                         ('SK97-PUL', 'SK97-PIP', {'RC': 'L', 'PDC': 2}),
                          ('GCSC00-PUL', 'GCSC00-PML', {'RC': 'L', 'PDC': 0}),
                          ('GCSC00-PUL', 'GCSC00-PMM', {'RC': 'L', 'PDC': 0}),
                          ('GCSC00-PUL', 'GCSC00-PMM-C', {'RC': 'L', 'PDC': 0}),
@@ -1238,6 +1274,9 @@ its own map.""" % node_x)
                          ('BK98-PUL', 'BK98-PICM', {'RC': 'L', 'PDC': 2}),
                          ('BK98-PUL', 'BK98-PIM', {'RC': 'L', 'PDC': 2}),
                          ('BK98-PUL', 'BK98-PIP', {'RC': 'L', 'PDC': 2}),
+                         ('NK78-LGN_1', 'NK78-LGN_MC', {'RC': 'S', 'PDC': 4}),
+                         ('NK78-LGN', 'NK78-LGN_ME', {'RC': 'L', 'PDC': 0}),
+                         ('NK78-LGN', 'NK78-LGN_MI', {'RC': 'L', 'PDC': 0}),
                          ('NK78-LGN', 'NK78-LGN_PE', {'RC': 'L', 'PDC': 0}),
                          ('NK78-LGN', 'NK78-LGN_PI', {'RC': 'L', 'PDC': 0}),
                          ('NK78-LGN', 'NK78-LGN_3', {'RC': 'L', 'PDC': 1}),
@@ -1260,6 +1299,8 @@ its own map.""" % node_x)
                          ('AB89-PAC', 'AB89-PAC3-II', {'RC': 'L', 'PDC': 0}),
                          ('AB89-PAC', 'AB89-PAC3-III', {'RC': 'L', 'PDC': 0}),
                          ('A85-AMG', 'A85-CEMC', {'RC': 'L', 'PDC': 5}),
+                         ('A85-AMG', 'A85-ABMC', {'RC': 'L', 'PDC': 2}),
+                         ('A85-AMG', 'A85-ABPC', {'RC': 'L', 'PDC': 2}),
                          ('GGC99-PUL', 'GGC99-PIC', {'RC': 'L', 'PDC': 2}),
                          ('GGC99-PUL', 'GGC99-PIL', {'RC': 'L', 'PDC': 2}),
                          ('GGC99-PUL', 'GGC99-PIL-S', {'RC': 'L', 'PDC': 2}),
@@ -1269,16 +1310,34 @@ its own map.""" % node_x)
                                                                  'PDC': 15}),
                          ('DS91-6', 'DS91-CMAD', {'RC': 'L', 'PDC': 2}),
                          ('WA91-HF', 'WA91-CA1-SLM', {'RC': 'L', 'PDC': 5}),
+                         ('WA91-HF', 'WA91-DG-ML', {'RC': 'L', 'PDC': 5}),
                          ('NHYM96-24', 'NHYM96-CMAC', {'RC': 'L', 'PDC': 18}),
                          ('NHYM96-24', 'NHYM96-CMAR', {'RC': 'L', 'PDC': 18}),
                          ('SA00-PH', 'SA00-TFL', {'RC': 'L', 'PDC': 0}),
                          ('SA00-PH', 'SA00-TFM', {'RC': 'L', 'PDC': 0}),
+                         ('SA00-36', 'SA00-36CL', {'RC': 'L', 'PDC': 0}),
+                         ('SA00-36', 'SA00-36CM', {'RC': 'L', 'PDC': 0}),
+                         ('SA00-36', 'SA00-36RL', {'RC': 'L', 'PDC': 0}),
+                         ('SA00-36', 'SA00-36RM', {'RC': 'L', 'PDC': 0}),
                          ('MM82A-INS', 'MM82A-OFA-P', {'RC': 'L', 'PDC': 15}),
                          # This seems suspect.
                          ('BB47-PEM', 'BB47-PEP', {'RC': 'L', 'PDC': 15}),
                          ('UD86A-MT*', 'UD86A-MTP', {'RC': 'L', 'PDC': 2}),
                          ('APPC92-PAC', 'APPC92-COA', {'RC': 'L', 'PDC': 15}),
                          ('APPC92-PAC', 'APPC92-COP', {'RC': 'L', 'PDC': 15}),
+                         ('YTHI90-TE', 'YTHI90-TEAD', {'RC': 'L', 'PDC': 0}),
+                         ('YTHI90-TE', 'YTHI90-TEPD', {'RC': 'L', 'PDC': 0}),
+                         ('YTHI90-TE', 'YTHI90-TEAV', {'RC': 'L', 'PDC': 0}),
+                         ('YTHI90-TE', 'YTHI90-TEPV', {'RC': 'L', 'PDC': 0}),
+                         ('RB79-17', 'RB79-LVQ', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-17', 'RB79-STRIATEC-I', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-17', 'RB79-STRIATEC-II', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-17', 'RB79-STRIATEC-III', {'RC': 'L',
+                                                           'PDC': 2}),
+                         ('RB79-17', 'RB79-STRIATEC-IV', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-17', 'RB79-STRIATEC-V', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-17', 'RB79-STRIATEC-VI', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-17', 'RB79-UVQ', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POI', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POL', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POM', {'RC': 'L', 'PDC': 2}),
@@ -1287,9 +1346,6 @@ its own map.""" % node_x)
         for source, target, attr in missing_edges:
             if source in nodes or target in nodes:
                 self.add_edge(source, target, rc=attr['RC'], pdc=attr['PDC'])
-        # Add intra-map edges implied by but absent from those supplied.
-        for source, target, TP in self._find_implied_intramap_edges():
-            self.add_edge(source, target, tp=TP)
 
     def keep_only_one_level_of_resolution(self, cong):
         """Determine each map's hierarchy and keep only one level.
