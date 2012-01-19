@@ -1072,6 +1072,10 @@ its own map.""" % node_x)
         # The following edges have incorrect RCs associated with them
         # in CoCoMac.
         for source, target, rc1, pdc, rc2 in [
+            # CP99 appear to adopt the scheme of W40 for the frontal
+            # lobe, not PP94, as they refer to an area 12 and do not
+            # refer to an area 9/46.
+            ('CP99-46', 'PP94-46', 'L', 15, 'S'),
             # Although LV00a uses PG91B's criteria to define Tpt, the
             # best conclusion is that LV00A-Tpt -S-> PG91B-Tpt, because
             # LV00a identifies a new area Toc that overlaps what PG91B
@@ -1120,6 +1124,8 @@ its own map.""" % node_x)
                          ('GC97-PUL', 'GC97-PIL-S', {'RC': 'L', 'PDC': 2}),
                          ('GC97-PUL', 'GC97-PIM', {'RC': 'L', 'PDC': 2}),
                          ('GC97-PUL', 'GC97-PIP', {'RC': 'L', 'PDC': 2}),
+                         # For this edge, see above.
+                         ('CP99-46', 'W40-46', {'RC': 'I', 'PDC': 15}),
                          ('CP99-CORE_SM', 'CP99-3B', {'RC': 'L',
                                                       'PDC': 13}),
                          ('CP99-CORE_SM', 'CP99-3A', {'RC': 'L',
