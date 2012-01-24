@@ -345,6 +345,7 @@ latter are not disjoint""" % (new, originals))
         desired_map : string
           Name of BrainMap to which translation will be performed.
         """
+        self.map = desired_map
         for original_s, original_t in conn.edges_iter():
             s_dict = self._make_translation_dict(mapp, original_s, desired_map)
             t_dict = self._make_translation_dict(mapp, original_t, desired_map)
@@ -353,5 +354,9 @@ latter are not disjoint""" % (new, originals))
                     attr = self._translate_attributes(s_mapping, t_mapping,
                                                       mapp, conn)
                     # The first element in each mapping is the node in
-                    # desired_map.
-                    self.add_edge(s_mapping[0], t_mapping[0], attr)
+                    # desired_map.  We must remove the brain map name,
+                    # pre-pended to the name of the area.  (Note that
+                    # the brain map is stored as self.map.)
+                    new_source = s_mapping[0].split('-', 1)[-1]
+                    new_target = t_mapping[0].split('-', 1)[-1]
+                    self.add_edge(new_source, new_target, attr)
