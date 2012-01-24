@@ -49,7 +49,7 @@ def draw_network(G, pos, node_color=None, ax=None,
         if node_color is None:
             color = (0, 0, 0)
         else:
-            color = node_color[i]
+            color = node_color[n]
         #if node_color is None or cmap is None:
         #    color = (0,0,0)
         #else:
