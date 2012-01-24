@@ -1113,7 +1113,14 @@ its own map.""" % node_x)
                 self[target][source]['RC'] = rc2
                 self[target][source]['PDC'] = pdc
         # Add edges missing from CoCoMac:
-        missing_edges = [('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
+        missing_edges = [('PHT00-46', 'PHT00-46D', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-46', 'PHT00-46V', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-11', 'PHT00-11L', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-11', 'PHT00-11M', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-29A-C', 'PHT00-29A', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-8A', 'PHT00-8AD', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-8A', 'PHT00-8AV', {'RC': 'L', 'PDC': 15}),
+                         ('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
                          ('SSA96-36', 'SSA96-36RL', {'RC': 'L', 'PDC': 0}),
                          ('SSA96-36', 'SSA96-36RM', {'RC': 'L', 'PDC': 0}),
                          ('AHGWU00-PL', 'AHGWU00-P2', {'RC': 'L', 'PDC': 12}),
