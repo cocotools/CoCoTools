@@ -1384,8 +1384,10 @@ its own map.""" % node_x)
         cong : ConGraph instance
           Updated Connectivity data.
         """
-        # Setting cong as an attribute of the graph for the duration
-        # of this method speeds up computation time substantially.
+        # I thought setting cong as an attribute of the graph for the
+        # duration of this method -- as opposed to passing cong around
+        # as an argument to the various methods called -- would speed
+        # up computation time, but I'm not sure it does.
         self.cong = cong
         intramap_nodes = set()
         for source, target in self.edges_iter():
