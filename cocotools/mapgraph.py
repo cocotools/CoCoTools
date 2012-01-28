@@ -55,10 +55,11 @@ class MapGraph(nx.DiGraph):
     until all remaining are disjoint.
 
     When keep_only_one_level_of_resolution is called, all but one level of
-    resolution is removed from the graph.  The level with the most
-    anatomical connections (i.e., edges in cong) is chosen; in the event of
-    a tie, the finest level of resolution is chosen for all maps but the
-    target map, for which the coarsest level of resolution is chosen.
+    resolution is removed from the graph (and cong).  The level with the
+    most anatomical connections (i.e., edges in cong) is chosen; in the
+    event of a tie, the finest level of resolution is chosen for all maps
+    but the target map, for which the coarsest level of resolution is
+    chosen.
 
     Redundant nodes within a map are merged into a single node in this
     graph and in the associated ConGraph.  A name for the node is chosen
@@ -434,11 +435,6 @@ class MapGraph(nx.DiGraph):
                 except nx.NetworkXError:
                     pass
             # Remove the level with fewer connections from the graph.
-            #
-            # Note, removing the nodes from cong as well would be
-            # superfluous; removing their mapping information is
-            # enough to prevent nodes from playing a role in the
-            # translation stage of ORT.
             current_map = larger_node.split('-')[0]
             if (larger_connections == smaller_connections and current_map ==
                 target_map) or larger_connections > smaller_connections:
@@ -447,6 +443,12 @@ class MapGraph(nx.DiGraph):
                 # the target map when the number of connections at the
                 # two levels is equal.
                 self.remove_nodes_from(smaller_nodes)
+                for node in smaller_nodes:
+                    if cong.has_node(node):
+                        # The node isn't guaranteed to be in cong, and
+                        # if it's not and removal is attempted,
+                        # NetworkX raises an exception.
+                        cong.remove_node(node)
                 path.append(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
                                                               smaller_nodes)
@@ -457,6 +459,8 @@ class MapGraph(nx.DiGraph):
                 # all maps but the target one when the number of
                 # connections at the two levels is equal.
                 self.remove_node(larger_node)
+                if cong.has_node(larger_node):
+                    cong.remove_node(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
                                                               [larger_node])
         return cong
