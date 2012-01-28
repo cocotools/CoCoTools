@@ -34,16 +34,20 @@ def test_edge_removal():
 @replace('cocotools.mapgraph.MapGraph.add_nodes_from', DiGraph.add_nodes_from)
 def test_keep_one_level():
     # Not mocked: _find_bottom_of_hierarchy, _remove_level_from_hierarchy.
-    hierarchy = {'J': {'A': {}}, 'B': {'I': {'F': {'K': {}, 'L': {}}, 'H': {}},
-                                       'D': {'E': {}}}}
+    hierarchy = {'A-J': {'A-A': {}},
+                 'A-B': {'A-I': {'A-F': {'A-K': {},
+                                         'A-L': {}},
+                                 'A-H': {}},
+                         'A-D': {'A-E': {}}}}
     mock_conn = DiGraph()
-    mock_conn.add_edges_from([('D', 'Z'), ('Y', 'F'), ('J', 'X')])
+    mock_conn.add_edges_from([('A-D', 'A-Z'), ('A-Y', 'A-F'), ('A-J', 'A-X')])
     mapp = MapGraph()
-    mapp.add_nodes_from(['A', 'B', 'D', 'E', 'F', 'H', 'I', 'J', 'K',
-                         'L'])
-    updated_conn = mapp._keep_one_level(hierarchy, mock_conn)
-    nt.assert_equal(updated_conn.edges(), [('D', 'Z'), ('J', 'X'), ('Y', 'F')])
-    nt.assert_equal(mapp.nodes(), ['D', 'F', 'H', 'J'])
+    mapp.add_nodes_from(['A-A', 'A-B', 'A-D', 'A-E', 'A-F', 'A-H', 'A-I',
+                         'A-J', 'A-K', 'A-L'])
+    updated_conn = mapp._keep_one_level(hierarchy, mock_conn, 'A')
+    nt.assert_equal(updated_conn.edges(), [('A-J', 'A-X'), ('A-D', 'A-Z'),
+                                           ('A-Y', 'A-F')])
+    nt.assert_equal(mapp.nodes(), ['A-H', 'A-J', 'A-D', 'A-F'])
 
 
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
@@ -230,14 +234,6 @@ def test_determine_hierarchies():
                     {'A': {'A-1': {}, 'A-2': {}}, 'B': {'B-1': {}},
                      'C': {'C-1': {}}})
     
-
-def test_get_intramap_edges():
-    neighbors = ['A', 'B', 'C']
-    nt.assert_equal(MapGraph._get_intramap_edges.im_func(None, 'X', neighbors),
-                    [('A', 'A', ['X']), ('A', 'B', ['X']), ('A', 'C', ['X']),
-                     ('B', 'A', ['X']), ('B', 'B', ['X']), ('B', 'C', ['X']),
-                     ('C', 'A', ['X']), ('C', 'B', ['X']), ('C', 'C', ['X'])])
-
 
 def test_new_attributes_are_better():
     mock_g = DiGraph()

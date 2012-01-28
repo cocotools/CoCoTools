@@ -57,7 +57,8 @@ class MapGraph(nx.DiGraph):
     When keep_only_one_level_of_resolution is called, all but one level of
     resolution is removed from the graph.  The level with the most
     anatomical connections (i.e., edges in cong) is chosen; in the event of
-    a tie, the finest level of resolution is chosen.
+    a tie, the finest level of resolution is chosen for all maps but the
+    target map, for which the coarsest level of resolution is chosen.
 
     Redundant nodes within a map are merged into a single node in this
     graph and in the associated ConGraph.  A name for the node is chosen
@@ -390,7 +391,7 @@ class MapGraph(nx.DiGraph):
                 return [], []
         return self._find_bottom_of_hierarchy(nodes_beneath, path)
                 
-    def _keep_one_level(self, hierarchy, cong):
+    def _keep_one_level(self, hierarchy, cong, target_map):
         """Isolate levels in hierarchy and remove all but one from the graph.
 
         hierarchy itself is changed in the same way the graph is and then
@@ -404,6 +405,9 @@ class MapGraph(nx.DiGraph):
 
         cong : ConGraph instance
           Associated Connectivity data.
+
+        target_map : string
+          Name of BrainMap to which translation will be performed.
 
         Returns
         -------
@@ -435,12 +439,23 @@ class MapGraph(nx.DiGraph):
             # superfluous; removing their mapping information is
             # enough to prevent nodes from playing a role in the
             # translation stage of ORT.
-            if larger_connections > smaller_connections:
+            current_map = larger_node.split('-')[0]
+            if (larger_connections == smaller_connections and current_map ==
+                target_map) or larger_connections > smaller_connections:
+                # The first part of the conditional expresses the
+                # decision to keep the coarser level of resolution for
+                # the target map when the number of connections at the
+                # two levels is equal.
                 self.remove_nodes_from(smaller_nodes)
                 path.append(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
                                                               smaller_nodes)
-            else:
+            elif (smaller_connections > larger_connections or current_map !=
+                  target_map):
+                # The second part of the conditional expresses the
+                # decision to keep the finer level of resolution for
+                # all maps but the target one when the number of
+                # connections at the two levels is equal.
                 self.remove_node(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
                                                               [larger_node])
@@ -1360,13 +1375,16 @@ its own map.""" % node_x)
             if source in nodes or target in nodes:
                 self.add_edge(source, target, rc=attr['RC'], pdc=attr['PDC'])
 
-    def keep_only_one_level_of_resolution(self, cong):
+    def keep_only_one_level_of_resolution(self, cong, target_map):
         """Determine each map's hierarchy and keep only one level.
 
         Parameters
         ----------
         cong : ConGraph instance
           Associated Connectivity data.
+
+        target_map : string
+          Name of BrainMap to which translation will be performed.
 
         Returns
         -------
@@ -1380,7 +1398,7 @@ its own map.""" % node_x)
         map_hierarchies, cong = self._determine_hierarchies(intramap_nodes,
                                                             cong)
         for hierarchy in map_hierarchies.itervalues():
-            cong = self._keep_one_level(hierarchy, cong)
+            cong = self._keep_one_level(hierarchy, cong, target_map)
         return cong
 
     def deduce_edges(self):
