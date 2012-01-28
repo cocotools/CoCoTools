@@ -392,7 +392,7 @@ class MapGraph(nx.DiGraph):
                 return [], []
         return self._find_bottom_of_hierarchy(nodes_beneath, path)
                 
-    def _keep_one_level(self, hierarchy, cong, target_map):
+    def _keep_one_level(self, hierarchy, target_map):
         """Isolate levels in hierarchy and remove all but one from the graph.
 
         hierarchy itself is changed in the same way the graph is and then
@@ -404,16 +404,8 @@ class MapGraph(nx.DiGraph):
           Larger regions are mapped to smaller regions.  All regions are
           from the same BrainMap.
 
-        cong : ConGraph instance
-          Associated Connectivity data.
-
         target_map : string
           Name of BrainMap to which translation will be performed.
-
-        Returns
-        -------
-        cong : ConGraph instance
-          Updated Connectivity data.
         """
         while True:
             path, bottom = self._find_bottom_of_hierarchy(hierarchy, [])
@@ -423,15 +415,15 @@ class MapGraph(nx.DiGraph):
             larger_node, smaller_nodes = bottom
             # See which level has more edges in cong.
             try:
-                larger_connections = len(cong.predecessors(larger_node) +
-                                         cong.successors(larger_node))
+                larger_connections = len(self.cong.predecessors(larger_node) +
+                                         self.cong.successors(larger_node))
             except nx.NetworkXError:
                 larger_connections = 0
             smaller_connections = 0
             for s in smaller_nodes:
                 try:
-                    smaller_connections += len(cong.predecessors(s))
-                    smaller_connections += len(cong.successors(s))
+                    smaller_connections += len(self.cong.predecessors(s))
+                    smaller_connections += len(self.cong.successors(s))
                 except nx.NetworkXError:
                     pass
             # Remove the level with fewer connections from the graph.
@@ -444,11 +436,11 @@ class MapGraph(nx.DiGraph):
                 # two levels is equal.
                 self.remove_nodes_from(smaller_nodes)
                 for node in smaller_nodes:
-                    if cong.has_node(node):
+                    if self.cong.has_node(node):
                         # The node isn't guaranteed to be in cong, and
                         # if it's not and removal is attempted,
                         # NetworkX raises an exception.
-                        cong.remove_node(node)
+                        self.cong.remove_node(node)
                 path.append(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
                                                               smaller_nodes)
@@ -459,13 +451,12 @@ class MapGraph(nx.DiGraph):
                 # all maps but the target one when the number of
                 # connections at the two levels is equal.
                 self.remove_node(larger_node)
-                if cong.has_node(larger_node):
-                    cong.remove_node(larger_node)
+                if self.cong.has_node(larger_node):
+                    self.cong.remove_node(larger_node)
                 hierarchy = self._remove_level_from_hierarchy(hierarchy, path,
                                                               [larger_node])
-        return cong
 
-    def _merge_identical_nodes(self, keeper, loser, cong):
+    def _merge_identical_nodes(self, keeper, loser):
         """Merge loser into keeper.
 
         Give keeper loser's inter-map edges and all its edges in cong.
@@ -479,14 +470,6 @@ class MapGraph(nx.DiGraph):
         loser : string
           Another node in the graph, identical to keeper and from the same
           map.
-
-        cong : ConGraph instance
-          Associated Connectivity data.
-
-        Returns
-        -------
-        cong : ConGraph instance
-          Updated Connectivity data.
         """
         # In this graph, we don't need to look up predecessors and
         # successors separately, because the methods for adding edges
@@ -501,19 +484,18 @@ class MapGraph(nx.DiGraph):
         # loser or its edges from conn because once removed from the
         # current graph it is untranslatable.
         try:
-            predecessors = cong.predecessors(loser)
-            successors = cong.successors(loser)
+            predecessors = self.cong.predecessors(loser)
+            successors = self.cong.successors(loser)
         except nx.NetworkXError:
             # loser isn't in cong.
             pass
         else:
             for p in predecessors:
-                attributes = cong[p][loser]
-                cong.add_edge(p, keeper, attributes)
+                attributes = self.cong[p][loser]
+                self.cong.add_edge(p, keeper, attributes)
             for s in successors:
-                attributes = cong[loser][s]
-                cong.add_edge(keeper, s, attributes)
-        return cong
+                attributes = self.cong[loser][s]
+                self.cong.add_edge(keeper, s, attributes)
 
     def _relate_node_to_others(self, node_x, others):
         """Return others to which node_x is related and the corresponding RC.
@@ -581,7 +563,7 @@ its own map.""" % node_x)
             return x_is_smaller[0], 'S'
         return [], 'D'
     
-    def _add_to_hierarchy(self, node_x, hierarchy, cong):
+    def _add_to_hierarchy(self, node_x, hierarchy):
         """Incorporate a new BrainSite into a BrainMap's spatial hierarchy.
 
         Raise an error if node_x cannot be placed in hierarchy.
@@ -597,16 +579,10 @@ its own map.""" % node_x)
           Larger regions are mapped to smaller regions in the same
           BrainMap.
 
-        cong : ConGraph instance
-          Associated Connectivity data.
-
         Returns
         -------
         hierarchy : dictionary
           Input hierarchy with node_x added.
-
-        cong : ConGraph instance
-          Updated Connectivity data.
         """
         related_to_x, rc = self._relate_node_to_others(node_x,
                                                        hierarchy.keys())
@@ -619,20 +595,19 @@ its own map.""" % node_x)
             hierarchy[node_x] = within_node_x
         elif rc == 'S':
             inner_hier = hierarchy[related_to_x]
-            hierarchy[related_to_x], cong = self._add_to_hierarchy(node_x,
-                                                                   inner_hier,
-                                                                   cong)
+            hierarchy[related_to_x] = self._add_to_hierarchy(node_x,
+                                                             inner_hier)
         elif rc == 'I':
             # Merge node_x into related_to_x, the identical node
             # already in the hierarchy.
-            cong = self._merge_identical_nodes(related_to_x, node_x, cong)
+            self._merge_identical_nodes(related_to_x, node_x)
         else:
             # node_x is disjoint from all nodes at the highest level
             # of the hierarchy.
             hierarchy[node_x] = {}
-        return hierarchy, cong
+        return hierarchy
 
-    def _determine_hierarchies(self, intramap_nodes, cong):
+    def _determine_hierarchies(self, intramap_nodes):
         """Resolve spatial hierarchy for each BrainMap.
 
         Parameters
@@ -641,18 +616,12 @@ its own map.""" % node_x)
           Nodes, not necessarily all in the same BrainMap, with intra-map
           edges.
 
-        cong : ConGraph instance
-          Associated Connectivity data.
-
         Returns
         -------
         hierarchies : dictionary
           Highest-level keys are BrainMaps.  The value for each BrainMap is
           a dict mapping the largest BrainSites to those they contain, and
           so on.
-
-        cong : ConGraph instance
-          Updated Connectivity data.
         """
         hierarchies = {}
         for node in intramap_nodes:
@@ -660,10 +629,8 @@ its own map.""" % node_x)
             if not hierarchies.has_key(brain_map):
                 hierarchies[brain_map] = {}
             hierarchy = hierarchies[brain_map]
-            hierarchies[brain_map], cong = self._add_to_hierarchy(node,
-                                                                  hierarchy,
-                                                                  cong)
-        return hierarchies, cong
+            hierarchies[brain_map] = self._add_to_hierarchy(node, hierarchy)
+        return hierarchies
         
 #------------------------------------------------------------------------------
 # Methods for Adding Edges
@@ -1395,14 +1362,18 @@ its own map.""" % node_x)
         cong : ConGraph instance
           Updated Connectivity data.
         """
+        # Setting cong as an attribute of the graph for the duration
+        # of this method speeds up computation time substantially.
+        self.cong = cong
         intramap_nodes = set()
         for source, target in self.edges_iter():
             if source.split('-')[0] == target.split('-')[0]:
                 intramap_nodes.update([source, target])
-        map_hierarchies, cong = self._determine_hierarchies(intramap_nodes,
-                                                            cong)
+        map_hierarchies = self._determine_hierarchies(intramap_nodes)
         for hierarchy in map_hierarchies.itervalues():
-            cong = self._keep_one_level(hierarchy, cong, target_map)
+            self._keep_one_level(hierarchy, target_map)
+        cong = copy.deepcopy(self.cong)
+        del self.cong
         return cong
 
     def deduce_edges(self):

@@ -44,9 +44,10 @@ def test_keep_one_level():
     mapp = MapGraph()
     mapp.add_nodes_from(['A-A', 'A-B', 'A-D', 'A-E', 'A-F', 'A-H', 'A-I',
                          'A-J', 'A-K', 'A-L'])
-    updated_conn = mapp._keep_one_level(hierarchy, mock_conn, 'A')
-    nt.assert_equal(updated_conn.edges(), [('A-J', 'A-X'), ('A-D', 'A-Z'),
-                                           ('A-Y', 'A-F')])
+    mapp.cong = mock_conn
+    mapp._keep_one_level(hierarchy, 'A')
+    nt.assert_equal(mapp.cong.edges(), [('A-J', 'A-X'), ('A-D', 'A-Z'),
+                                        ('A-Y', 'A-F')])
     nt.assert_equal(mapp.nodes(), ['A-H', 'A-J', 'A-D', 'A-F'])
 
 
@@ -55,20 +56,20 @@ def test_add_to_hierarchy():
     # Not mocked: _relate_node_to_others
     mapp = MapGraph()
     # Add to an empty hierarchy.
-    hierarchy, cong = mapp._add_to_hierarchy('A-1', {}, None)
+    hierarchy = mapp._add_to_hierarchy('A-1', {})
     nt.assert_equal(hierarchy, {'A-1': {}})
     # RC = D.
-    hierarchy, cong = mapp._add_to_hierarchy('A-2', hierarchy, None)
+    hierarchy = mapp._add_to_hierarchy('A-2', hierarchy)
     nt.assert_equal(hierarchy, {'A-1': {}, 'A-2': {}})
     # RC = L.
     mapp.add_edges_from([('A-3', 'A-1', {'RC': 'L'}),
                          ('A-3', 'A-2', {'RC': 'L'})])
-    hierarchy, cong = mapp._add_to_hierarchy('A-3', hierarchy, None)
+    hierarchy = mapp._add_to_hierarchy('A-3', hierarchy)
     nt.assert_equal(hierarchy, {'A-3': {'A-1': {}, 'A-2': {}}})
     # RC = S for the first round, then RC = L.
     mapp.add_edges_from([('A-4', 'A-3', {'RC': 'S'}),
                          ('A-4', 'A-1', {'RC': 'L'})])
-    hierarchy, cong = mapp._add_to_hierarchy('A-4', hierarchy, None)
+    hierarchy = mapp._add_to_hierarchy('A-4', hierarchy)
     nt.assert_equal(hierarchy, {'A-3': {'A-4': {'A-1': {}}, 'A-2': {}}})
 
 
@@ -198,8 +199,9 @@ def test_merge_identical_nodes():
                          ('A-1', 'B-1', {'RC': 'I', 'PDC': 7}),
                          ('A-1', 'C-1', {'RC': 'L', 'PDC': 10}),
                          ('A-1', 'A-2', {'RC': 'I', 'PDC': 12})])
-    mapp._merge_identical_nodes('A-2', 'A-1', mock_conn)
-    nt.assert_equal(mock_conn.edges(), [('A-1', 'A-5'), ('A-2', 'A-5'),
+    mapp.cong = mock_conn
+    mapp._merge_identical_nodes('A-2', 'A-1')
+    nt.assert_equal(mapp.cong.edges(), [('A-1', 'A-5'), ('A-2', 'A-5'),
                                         ('A-4', 'A-1'), ('A-4', 'A-2')])
     nt.assert_equal(mapp.edges(), [('A-2', 'B-1'), ('A-2', 'C-1')])
 
@@ -218,9 +220,9 @@ def test_relate_node_to_others():
                     (['A-3', 'A-4'], 'L'))
 
 
-def mock_add_to_hierarchy(self, node, hierarchy, cong):
+def mock_add_to_hierarchy(self, node, hierarchy):
     hierarchy[node] = {}
-    return hierarchy, cong
+    return hierarchy
     
 
 @replace('cocotools.mapgraph.MapGraph._add_to_hierarchy',
@@ -229,8 +231,7 @@ def test_determine_hierarchies():
     intramap_nodes = set(['A-1', 'A-2', 'B-1', 'C-1'])
     mapp = MapGraph()
     nt.assert_equal(MapGraph._determine_hierarchies.im_func(mapp,
-                                                            intramap_nodes,
-                                                            None)[0],
+                                                            intramap_nodes),
                     {'A': {'A-1': {}, 'A-2': {}}, 'B': {'B-1': {}},
                      'C': {'C-1': {}}})
     
