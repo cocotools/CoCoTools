@@ -333,6 +333,8 @@ latter are not disjoint""" % (new, originals))
     def add_translated_edges(self, mapp, conn, desired_map):
         """Translate edges in conn to nomenclature of desired_bmap.
 
+        Add all desired_map nodes in mapp to this graph.
+
         Parameters
         ----------
         mapp : MapGraph
@@ -346,6 +348,9 @@ latter are not disjoint""" % (new, originals))
           Name of BrainMap to which translation will be performed.
         """
         self.map = desired_map
+        for node in mapp.nodes_iter():
+            if node.split('-')[0] == desired_map:
+                self.add_node(node.split('-', 1)[-1])
         for original_s, original_t in conn.edges_iter():
             s_dict = self._make_translation_dict(mapp, original_s, desired_map)
             t_dict = self._make_translation_dict(mapp, original_t, desired_map)
