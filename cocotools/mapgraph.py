@@ -1099,7 +1099,33 @@ its own map.""" % node_x)
                 self[target][source]['RC'] = rc2
                 self[target][source]['PDC'] = pdc
         # Add edges missing from CoCoMac:
-        missing_edges = [('PHT00-46', 'PHT00-46D', {'RC': 'L', 'PDC': 15}),
+        missing_edges = [('PHT00-PTG', 'LSB86-PPT', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-SN', 'PHT00-SNR', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-SN', 'PHT00-SNC', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-6DC', 'PHT00-F2', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-6DR', 'PHT00-F7', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-4', 'PHT00-F1', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-6VC', 'PHT00-F4', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-6VR', 'PHT00-F5', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-PUL', 'LSB86-PUL', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-DTG', 'LSB86-DLT', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-SN', 'SA00-SN', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-LA', 'SA00-LV', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-LA', 'SA00-LDI', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-6DC', 'TTNI97-PMD', {'RC': 'S', 'PDC': 15}),
+                         ('PHT00-6DR', 'TTNI97-PMD', {'RC': 'S', 'PDC': 15}),
+                         ('PHT00-SNC', 'SSS91-SN.COM', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-6DR', 'BP87-6DR', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-SNR', 'SSS91-SN.RET', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-8A', 'SDGM89-FEF', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-SNC', 'SUD90-SN.COM', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-CD', 'SUD90-CD_G', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-SNR', 'SUD90-SN.RET', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-CD', 'SUD90-CD_T', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-VTA', 'SUD90-VTA', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-ATG', 'O52-TEG.A', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-TPPRO', 'AP84-TG', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-46', 'PHT00-46D', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-46', 'PHT00-46V', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-11', 'PHT00-11L', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-11', 'PHT00-11M', {'RC': 'L', 'PDC': 15}),
@@ -1363,9 +1389,9 @@ its own map.""" % node_x)
                          ('J85-SG', 'J85-POL', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POM', {'RC': 'L', 'PDC': 2}),
                          ('MCSGP04-23', 'MCSGP04-M4', {'RC': 'L', 'PDC': 1})]
-        nodes = self.nodes()
+        maps = [node.split('-')[0] for node in self.nodes_iter()]
         for source, target, attr in missing_edges:
-            if source in nodes or target in nodes:
+            if source.split('-')[0] in maps or target.split('-')[0] in maps:
                 self.add_edge(source, target, rc=attr['RC'], pdc=attr['PDC'])
 
     def keep_only_one_level_of_resolution(self, cong, target_map):
