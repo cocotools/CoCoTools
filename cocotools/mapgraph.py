@@ -3,6 +3,7 @@ import copy
 from itertools import product
 
 import networkx as nx
+import numpy as np
 
 from congraph import ConGraph
 
@@ -316,36 +317,113 @@ class MapGraph(nx.DiGraph):
                                     path)
         return hierarchy
 
-    def remove_node(self, node):
+    def remove_node(self, node, remove_from_tp=False):
         """Remove node from the graph.
 
-        Also remove edges that node mediates (as a member of the TP).
+        By default, do not remove edges that the node mediates (as a member
+        of the TP).
 
         Parameters
         ----------
         node : string
           A node in the graph.
+
+        remove_from_tp : bool  (optional)
+          Indicates whether edges in which nodes play a TP role should be
+          removed.  Default is False.
         """
         nx.DiGraph.remove_node.im_func(self, node)
-        edges_to_remove = []
-        for source, target in self.edges_iter():
-            if node in self[source][target]['TP']:
-                edges_to_remove.append((source, target))
-        self.remove_edges_from(edges_to_remove)
+        if remove_from_tp:
+            edges_to_remove = []
+            for source, target in self.edges_iter():
+                if node in self[source][target]['TP']:
+                    edges_to_remove.append((source, target))
+            self.remove_edges_from(edges_to_remove)
 
-    def remove_nodes_from(self, nodes):
+    def remove_nodes_from(self, nodes, remove_from_tp=False):
         """Remove nodes from the graph.
 
-        Also remove edges that removed nodes mediate (as members of the
-        TP).
+        By default, do not remove edges that removed nodes mediate (as
+        members of the TP).
 
         Parameters
         ----------
         nodes : list
           Nodes to be removed.
+
+        remove_from_tp : bool (optional)
+          Indicates whether edges in which nodes play a TP role should be
+          removed.  Default is False.
         """
         for node in nodes:
             self.remove_node(node)
+
+    def _transfer_data(self, from_, to_):
+        """Transfer RCs and anatomical connections between nodes.
+
+        The node(s) in from_ is going to be removed from the graph, and
+        the node(s) in to_ are from the same map, at a different
+        hierarchical level, and will be kept.
+
+        Parameters
+        ----------
+        from_ : list or string
+          List of nodes or a single node.
+
+        to_ : list or string
+          List of nodes or a single node from the same map as from_.
+        """
+        if isinstance(from_, list):
+            # from_ is the lower level, and to_ is a single node
+            # representing the next higher level.  Thus, the lower
+            # level is the one that will be removed; we're
+            # transferring from the lower level to the higher one.
+            current_map = to_.split('-')[0]
+            for node in from_:
+                # Transfer relations.
+                other_map_neighbors = [n for n in self.neighbors(node) if
+                                       n.split('-')[0] != current_map]
+                for neighbor in other_map_neighbors:
+                    self.add_edge(to_, neighbor, tp=[node])
+                # Transfer connections.
+                try:
+                    successors = self.cong.successors(node)
+                except nx.NetworkXError:
+                    continue
+                for s in successors:
+                    attributes = self.cong[node][s]
+                    # Logically, only the present connections can be
+                    # transferred.
+                    if attributes['Connection'] == 'Present':
+                        self.cong.add_edge(to_, s, attributes)
+                for p in self.cong.predecessors(node):
+                    attributes = self.cong[p][node]
+                    if attributes['Connection'] == 'Present':
+                        self.cong.add_edge(p, to_, attributes)
+        else:
+            # The higher level will be removed; we're transferring
+            # from the higher to the lower level.
+            other_map_neighbors = [n for n in self.neighbors(from_) if
+                                   n.split('-')[0] != from_.split('-')[0]]
+            try:
+                successors = self.cong.successors(from_)
+                predecessors = self.cong.predecessors(from_)
+            except nx.NetworkXError:
+                successors = []
+                predecessors = []
+            for node in to_:
+                for neighbor in other_map_neighbors:
+                    self.add_edge(node, neighbor, tp=[from_])
+                for s in successors:
+                    attributes = self.cong[from_][s]
+                    # Logically, only the absent connections can be
+                    # transferred.
+                    if attributes['Connection'] == 'Absent':
+                        self.cong.add_edge(node, s, attributes)
+                for p in predecessors:
+                    attributes = self.cong[p][from_]
+                    if attributes['Connection'] == 'Absent':
+                        self.cong.add_edge(p, node, attributes)
         
     def _find_bottom_of_hierarchy(self, hierarchy, path):
         """Return nodes at the lowest level and a node that maps to them.
@@ -430,10 +508,10 @@ class MapGraph(nx.DiGraph):
             current_map = larger_node.split('-')[0]
             if (larger_connections == smaller_connections and current_map ==
                 target_map) or larger_connections > smaller_connections:
-                # The first part of the conditional expresses the
-                # decision to keep the coarser level of resolution for
-                # the target map when the number of connections at the
-                # two levels is equal.
+                # If there are more connections for the higher level,
+                # or if the levels tie and this is the target map,
+                # remove the lower level.
+                self._transfer_data(smaller_nodes, larger_node)
                 self.remove_nodes_from(smaller_nodes)
                 for node in smaller_nodes:
                     if self.cong.has_node(node):
@@ -446,10 +524,10 @@ class MapGraph(nx.DiGraph):
                                                               smaller_nodes)
             elif (smaller_connections > larger_connections or current_map !=
                   target_map):
-                # The second part of the conditional expresses the
-                # decision to keep the finer level of resolution for
-                # all maps but the target one when the number of
-                # connections at the two levels is equal.
+                # If there are more connections for the lower level,
+                # or if the levels tie and this is not the target map,
+                # remove the higher level.
+                self._transfer_data(larger_node, smaller_nodes)
                 self.remove_node(larger_node)
                 if self.cong.has_node(larger_node):
                     self.cong.remove_node(larger_node)

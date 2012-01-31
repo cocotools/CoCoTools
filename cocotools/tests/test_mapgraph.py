@@ -16,6 +16,49 @@ from cocotools import MapGraph, MapGraphError
 # Integration Tests
 #------------------------------------------------------------------------------
 
+class TransferDataTestCase(TestCase):
+
+    def setUp(self):
+        m = MapGraph()
+        m.cong = DiGraph()
+        m.add_edges_from([('A00-1', 'B00-1', {'RC': 'L', 'PDC': 0}),
+                          ('A00-2', 'B00-2', {'RC': 'I', 'PDC': 0}),
+                          ('A00-3', 'A00-1', {'RC': 'L', 'PDC': 0}),
+                          ('A00-3', 'A00-2', {'RC': 'L', 'PDC': 0}),
+                          ('A00-3', 'B00-3', {'RC': 'I', 'PDC': 0})])
+        m.cong.add_edges_from([('A00-1', 'C00-1', {'Connection': 'Present'}),
+                               ('C00-2', 'A00-2', {'Connection': 'Present'}),
+                               ('A00-3', 'C00-3', {'Connection': 'Absent'}),
+                               ('C00-4', 'A00-3', {'Connection': 'Absent'})])
+        self.m = m
+
+    def test_keep_higher(self):
+        self.m._transfer_data(['A00-1', 'A00-2'], 'A00-3')
+        # Check relations.
+        self.assertEqual(self.m.number_of_edges(), 14)
+        self.assertEqual(self.m['A00-3']['B00-1']['RC'], 'L')
+        self.assertEqual(self.m['A00-3']['B00-2']['RC'], 'L')
+        # Check connections.
+        self.assertEqual(self.m.cong.number_of_edges(), 6)
+        self.assertEqual(self.m.cong['A00-3']['C00-1']['Connection'],
+                         'Present')
+        self.assertEqual(self.m.cong['C00-2']['A00-3']['Connection'],
+                         'Present')
+
+    def test_keep_lower(self):
+        self.m._transfer_data('A00-3', ['A00-1', 'A00-2'])
+        # Relations.
+        self.assertEqual(self.m.number_of_edges(), 14)
+        self.assertEqual(self.m['A00-1']['B00-3']['RC'], 'S')
+        self.assertEqual(self.m['A00-2']['B00-3']['RC'], 'S')
+        # Connections.
+        self.assertEqual(self.m.cong.number_of_edges(), 8)
+        self.assertEqual(self.m.cong.successors('C00-4'), ['A00-3', 'A00-2',
+                                                           'A00-1'])
+        self.assertEqual(self.m.cong.predecessors('C00-3'), ['A00-3', 'A00-2',
+                                                             'A00-1'])
+
+
 @replace('cocotools.mapgraph.MapGraph.add_edges_from', DiGraph.add_edges_from)
 def test_edge_removal():
     # Test for remove_edge and remove_edges_from.
@@ -33,7 +76,8 @@ def test_edge_removal():
 
 @replace('cocotools.mapgraph.MapGraph.add_nodes_from', DiGraph.add_nodes_from)
 def test_keep_one_level():
-    # Not mocked: _find_bottom_of_hierarchy, _remove_level_from_hierarchy.
+    # Not mocked: _find_bottom_of_hierarchy,
+    # _remove_level_from_hierarchy, _transfer_data.
     hierarchy = {'A-J': {'A-A': {}},
                  'A-B': {'A-I': {'A-F': {'A-K': {},
                                          'A-L': {}},
@@ -157,9 +201,9 @@ def test_remove_node():
     mock_mapp.add_node('X')
     mock_mapp.add_edges_from([('A', 'B', {'TP': ['X']}),
                               ('B', 'C', {'TP': ['Y']})])
-    MapGraph.remove_node.im_func(mock_mapp, 'X')
+    MapGraph.remove_node.im_func(mock_mapp, 'X', True)
     nt.assert_equal(mock_mapp.edges(), [('B', 'C')])
-                       
+
 
 def test_find_bottom_of_hierarchy():
 
