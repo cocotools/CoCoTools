@@ -33,7 +33,7 @@ class TransferDataTestCase(TestCase):
         self.m = m
 
     def test_keep_higher(self):
-        self.m._transfer_data(['A00-1', 'A00-2'], 'A00-3')
+        self.m._transfer_data_to_larger(['A00-1', 'A00-2'], 'A00-3')
         # Check relations.
         self.assertEqual(self.m.number_of_edges(), 14)
         self.assertEqual(self.m['A00-3']['B00-1']['RC'], 'L')
@@ -46,7 +46,7 @@ class TransferDataTestCase(TestCase):
                          'Present')
 
     def test_keep_lower(self):
-        self.m._transfer_data('A00-3', ['A00-1', 'A00-2'])
+        self.m._transfer_data_to_smaller('A00-3', ['A00-1', 'A00-2'])
         # Relations.
         self.assertEqual(self.m.number_of_edges(), 14)
         self.assertEqual(self.m['A00-1']['B00-3']['RC'], 'S')
@@ -75,9 +75,12 @@ def test_edge_removal():
 
 
 @replace('cocotools.mapgraph.MapGraph.add_nodes_from', DiGraph.add_nodes_from)
+@replace('cocotools.mapgraph.MapGraph._transfer_data_to_smaller',
+         lambda self, l, s: None)
+@replace('cocotools.mapgraph.MapGraph._transfer_data_to_larger',
+         lambda self, s, l: None)
 def test_keep_one_level():
-    # Not mocked: _find_bottom_of_hierarchy,
-    # _remove_level_from_hierarchy, _transfer_data.
+    # Not mocked: _find_bottom_of_hierarchy, _remove_level_from_hierarchy.
     hierarchy = {'A-J': {'A-A': {}},
                  'A-B': {'A-I': {'A-F': {'A-K': {},
                                          'A-L': {}},
@@ -201,7 +204,7 @@ def test_remove_node():
     mock_mapp.add_node('X')
     mock_mapp.add_edges_from([('A', 'B', {'TP': ['X']}),
                               ('B', 'C', {'TP': ['Y']})])
-    MapGraph.remove_node.im_func(mock_mapp, 'X', True)
+    MapGraph.remove_node.im_func(mock_mapp, 'X')
     nt.assert_equal(mock_mapp.edges(), [('B', 'C')])
 
 
