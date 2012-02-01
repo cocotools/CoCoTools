@@ -385,7 +385,11 @@ class MapGraph(nx.DiGraph):
             predecessors = []
         for small_node in smaller:
             # Transfer relations.
-            intra_pdc = self[small_node][larger]['PDC']
+            try:
+                intra_pdc = self[small_node][larger]['PDC']
+            except KeyError:
+                raise KeyError('Graph is missing edges between %s and %s.' %
+                               (small_node, larger))
             for neighbor in extra_neighbors:
                 extra_pdc = self[larger][neighbor]['PDC']
                 extra_rc = self[larger][neighbor]['RC']
@@ -422,7 +426,11 @@ class MapGraph(nx.DiGraph):
         current_map = larger.split('-')[0]
         for small_node in smaller:
             # Transfer relations.
-            intra_pdc = self[larger][small_node]['PDC']
+            try:
+                intra_pdc = self[larger][small_node]['PDC']
+            except KeyError:
+                raise KeyError('Graph is missing edges between %s and %s.' %
+                               (small_node, larger))
             extra_neighbors = [n for n in self.neighbors(small_node) if
                                n.split('-')[0] != current_map]
             for neighbor in extra_neighbors:
@@ -1255,9 +1263,19 @@ its own map.""" % node_x)
                          ('PHT00-8A', 'PHT00-8AD', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-8A', 'PHT00-8AV', {'RC': 'L', 'PDC': 15}),
                          ('G82-SZ', 'G82-SC', {'RC': 'S', 'PDC': 2}),
+                         ('RAP87-AMYG', 'RAP87-BAM', {'RC': 'L', 'PDC': 2}),
+                         ('RAP87-AMYG', 'RAP87-BAP', {'RC': 'L', 'PDC': 2}),
+                         ('RAP87-AMYG', 'RAP87-BM', {'RC': 'L', 'PDC': 2}),
+                         ('RAP87-AMYG', 'RAP87-BP', {'RC': 'L', 'PDC': 2}),
+                         ('RAP87-AMYG', 'RAP87-BPL', {'RC': 'L', 'PDC': 2}),
                          ('SSA96-36', 'SSA96-36RL', {'RC': 'L', 'PDC': 0}),
                          ('SSA96-36', 'SSA96-36RM', {'RC': 'L', 'PDC': 0}),
                          ('AHGWU00-PL', 'AHGWU00-P2', {'RC': 'L', 'PDC': 12}),
+                         ('AHGWU00-PUL', 'AHGWU00-P2', {'RC': 'L', 'PDC': 15}),
+                         ('AHGWU00-PUL', 'AHGWU00-PICL', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('AHGWU00-PUL', 'AHGWU00-PLVL', {'RC': 'L',
+                                                          'PDC': 15}),
                          ('PP94-8', 'PP94-8AD', {'RC': 'L', 'PDC': 2}),
                          ('PP94-8', 'PP94-8AV', {'RC': 'L', 'PDC': 2}),
                          ('GC97-PUL', 'GC97-PIC', {'RC': 'L', 'PDC': 2}),
@@ -1341,6 +1359,8 @@ its own map.""" % node_x)
                          ('AIC87-36', 'AIC87-36R-IV', {'RC': 'L', 'PDC': 0}),
                          ('AIC87-36', 'AIC87-36R-V', {'RC': 'L', 'PDC': 0}),
                          ('AIC87-36', 'AIC87-36R-VI', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-E', 'AIC87-ELC', {'RC': 'L', 'PDC': 0}),
+                         ('AIC87-E', 'AIC87-ELR', {'RC': 'L', 'PDC': 0}),
                          ('ST96-TE', 'ST96-TEAV', {'RC': 'L', 'PDC': 0}),
                          ('ST96-TE', 'ST96-TEAD', {'RC': 'L', 'PDC': 0}),
                          ('SR88-28', 'SR88-28L-I', {'RC': 'L', 'PDC': 0}),
@@ -1415,6 +1435,7 @@ its own map.""" % node_x)
                          ('GCSC00-PUL', 'GCSC00-PML', {'RC': 'L', 'PDC': 0}),
                          ('GCSC00-PUL', 'GCSC00-PMM', {'RC': 'L', 'PDC': 0}),
                          ('GCSC00-PUL', 'GCSC00-PMM-C', {'RC': 'L', 'PDC': 0}),
+                         ('GCSC00-PUL', 'GCSC00-PLD', {'RC': 'L', 'PDC': 0}),
                          ('J49-APIMAC', 'J49-APIMACDL', {'RC': 'L', 'PDC': 4}),
                          ('J49-APIMAC', 'J49-APIMACDM', {'RC': 'L', 'PDC': 4}),
                          ('BK98-PUL', 'BK98-PICL', {'RC': 'L', 'PDC': 2}),
@@ -1448,6 +1469,8 @@ its own map.""" % node_x)
                          ('A85-AMG', 'A85-CEMC', {'RC': 'L', 'PDC': 5}),
                          ('A85-AMG', 'A85-ABMC', {'RC': 'L', 'PDC': 2}),
                          ('A85-AMG', 'A85-ABPC', {'RC': 'L', 'PDC': 2}),
+                         ('GG95-PM', 'GG95-CPMD', {'RC': 'L', 'PDC': 0}),
+                         ('GG95-PM', 'GG95-RPMD', {'RC': 'L', 'PDC': 0}),
                          ('GGC99-PUL', 'GGC99-PIC', {'RC': 'L', 'PDC': 2}),
                          ('GGC99-PUL', 'GGC99-PIL', {'RC': 'L', 'PDC': 2}),
                          ('GGC99-PUL', 'GGC99-PIL-S', {'RC': 'L', 'PDC': 2}),
@@ -1458,8 +1481,16 @@ its own map.""" % node_x)
                          ('DS91-6', 'DS91-CMAD', {'RC': 'L', 'PDC': 2}),
                          ('WA91-HF', 'WA91-CA1-SLM', {'RC': 'L', 'PDC': 5}),
                          ('WA91-HF', 'WA91-DG-ML', {'RC': 'L', 'PDC': 5}),
+                         ('WA91-HF', 'WA91-CA2-SLM', {'RC': 'L', 'PDC': 5}),
                          ('NHYM96-24', 'NHYM96-CMAC', {'RC': 'L', 'PDC': 18}),
                          ('NHYM96-24', 'NHYM96-CMAR', {'RC': 'L', 'PDC': 18}),
+                         ('YI88-CA1', 'YI88-CA1MED-SP', {'RC': 'L', 'PDC': 2}),
+                         ('YI88-CA1', 'YI88-CA1MED-SM', {'RC': 'L', 'PDC': 2}),
+                         ('YI88-CA1', 'YI88-CA1MED-SR', {'RC': 'L', 'PDC': 2}),
+                         ('YI81-LGN', 'YI81-LGN_PC-L', {'RC': 'L', 'PDC': 2}),
+                         ('YI81-LGN', 'YI81-LGN_PC-IL', {'RC': 'L', 'PDC': 2}),
+                         ('YI81-LGN', 'YI81-LGN_MC-L', {'RC': 'L', 'PDC': 2}),
+                         ('YI81-LGN', 'YI81-LGN_MC-IL', {'RC': 'L', 'PDC': 2}),
                          ('SA00-PH', 'SA00-TFL', {'RC': 'L', 'PDC': 0}),
                          ('SA00-PH', 'SA00-TFM', {'RC': 'L', 'PDC': 0}),
                          ('SA00-36', 'SA00-36CL', {'RC': 'L', 'PDC': 0}),
@@ -1467,6 +1498,14 @@ its own map.""" % node_x)
                          ('SA00-36', 'SA00-36RL', {'RC': 'L', 'PDC': 0}),
                          ('SA00-36', 'SA00-36RM', {'RC': 'L', 'PDC': 0}),
                          ('MM82A-INS', 'MM82A-OFA-P', {'RC': 'L', 'PDC': 15}),
+                         ('MMLW83-CH4', 'MMLW83-CH4ID', {'RC': 'L', 'PDC': 9}),
+                         ('MMLW83-CH4', 'MMLW83-CH4AL', {'RC': 'L', 'PDC': 9}),
+                         ('MMLW83-CH4', 'MMLW83-CH4AM', {'RC': 'L', 'PDC': 9}),
+                         ('MMLW83-CH4', 'MMLW83-CH4IV', {'RC': 'L', 'PDC': 9}),
+                         ('L45-NUC.AMYG.BAS.', 'L45-NUC.AMYG.BAS.P.MED.(D.)',
+                          {'RC': 'L', 'PDC': 0}),
+                         ('L45-NUC.AMYG.BAS.', 'L45-NUC.AMYG.BAS.P.MED.(S.)',
+                          {'RC': 'L', 'PDC': 0}),
                          # This seems suspect.
                          ('BB47-PEM', 'BB47-PEP', {'RC': 'L', 'PDC': 15}),
                          ('UD86A-MT*', 'UD86A-MTP', {'RC': 'L', 'PDC': 2}),
@@ -1485,6 +1524,9 @@ its own map.""" % node_x)
                          ('RB79-17', 'RB79-STRIATEC-V', {'RC': 'L', 'PDC': 2}),
                          ('RB79-17', 'RB79-STRIATEC-VI', {'RC': 'L', 'PDC': 2}),
                          ('RB79-17', 'RB79-UVQ', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-PUL', 'RB79-PLA', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-PUL', 'RB79-PLB', {'RC': 'L', 'PDC': 2}),
+                         ('RB79-PUL', 'RB79-PLG', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POI', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POL', {'RC': 'L', 'PDC': 2}),
                          ('J85-SG', 'J85-POM', {'RC': 'L', 'PDC': 2}),
