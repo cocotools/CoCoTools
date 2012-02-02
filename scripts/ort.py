@@ -1,3 +1,4 @@
+import copy
 import pickle
 
 import cocotools as coco
@@ -66,7 +67,8 @@ elif response == 'y':
 # mapg3.pck and cong2.pck
 response = raw_input('Have hierarchies been removed (y/n)? ')
 if response == 'n':
-    cong = mapg.keep_only_one_level_of_resolution(cong)
+    post_clean = copy.deepcopy(mapg)
+    cong = mapg.keep_only_one_level_of_resolution(cong, 'PHT00')
     with open('results/post_sfn_revisions/mapg3.pck', 'w') as f:
         pickle.dump(mapg, f)
     with open('results/post_sfn_revisions/cong2.pck', 'w') as f:
