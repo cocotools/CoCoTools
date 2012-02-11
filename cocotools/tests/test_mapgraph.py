@@ -80,7 +80,8 @@ def test_edge_removal():
 @replace('cocotools.mapgraph.MapGraph._transfer_data_to_larger',
          lambda self, s, l: None)
 def test_keep_one_level():
-    # Not mocked: _find_bottom_of_hierarchy, _remove_level_from_hierarchy.
+    # Not mocked: _find_bottom_of_hierarchy,
+    # _remove_level_from_hierarchy, _summate_connections.
     hierarchy = {'A-J': {'A-A': {}},
                  'A-B': {'A-I': {'A-F': {'A-K': {},
                                          'A-L': {}},
@@ -139,6 +140,21 @@ def test_find_partial_coverage():
 # Unit Tests
 #------------------------------------------------------------------------------
 
+def test_summate_connections():
+    mock_cong = DiGraph()
+    mock_cong.add_edges_from([('A-1', 'B-3'), ('B-2', 'A-1'), ('A-2', 'B-2'),
+                              ('C-3', 'B-1'), ('D-1', 'D-2')])
+    mock_mapg = DiGraph()
+    mock_mapg.add_edges_from([('A-1', 'B-1', {'RC': 'I'}),
+                              ('A-1', 'C-1', {'RC': 'S'}),
+                              ('A-2', 'D-1', {'RC': 'L'}),
+                              ('A-2', 'E-1', {'RC': 'O'})])
+    mock_mapg.cong = mock_cong
+    nt.assert_equal(MapGraph._summate_connections.im_func(mock_mapg,
+                                                          ['A-1', 'A-2']),
+                    4)
+
+    
 def test_get_worst_pdc():
     mock_mapp = DiGraph()
     mock_mapp.add_edges_from([('A-1', 'B-1', {'RC': 'L', 'PDC': 5}),

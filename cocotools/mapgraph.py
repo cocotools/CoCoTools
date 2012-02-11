@@ -454,7 +454,30 @@ class MapGraph(nx.DiGraph):
                 attributes = self.cong[p][small_node]
                 if attributes['Connection'] == 'Present':
                     self.cong.add_edge(p, larger, attributes)
-        
+
+    def _summate_connections(self, node_list):
+        """Return number of connections for nodes and identical ones.
+
+        All nodes in node_list are from the same map.
+        """
+        same_map = node_list[0].split('-')[0]
+        n_connections = 0
+        for node in node_list:
+            try:
+                n_connections += len(self.cong.predecessors(node))
+                n_connections += len(self.cong.successors(node))
+            except nx.NetworkXError:
+                pass
+            for neighbor in self.neighbors(node):
+                if (neighbor.split('-')[0] != same_map and
+                    self[node][neighbor]['RC'] == 'I'):
+                    try:
+                        n_connections += len(self.cong.predecessors(neighbor))
+                        n_connections += len(self.cong.successors(neighbor))
+                    except nx.NetworkXError:
+                        pass
+        return n_connections
+            
     def _find_bottom_of_hierarchy(self, hierarchy, path):
         """Return nodes at the lowest level and a node that maps to them.
 
@@ -522,18 +545,8 @@ class MapGraph(nx.DiGraph):
                 break
             larger_node, smaller_nodes = bottom
             # See which level has more edges in cong.
-            try:
-                larger_connections = len(self.cong.predecessors(larger_node) +
-                                         self.cong.successors(larger_node))
-            except nx.NetworkXError:
-                larger_connections = 0
-            smaller_connections = 0
-            for s in smaller_nodes:
-                try:
-                    smaller_connections += len(self.cong.predecessors(s))
-                    smaller_connections += len(self.cong.successors(s))
-                except nx.NetworkXError:
-                    pass
+            larger_connections = self._summate_connections([larger_node])
+            smaller_connections = self._summate_connections(smaller_nodes)
             # Remove the level with fewer connections from the graph.
             current_map = larger_node.split('-')[0]
             if (larger_connections == smaller_connections and current_map ==
