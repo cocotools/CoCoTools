@@ -1,5 +1,7 @@
 import copy
 
+import networkx as nx
+
 
 def write_A_to_mat(g, path):
     """Write adjacency matrix (A) of g as a .mat file.
@@ -85,5 +87,3 @@ def check_for_dups(g):
                 dups.append(original_node)
         dups.sort()
         return dups
-
-
