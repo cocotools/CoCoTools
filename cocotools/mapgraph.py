@@ -1144,9 +1144,17 @@ its own map.""" % node_x)
 
         # The removal of MCSGP04-M3 gets rid of some internal 'O' RCs,
         # but we haven't read the original paper.
+
+        # 4C, 6VV, 6VD, and AHIPM are not in PHT00.  (Is AHIPM meant
+        # to be AHIPC?)  5, although listed, does not appear in any
+        # figures.  Note that we're really using PHPT08 -- we haven't
+        # looked in PHT00 itself.
         self.remove_nodes_from(['DU86-DMZ', 'UD86A-DMZ', 'SP89B-MST',
                                 'SP89A-MST', 'SA90-TE', 'MCSGP04-M3',
-                                'MV92-M3', 'AHGWU00-P1', 'SMKB95-45A+8AR'])
+                                'MV92-M3', 'AHGWU00-P1', 'SMKB95-45A+8AR',
+                                'PHT00-4C', 'PHT00-5', 'PHT00-6VD',
+                                'PHT00-6VV', 'PHT00-AHIPM', 'PHT00-CXA',
+                                'PHT00-ST2G', 'PHT00-ST2S'])
         # Although CoCoMac contains the following edges, they are not
         # supported by the original papers.
         self.remove_edges_from([('FV91-VOT', 'GSG88-V4'),
@@ -1208,6 +1216,42 @@ its own map.""" % node_x)
                 self[target][source]['PDC'] = pdc
         # Add edges missing from CoCoMac:
         missing_edges = [('PHT00-PTG', 'LSB86-PPT', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-24/23', 'PHT00-24/23A', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('PHT00-24/23', 'PHT00-24/23B', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('PHT00-24/23', 'PHT00-24/23C', {'RC': 'L',
+                                                          'PDC': 15}),
+                         ('PHT00-TEOM', 'PHT00-PITD', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-VIP', 'PHT00-DIP', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-TL', 'PHT00-36', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-V5', 'PHT00-MT', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-TL', 'PHT00-TLO', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-TL', 'PHT00-TLR', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-36', 'PHT00-TLO', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-36', 'PHT00-TLR', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-LIP', 'PHT00-POA', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-LIPE', 'PHT00-POAE', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-LIPI', 'PHT00-POAI', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-REI', 'PHT00-REIP', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-REI', 'PHT00-REIT', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-PAI', 'PHT00-PAIL', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-PAI', 'PHT00-PAIM', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-POA', 'PHT00-POAE', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-POA', 'PHT00-POAI', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-LIP', 'PHT00-LIPE', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-LIP', 'PHT00-LIPI', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-EOR', 'PHT00-EOL', {'RC': 'I', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-ECL', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-EC', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-EI', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-ELC', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-ELR', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-EOL', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-ER', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-ENT', 'PHT00-EL', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-EL', 'PHT00-ELC', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-EL', 'PHT00-ELR', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-SN', 'PHT00-SNR', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-SN', 'PHT00-SNC', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-6DC', 'PHT00-F2', {'RC': 'I', 'PDC': 15}),
@@ -1259,6 +1303,7 @@ its own map.""" % node_x)
                          ('PHT00-TE2', 'PHT00-TE2M', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-TF', 'PHT00-TFL', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-TF', 'PHT00-TFM', {'RC': 'L', 'PDC': 15}),
+                         ('PHT00-TF', 'PHT00-TFO', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-29A-C', 'PHT00-29A', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-8A', 'PHT00-8AD', {'RC': 'L', 'PDC': 15}),
                          ('PHT00-8A', 'PHT00-8AV', {'RC': 'L', 'PDC': 15}),
