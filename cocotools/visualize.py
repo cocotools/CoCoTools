@@ -163,9 +163,9 @@ def view_PHT00(path_to_graph, projection, only_nodes=None):
     projection : string
       'axial', 'sagittal', or 'coronal'.
     """
-    atlas = utils.load_labels()
-    labels, positions, aspect, colors = utils.make_projection(atlas)
-    g, gnorm = utils.load_graphs(path_to_graph, atlas)
+    atlas = load_labels()
+    labels, positions, aspect, colors = make_projection(atlas)
+    g, gnorm = load_graphs(path_to_graph, atlas)
     graph_view(projection, gnorm, aspect, colors, positions,
                only_nodes=only_nodes)
     plt.show()
