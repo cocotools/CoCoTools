@@ -1,6 +1,6 @@
 import re
 import copy
-from itertools import product
+import itertools
 
 import networkx as nx
 import numpy as np
@@ -168,11 +168,11 @@ class MapGraph(nx.DiGraph):
         # one of the neighbors with an RC of 'I' or 'S'.
         best_is, best_pdc = self._get_best_is(node, is_neighbors)
         if lo_neighbors and self._get_worst_pdc(node, lo_neighbors) < best_pdc:
-            self.remove_edges_from(product([node], is_neighbors))
+            self.remove_edges_from(itertools.product([node], is_neighbors))
         else:
             all_neighbors = is_neighbors + lo_neighbors
             all_neighbors.remove(best_is)
-            self.remove_edges_from(product([node], all_neighbors))
+            self.remove_edges_from(itertools.product([node], all_neighbors))
 
     def _organize_by_rc(self, node, neighbors):
         """Return neighbors grouped by their RC with node.
@@ -1022,29 +1022,22 @@ its own map.""" % node_x)
             nx.DiGraph.remove_edge.im_func(self, source, target)
         except nx.NetworkXError:
             # The edge isn't in the graph.
-            pass
-        try:
-            nx.DiGraph.remove_edge.im_func(self, target, source)
-        except nx.NetworkXError:
-            pass
+            return
+        # If (source, target) was in the graph, then we must
+        # remove its reciprocal, and then check whether it or its
+        # reciprocal mediates any other edges in the graph.
+        nx.DiGraph.remove_edge.im_func(self, target, source)
         edges_with_bad_tp = []
         for s, t in self.edges_iter():
             if (t, s) in edges_with_bad_tp:
-                # Reciprocals are taken care of by self.remove_edges_from.
+                # Reciprocals are taken care of automatically.
                 continue
             tp = self[s][t]['TP']
-            for i, node in enumerate(tp):
-                if node == source:
-                    if i != 0:
-                        before = tp[i - 1]
-                    else:
-                        before = None
-                    try:
-                        after = tp[i + 1]
-                    except IndexError:
-                        after = None
-                    if target in (before, after):
-                        edges_with_bad_tp.append((s, t))
+            for node, next_node in zip(tp, tp[1:]):
+                if set([node, next_node]) == set([source, target]):
+                    edges_with_bad_tp.append((s, t))
+                    # This edge is bad; we can move on to the next one.
+                    break
         self.remove_edges_from(edges_with_bad_tp)
 
     def remove_edges_from(self, edges):
