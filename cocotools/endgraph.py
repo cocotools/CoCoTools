@@ -278,7 +278,7 @@ latter are not disjoint""" % (new, originals))
 
     def _take_most_extensive_ec(self, orig_s_ecs, original_sources,
                                 orig_t_ecs, original_targets):
-        extensiveness_rank = ('C', 'X', 'P', 'N')
+        extensiveness_rank = ('C', 'X', 'P', 'N', 'U')
         reduced_s_ecs = []
         for s in original_sources:
             best_rank = 4
