@@ -274,7 +274,154 @@ latter are not disjoint""" % (new, originals))
 
     def _at_logic(self, ecs, rcs):
         """Here I am, Rob! ;)"""
-        pass
+        if len(rcs) == 1 and rcs[0] in ('I', 'L'):
+            table = {'B': {'I': {'N': 'N',
+                                 'P': 'P',
+                                 'X': 'X',
+                                 'C': 'C'},
+                           'L': {'N': 'N',
+                                 'P': 'U',
+                                 'X': 'U',
+                                 'C': 'C'}}}
+        else:
+            table = {'B': {'S': {'Np': 'Up',
+                                 'Nx': 'Up',
+                                 'Nc': 'N',
+                                 'N': 'N',
+                                 'P': 'P',
+                                 'X': 'X',
+                                 'C': 'C',
+                                 'U': 'Ux'
+                                 },
+                           'O': {'Np': 'Ux',
+                                 'Nx': 'Ux',
+                                 'Nc': 'N',
+                                 'N': 'N',
+                                 'P': 'Ux',
+                                 'X': 'Ux',
+                                 'C': 'C',
+                                 'U': 'Ux'
+                                 }
+                           },
+                     'N': {'S': {'Np': 'Up',
+                                 'Nx': 'Up',
+                                 'Nc': 'N',
+                                 'N': 'N',
+                                 'P': 'P',
+                                 'X': 'P',
+                                 'C': 'P',
+                                 'U': 'Up'
+                                 },
+                           'O': {'Np': 'Up',
+                                 'Nx': 'Up',
+                                 'Nc': 'N',
+                                 'N': 'N',
+                                 'P': 'Up',
+                                 'X': 'Up',
+                                 'C': 'P',
+                                 'U': 'Up'
+                                 }
+                           },
+                     'Up': {'S': {'Np': 'Up',
+                                  'Nx': 'Up',
+                                  'Nc': 'Up',
+                                  'N': 'Up',
+                                  'P': 'P',
+                                  'X': 'P',
+                                  'C': 'P',
+                                  'U': 'Up'
+                                  },
+                            'O': {'Np': 'Up',
+                                  'Nx': 'Up',
+                                  'Nc': 'Up',
+                                  'N': 'Up',
+                                  'P': 'Up',
+                                  'X': 'Up',
+                                  'C': 'P',
+                                  'U': 'Up'
+                                  }
+                            },
+                     'Ux': {'S': {'Np': 'Up',
+                                  'Nx': 'Up',
+                                  'Nc': 'Up',
+                                  'N': 'Up',
+                                  'P': 'P',
+                                  'X': 'X',
+                                  'C': 'X',
+                                  'U': 'Ux'
+                                  },
+                            'O': {'Np': 'Ux',
+                                  'Nx': 'Ux',
+                                  'Nc': 'Up',
+                                  'N': 'Up',
+                                  'P': 'Ux',
+                                  'X': 'Ux',
+                                  'C': 'X',
+                                  'U': 'Ux'
+                                  }
+                            },
+                     'P': {'S': {'Np': 'P',
+                                 'Nx': 'P',
+                                 'Nc': 'P',
+                                 'N': 'P',
+                                 'P': 'P',
+                                 'X': 'P',
+                                 'C': 'P',
+                                 'U': 'P'
+                                 },
+                           'O': {'Np': 'P',
+                                 'Nx': 'P',
+                                 'Nc': 'P',
+                                 'N': 'P',
+                                 'P': 'P',
+                                 'X': 'P',
+                                 'C': 'P',
+                                 'U': 'P'
+                                 }
+                           },
+                     'X': {'S': {'Np': 'P',
+                                 'Nx': 'P',
+                                 'Nc': 'P',
+                                 'N': 'P',
+                                 'P': 'P',
+                                 'X': 'X',
+                                 'C': 'X',
+                                 'U': 'X'
+                                 },
+                           'O': {'Np': 'X',
+                                 'Nx': 'X',
+                                 'Nc': 'P',
+                                 'N': 'P',
+                                 'P': 'X',
+                                 'X': 'X',
+                                 'C': 'X',
+                                 'U': 'X'
+                                 }
+                           },
+                     'C': {'S': {'Np': 'P',
+                                 'Nx': 'P',
+                                 'Nc': 'P',
+                                 'N': 'P',
+                                 'P': 'P',
+                                 'X': 'X',
+                                 'C': 'C',
+                                 'U': 'X'
+                                 },
+                           'O': {'Np': 'X',
+                                 'Nx': 'X',
+                                 'Nc': 'P',
+                                 'N': 'P',
+                                 'P': 'X',
+                                 'X': 'X',
+                                 'C': 'C',
+                                 'U': 'X'
+                                 }
+                           }
+                     }
+        result = 'B'
+        for ec, rc in zip(ecs, rcs):
+            result = table[result][rc][ec]
+        return result
 
     def _take_most_extensive_ec(self, orig_s_ecs, original_sources,
                                 orig_t_ecs, original_targets):
@@ -283,18 +430,20 @@ latter are not disjoint""" % (new, originals))
         for s in original_sources:
             best_rank = 4
             for ec in orig_s_ecs[s]:
-                current_rank = extensiveness_rank.index(ec)
+                current_rank = extensiveness_rank.index(ec[0])
                 if current_rank < best_rank:
                     best_rank = current_rank
-            reduced_s_ecs.append(extensiveness_rank[best_rank])
+                    best_ec = ec
+            reduced_s_ecs.append(best_ec)
         reduced_t_ecs = []
         for t in original_targets:
             best_rank = 4
             for ec in orig_t_ecs[t]:
-                current_rank = extensiveness_rank.index(ec)
+                current_rank = extensiveness_rank.index(ec[0])
                 if current_rank < best_rank:
                     best_rank = current_rank
-            reduced_t_ecs.append(extensiveness_rank[best_rank])
+                    best_ec = ec
+            reduced_t_ecs.append(best_ec)
         return reduced_s_ecs, reduced_t_ecs
 
     def _translate_attr_original(self, s_mapping, t_mapping, mapp, conn):
