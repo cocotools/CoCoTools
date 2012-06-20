@@ -86,7 +86,7 @@ def mock_resolve_connections(self, connections):
 def test_translate_attributes():
     mock_conn = DiGraph()
     mock_conn.add_edge('B-1', 'B-2', Connection='Present')
-    translate = EndGraph._translate_attributes.im_func
+    translate = EndGraph._translate_attr_modified.im_func
     # PDCs that get averaged are 3 (RCs), 6 (existent conn edge), and
     # 18 (non-existent conn edge).
     nt.assert_equal(translate(EndGraph(), ('A-1', ['B-1', 'B-3']),

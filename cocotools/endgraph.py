@@ -222,7 +222,7 @@ latter are not disjoint""" % (new, originals))
                 pdcs.append(mapp[orig][new]['PDC'])
             return rcs, pdcs
 
-    def _translate_attributes(self, s_mapping, t_mapping, mapp, conn):
+    def _translate_attr_modified(self, s_mapping, t_mapping, mapp, conn):
         """Determine edge attributes based on edges from another BrainMap.
 
         Parameters
@@ -272,6 +272,69 @@ latter are not disjoint""" % (new, originals))
                 # weighted equally.
                 'PDC': np.mean(pdcs)}
 
+    def _at_logic(self, ecs, rcs):
+        """Here I am, Rob! ;)"""
+        pass
+
+    def _take_most_extensive_ec(self, orig_s_ecs, original_sources,
+                                orig_t_ecs, original_targets):
+        extensiveness_rank = ('C', 'X', 'P', 'N')
+        reduced_s_ecs = []
+        for s in original_sources:
+            best_rank = 4
+            for ec in orig_s_ecs[s]:
+                current_rank = extensiveness_rank.index(ec)
+                if current_rank < best_rank:
+                    best_rank = current_rank
+            reduced_s_ecs.append(extensiveness_rank[best_rank])
+        reduced_t_ecs = []
+        for t in original_targets:
+            best_rank = 4
+            for ec in orig_t_ecs[t]:
+                current_rank = extensiveness_rank.index(ec)
+                if current_rank < best_rank:
+                    best_rank = current_rank
+            reduced_t_ecs.append(extensiveness_rank[best_rank])
+        return reduced_s_ecs, reduced_t_ecs
+
+    def _translate_attr_original(self, s_mapping, t_mapping, mapp, conn):
+        pdcs = []
+        source_rcs, pdcs = self._get_rcs(s_mapping, mapp, pdcs)
+        target_rcs, pdcs = self._get_rcs(t_mapping, mapp, pdcs)
+        new_source, original_sources = s_mapping
+        new_target, original_targets = t_mapping
+        orig_s_ecs = {}
+        orig_t_ecs = {}
+        for original_s in original_sources:
+            for original_t in original_targets:
+                try:
+                    conn_dict = conn[original_s][original_t]
+                except KeyError:
+                    conn_dict = {'EC_Source': 'U', 'EC_Target': 'U'}
+                    # It's kind of weird that we're incorporating PDCs
+                    # for edges that aren't ultimately going to factor
+                    # into the final EC (as only the most extensive is
+                    # kept), but whatever.
+                    pdcs.append(18)
+                else:
+                    pdcs.append(self._get_mean_pdc(original_s, original_t,
+                                                   conn))
+                if not orig_s_ecs.has_key(original_s):
+                    orig_s_ecs[original_s] = [conn_dict['EC_Source']]
+                else:
+                    orig_s_ecs[original_s].append(conn_dict['EC_Source'])
+                if not orig_t_ecs.has_key(original_t):
+                    orig_t_ecs[original_t] = [conn_dict['EC_Target']]
+                else:
+                    orig_t_ecs[original_t].append(conn_dict['EC_Target'])
+        orig_s_ecs, orig_t_ecs = self._take_most_extensive_ec(orig_s_ecs,
+                                                              original_sources,
+                                                              orig_t_ecs,
+                                                              original_targets)
+        return {'EC_Source': self._at_logic(orig_s_ecs, source_rcs),
+                'EC_Target': self._at_logic(orig_t_ecs, target_rcs),
+                'PDC': np.mean(pdcs)}
+
     def _translate_node(self, mapp, node, other_map):
         """Return list of nodes from other_map coextensive with node.
 
@@ -302,7 +365,7 @@ latter are not disjoint""" % (new, originals))
         return [n for n in neighbors if n.split('-')[0] == other_map]
 
     def _make_translation_dict(self, mapp, original_node, desired_map):
-        """Map regions in desired_bmap to regions in node's map.
+        """Map regions in desired_bmap to coextensive regions in node's map.
 
         Parameters
         ----------
@@ -317,8 +380,8 @@ latter are not disjoint""" % (new, originals))
         Returns
         -------
         translation_dict : dictionary
-          Nodes in desired_bmap are mapped to lists of nodes in the
-          BrainMap node is from.
+          Nodes in desired_bmap are mapped to lists of coextensive nodes
+          in the BrainMap node is from.
         """
         original_map = original_node.split('-')[0]
         if original_map == desired_map:
@@ -330,7 +393,7 @@ latter are not disjoint""" % (new, originals))
                                                               original_map)
         return translation_dict
 
-    def add_translated_edges(self, mapp, conn, desired_map):
+    def add_translated_edges(self, mapp, conn, desired_map, method):
         """Translate edges in conn to nomenclature of desired_bmap.
 
         Add all desired_map nodes in mapp to this graph.
@@ -346,18 +409,25 @@ latter are not disjoint""" % (new, originals))
 
         desired_map : string
           Name of BrainMap to which translation will be performed.
+
+        method : string
+          AT method to be used: 'original' (that of Stephan & Kotter)
+          or 'modified'
         """
         self.map = desired_map
         for node in mapp.nodes_iter():
             if node.split('-')[0] == desired_map:
                 self.add_node(node.split('-', 1)[-1])
+        at_setting = {'original': self._translate_attr_original,
+                      'modified': self._translate_attr_modified}
+        self._translate_attr = at_setting[method]
         for original_s, original_t in conn.edges_iter():
             s_dict = self._make_translation_dict(mapp, original_s, desired_map)
             t_dict = self._make_translation_dict(mapp, original_t, desired_map)
             for s_mapping in s_dict.iteritems():
                 for t_mapping in t_dict.iteritems():
-                    attr = self._translate_attributes(s_mapping, t_mapping,
-                                                      mapp, conn)
+                    attr = self._translate_attr(s_mapping, t_mapping, mapp,
+                                                conn)
                     # The first element in each mapping is the node in
                     # desired_map.  We must remove the brain map name,
                     # pre-pended to the name of the area.  (Note that
