@@ -58,6 +58,9 @@ MAPPING_SOURCES = ['A85', 'A86', 'AAC85', 'AAES90', 'AB89', 'ABMR98', 'ABP80',
 MAPPING_TIMEOUTS = ['APPC92', 'BB47', 'GM', 'O52', 'PRA87', 'W40', 'AP00']
 
 
+MAPPING_NON_TIMEOUTS = list(set(MAPPING_SOURCES) - set(MAPPING_TIMEOUTS))
+
+
 CONNECTIVITY_SOURCES = ['A85', 'A86', 'AAC85', 'AAES90', 'AHGWU00', 'AI92',
                         'AIC87', 'AM02', 'AM84', 'AP84', 'APA83', 'APPC92',
                         'ASM94', 'B00', 'B05', 'B09', 'B84', 'B88', 'BAS90',
@@ -110,3 +113,7 @@ CONNECTIVITY_SOURCES = ['A85', 'A86', 'AAC85', 'AAES90', 'AHGWU00', 'AI92',
 
 CONNECTIVITY_TIMEOUTS = ['B09', 'BB47', 'BP89', 'CP94', 'FV91', 'LV00a', 'O52',
                          'W40', 'AP00']
+
+
+CONNECTIVITY_NON_TIMEOUTS = list(set(CONNECTIVITY_SOURCES) -
+                                 set(CONNECTIVITY_TIMEOUTS))
