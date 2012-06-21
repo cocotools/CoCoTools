@@ -428,8 +428,9 @@ latter are not disjoint""" % (new, originals))
         extensiveness_rank = ('C', 'X', 'P', 'N', 'U')
         reduced_s_ecs = []
         for s in original_sources:
-            best_rank = 4
+            best_rank = 5
             for ec in orig_s_ecs[s]:
+                # For Nx, Np, Nc, consider only the first letter (i.e., N)
                 current_rank = extensiveness_rank.index(ec[0])
                 if current_rank < best_rank:
                     best_rank = current_rank

@@ -62,7 +62,8 @@ def test_get_rcs():
 
 
 def mock_get_rcs(self, mapping, mapp, pdcs):
-    return ['S'], [3]
+    new, old = mapping
+    return ['S']*len(old), [3]*len(old)+pdcs
 
 
 def mock_translate_connection(self, s_rc, t_rc, connection):
@@ -83,7 +84,7 @@ def mock_resolve_connections(self, connections):
 @replace('cocotools.endgraph.EndGraph._get_mean_pdc', mock_get_mean_pdc)
 @replace('cocotools.endgraph.EndGraph._resolve_connections',
          mock_resolve_connections)
-def test_translate_attributes():
+def test_translate_attr_modified():
     mock_conn = DiGraph()
     mock_conn.add_edge('B-1', 'B-2', Connection='Present')
     translate = EndGraph._translate_attr_modified.im_func
@@ -91,9 +92,52 @@ def test_translate_attributes():
     # 18 (non-existent conn edge).
     nt.assert_equal(translate(EndGraph(), ('A-1', ['B-1', 'B-3']),
                               ('A-2', ['B-2']), None, mock_conn),
-                    {'Connection': 'Present', 'PDC': 9})
+                    {'Connection': 'Present', 'PDC': 6.6})
+
+
+def test_at_logic():
+    at_logic = EndGraph._at_logic.im_func
+    nt.assert_equal(at_logic(None, ['X', 'Np', 'U', 'C'],
+                             ['S', 'O', 'O', 'S']), 'X')
+    nt.assert_equal(at_logic(None, ['X'], ['L']), 'U')
+    nt.assert_equal(at_logic(None, ['U', 'Np', 'Np', 'C'],
+                             ['S', 'O', 'S', 'O']), 'P')
+
+
+def test_take_most_extensive_ec():
+    f = EndGraph._take_most_extensive_ec.im_func
+    nt.assert_equal(f(None, {'B-1': ['N', 'Nc', 'C'], 'B-3': ['U']},
+                      ['B-1', 'B-3'], {'B-2': ['Nc', 'U']}, ['B-2']),
+                    (['C', 'U'], ['Nc']))
+
+
+def mock_take_most_extensive_ec(self, orig_s_ecs, orig_sources, orig_t_ecs,
+                                orig_targets):
+    s_ecs = [v[0] for v in orig_s_ecs.itervalues()]
+    t_ecs = [v[0] for v in orig_t_ecs.itervalues()]
+    return s_ecs, t_ecs
+
+
+def mock_at_logic(self, ecs, rcs):
+    return ecs.pop()
 
     
+@replace('cocotools.endgraph.EndGraph._get_rcs', mock_get_rcs)
+@replace('cocotools.endgraph.EndGraph._get_mean_pdc', mock_get_mean_pdc)
+@replace('cocotools.endgraph.EndGraph._take_most_extensive_ec',
+         mock_take_most_extensive_ec)
+@replace('cocotools.endgraph.EndGraph._at_logic', mock_at_logic)
+def test_translate_attr_original():
+    mock_conn = DiGraph()
+    mock_conn.add_edge('B-1', 'B-2', {'EC_Source': 'N', 'EC_Target': 'Nc'})
+    translate = EndGraph._translate_attr_original.im_func
+    # PDCs that get averaged are 3 (RCs), 6 (existent conn edge), and
+    # 18 (non-existent conn edge).
+    nt.assert_equal(translate(EndGraph(), ('A-1', ['B-1', 'B-3']),
+                              ('A-2', ['B-2']), None, mock_conn),
+                    {'EC_Source': 'N', 'EC_Target': 'Nc', 'PDC': 6.6})
+
+
 def test_translate_node():
     g = DiGraph()
     g.add_edges_from([('A-1', 'B-1'), ('A-1', 'C-1'), ('A-1', 'B-2')])
