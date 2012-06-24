@@ -73,8 +73,6 @@ class ConGraph(DiGraph):
         """
         self._assert_valid_attr(new_attr)
         add_edge = DiGraph.add_edge.im_func
-        if new_attr['Connection'] == 'Unknown':
-            return
         if not self.has_edge(source, target):
             add_edge(self, source, target, new_attr)
         else:
