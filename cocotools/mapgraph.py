@@ -332,13 +332,17 @@ class MapGraph(nx.DiGraph):
         The edges that node mediates must be removed, because other methods
         depend on edges implied by the TP being present in the graph, and
         when node is removed so will all of its edges.
+
+        Whereas NetworkX's remove_node method raises an error if the node
+        is not in the graph to begin with, this method does not.
         """
-        nx.DiGraph.remove_node.im_func(self, node)
-        edges_to_remove = []
-        for source, target in self.edges_iter():
-            if node in self[source][target]['TP']:
-                edges_to_remove.append((source, target))
-        self.remove_edges_from(edges_to_remove)
+        if self.has_node(node):
+            nx.DiGraph.remove_node.im_func(self, node)
+            edges_to_remove = []
+            for source, target in self.edges_iter():
+                if node in self[source][target]['TP']:
+                    edges_to_remove.append((source, target))
+            self.remove_edges_from(edges_to_remove)
 
     def remove_nodes_from(self, nodes):
         """Remove nodes from the graph.
