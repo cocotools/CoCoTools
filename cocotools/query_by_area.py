@@ -267,7 +267,7 @@ def url(search_type, bmap):
 
 
 @_CoCoLite
-def query_cocomac(search_type, bmap):
+def query_cocomac_one_area(search_type, bmap, area):
     """Return XML corresponding to a CoCoMac query.
 
     XML is returned as a string.  The local SQLite database is queried
@@ -288,13 +288,13 @@ def query_cocomac(search_type, bmap):
       XML containing query results.
     """
     try:
-        xml = urllib2.urlopen(url(search_type, bmap), timeout=120).read()
+        xml = urllib2.urlopen(url(search_type, bmap, area), timeout=120).read()
     except (urllib2.URLError, timeout):
         return
     return _scrub_xml_str(xml)
 
 
-def single_area_ebunch(search_type, bmap):
+def single_area_ebunch(search_type, bmap, area):
     """Construct and return ebunch from data for one BrainMap.
 
     Parameters
@@ -305,6 +305,8 @@ def single_area_ebunch(search_type, bmap):
     bmap : string
       Name of a BrainMap in CoCoMac.
 
+    area : string
+
     Returns
     -------
     ebunch : list of tuples
@@ -314,14 +316,14 @@ def single_area_ebunch(search_type, bmap):
     Integrated primary projections are returned for Connectivity queries,
     and primary relations are returned for Mapping queries.
     """
-    xml = query_cocomac(search_type, bmap)
+    xml = query_cocomac_one_area(search_type, bmap, area)
     if xml:
         tree = _element_tree(xml)
         ebunch = []
         for prim in tree.iterfind('%s%s' % (P, SPECS[search_type]['primtag'])):
             ebunch.append(_element2edge(prim, search_type))
         if not ebunch:
-            query_cocomac.remove_entry(search_type, bmap)
+            query_cocomac_one_area.remove_entry(search_type, bmap)
         if search_type == 'Mapping':
             return ebunch
         else:
@@ -376,9 +378,9 @@ def query_maps_by_area(search_type, subset=False):
     failures = []
     for bmap in bmaps:
         for area in TIMEOUT_AREAS[bmap]:
-            little_ebunch = single_area_ebunch(search_type, bmap)
+            little_ebunch = single_area_ebunch(search_type, bmap, area)
             if little_ebunch:
                 big_ebunch += little_ebunch
             else:
-                failures.append(bmap)
+                failures.append('%s-%s' % (bmap, area))
     return big_ebunch, failures

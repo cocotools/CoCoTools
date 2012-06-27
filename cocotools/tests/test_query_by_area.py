@@ -30,7 +30,7 @@ def mock_func(search_type, bmap):
     return
     
     
-def mock_query_cocomac(search_type, bmap):
+def mock_query_cocomac_one_area(search_type, bmap, area):
     assert search_type == 'Mapping'
     assert bmap == 'A'
     return 'X'
@@ -47,8 +47,8 @@ def mock__element2edge(prim_e, search_type):
     return ('node', 'node', 'edge_attr')
 
 
-def mock_single_map_ebunch(search_type, bmap):
-    if bmap in ('A', 'C', 'PP99'):
+def mock_single_area_ebunch(search_type, bmap, area):
+    if bmap in ('W40', 'O52', 'PP99'):
         return [('node', 'node', 'edge_attr'), ('node', 'node', 'edge_attr')]
 
 #------------------------------------------------------------------------------
@@ -149,17 +149,17 @@ def test_scrub_xml_str():
         nt.assert_equal(scrub_xml_str(text), valid)
 
 #------------------------------------------------------------------------------
-# _CoCoLite and query_cocomac Tests
+# _CoCoLite and query_cocomac_one_area Tests
 #------------------------------------------------------------------------------
 
 @replace('cocotools.query_by_area.url', mock_url)
 @replace('cocotools.query_by_area._scrub_xml_str', mock__scrub_xml_str)
-def test_query_cocomac():
-    # query_cocomac has been decorated.  Test __init__ and
+def test_query_cocomac_one_area():
+    # query_cocomac_one_area has been decorated.  Test __init__ and
     # setup_connection.
-    nt.assert_true(isinstance(cq.query_cocomac.con, sqlite3.Connection))
+    nt.assert_true(isinstance(cq.query_cocomac_one_area.con, sqlite3.Connection))
     # But the undecorated function can be used within the decorated one.
-    undecorated = cq.query_cocomac.func
+    undecorated = cq.query_cocomac_one_area.func
     nt.assert_equal(undecorated(None, None), '<!doctype ')
     
     
@@ -191,13 +191,13 @@ VALUES ('A', 'Mapping', 'entry #2')
     
 @replace('cocotools.query_by_area.DBPATH', ':memory:')
 def test_remove_entry():
-    cq.query_cocomac.con.execute("""
+    cq.query_cocomac_one_area.con.execute("""
 INSERT INTO cache
 VALUES ('A', 'B', 'Blah')
 """)
-    nt.assert_equal(cq.query_cocomac.select_xml('B', 'A'), 'Blah')
-    cq.query_cocomac.remove_entry('B', 'A')
-    nt.assert_raises(IndexError, cq.query_cocomac.select_xml, 'B', 'A')
+    nt.assert_equal(cq.query_cocomac_one_area.select_xml('B', 'A'), 'Blah')
+    cq.query_cocomac_one_area.remove_entry('B', 'A')
+    nt.assert_raises(IndexError, cq.query_cocomac_one_area.select_xml, 'B', 'A')
     
 #------------------------------------------------------------------------------
 # Public Function Unit Tests
@@ -210,19 +210,28 @@ teamcoco&password=teamcoco&OutputType=XML_Browser&DataSet=PrimRel"""
     nt.assert_equal(cq.url('Mapping', 'PP99'), url)
 
     
-@replace('cocotools.query_by_area.query_cocomac', mock_query_cocomac)
+@replace('cocotools.query_by_area.query_cocomac_one_area',
+         mock_query_cocomac_one_area)
 @replace('cocotools.query_by_area._element_tree', mock__element_tree)
 @replace('cocotools.query_by_area._element2edge', mock__element2edge)
-def test_single_map_ebunch():
+def test_single_area_ebunch():
     ebunch = [('node', 'node', 'edge_attr') for i in range(4)]
-    nt.assert_equal(cq.single_map_ebunch('Mapping', 'A'), ebunch)
+    nt.assert_equal(cq.single_area_ebunch('Mapping', 'A', 'B'), ebunch)
 
     
-@replace('cocotools.query_by_area.single_map_ebunch', mock_single_map_ebunch)
-def test_multi_map_ebunch():
-    e, f = cq.multi_map_ebunch(None, ['A', 'B', 'C', 'D'])
-    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(4)])
-    nt.assert_equal(f, ['B', 'D'])
-    e, f = cq.multi_map_ebunch(None, 'cocotools/tests/sample_bmaps.txt')
-    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(2)])
-    nt.assert_equal(f, ['PP02'])
+@replace('cocotools.query_by_area.single_area_ebunch', mock_single_area_ebunch)
+def test_query_maps_by_area():
+    e, f = cq.query_maps_by_area(None, ['W40', 'CP94', 'O52'])
+    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(226)])
+    nt.assert_equal(f, ['CP94-10m', 'CP94-10o', 'CP94-11l', 'CP94-11m',
+                        'CP94-12l', 'CP94-12m', 'CP94-12o', 'CP94-12r',
+                        'CP94-13a', 'CP94-13b', 'CP94-13L', 'CP94-13M',
+                        'CP94-14c', 'CP94-14r', 'CP94-24a', 'CP94-24b',
+                        'CP94-24c', 'CP94-25', 'CP94-32', 'CP94-45', 'CP94-46',
+                        'CP94-6D', 'CP94-6Va', 'CP94-6Vb', 'CP94-8', 'CP94-9',
+                        'CP94-AON', 'CP94-AONl', 'CP94-AONm', 'CP94-G#2',
+                        'CP94-Iai', 'CP94-Ial', 'CP94-Iam', 'CP94-Iapl',
+                        'CP94-Iapm', 'CP94-OT', 'CP94-PC#2', 'CP94-PrCO'])
+    e, f = cq.query_maps_by_area(None, 'cocotools/tests/sample_bmaps2.txt')
+    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(226)])
+    nt.assert_equal(f, [])
