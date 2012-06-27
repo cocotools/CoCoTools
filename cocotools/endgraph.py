@@ -58,8 +58,11 @@ class EndGraph(nx.DiGraph):
         attributes : dictionary
           Has keys and valid values for 'Connection' and 'PDC'.
         """
-        if source == target or attributes['Connection'] == 'Unknown':
+        if source == target:
             return
+        if attributes.has_key('Connection'):
+            if attributes['Connection'] == 'Unknown':
+                return
         if not self.has_edge(source, target):
             nx.DiGraph.add_edge.im_func(self, source, target, attributes)
         elif self._new_attributes_are_better(source, target, attributes['PDC']):
