@@ -14,7 +14,7 @@ from brain_maps import MAPPING_TIMEOUTS, CONNECTIVITY_TIMEOUTS, TIMEOUT_AREAS
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
             'O', 'M', 'P', 'Q', 'R', None)
-DBPATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools.sqlite')
+DBPATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools_area.sqlite')
 DBDIR = os.path.dirname(DBPATH)
 P = './/{http://www.cocomac.org}'
 SPECS = {'Mapping': {'data_set': 'PrimRel', 'primtag': 'PrimaryRelation',
@@ -25,7 +25,7 @@ SPECS = {'Mapping': {'data_set': 'PrimRel', 'primtag': 'PrimaryRelation',
                                          'PDC_Density')}}
 
 
-class _CoCoLite(object):
+class _CoCoLiteArea(object):
 
     def __init__(self, func):
         self.func = func
@@ -43,42 +43,42 @@ class _CoCoLite(object):
             con.execute("""
 CREATE TABLE IF NOT EXISTS cache
 (
-    bmap TEXT,
+    bmapPLUSarea TEXT,
     type TEXT,
     xml TEXT UNIQUE
 )
 """)
         return con
 
-    def __call__(self, search_type, bmap):
+    def __call__(self, search_type, bmap, area):
         try:
-            xml = self.select_xml(search_type, bmap)
+            xml = self.select_xml(search_type, bmap, area)
         except IndexError:
-            xml = self.func(search_type, bmap)
+            xml = self.func(search_type, bmap, area)
             if xml:
                 with self.con as con:
                     con.execute("""
 INSERT INTO cache
 VALUES (?, ?, ?)
-""", (bmap, search_type, xml))
+""", ('%s-%s' % (bmap, area), search_type, xml))
         return xml
 
-    def select_xml(self, search_type, bmap):
+    def select_xml(self, search_type, bmap, area):
         rows = self.con.execute("""
 SELECT xml
 FROM cache
-WHERE bmap = ? AND type = ?
-""", (bmap, search_type)).fetchall()
+WHERE bmapPLUSarea = ? AND type = ?
+""", ('%s-%s' % (bmap, area), search_type)).fetchall()
         if len(rows) > 1:
-            raise sqlite3.IntegrityError('multiple xml entries for bmap %s' %
-                                         bmap)
+            raise sqlite3.IntegrityError('multiple xml entries for area %s-%s'
+                                         % (bmap, area))
         return rows[0][0]
 
-    def remove_entry(self, search_type, bmap):
+    def remove_entry(self, search_type, bmap, area):
         self.con.execute("""
 DELETE FROM cache
-WHERE bmap = ? AND type = ?
-""", (bmap, search_type))
+WHERE bmapPLUSarea = ? AND type = ?
+""", ('%s-%s' % (bmap, area), search_type))
         self.con.commit()
 
 #------------------------------------------------------------------------------
@@ -239,7 +239,7 @@ def _scrub_xml_str(raw):
 # Public Functions
 #------------------------------------------------------------------------------
 
-def url(search_type, bmap):
+def url(search_type, bmap, area):
     """Return CoCoMac URL corresponding to XML query results.
 
     Parameters
@@ -250,23 +250,26 @@ def url(search_type, bmap):
     bmap : string
       Name of a BrainMap in CoCoMac.
 
+    area
+
     Returns
     -------
     string
       URL corresponding to query results.
     """
-    search_string = "('%s')[SourceMap]OR('%s')[TargetMap]" % (bmap, bmap)
+    map_string = "(('%s')[SourceMap]OR('%s')[TargetMap])" % (bmap, bmap)
+    area_string = "(('%s')[SourceSite]OR('%s')[TargetSite])" % (area, area)
     query_dict = dict(user='teamcoco',
                       password='teamcoco',
                       Search=search_type,
-                      SearchString=search_string,
+                      SearchString=map_string+'AND'+area_string,
                       DataSet=SPECS[search_type]['data_set'],
                       OutputType='XML_Browser')
     # The site appears to have changed from cocomac.org to 134.95.56.239:
     return 'http://134.95.56.239/URLSearch.asp?' + urllib.urlencode(query_dict)
 
 
-@_CoCoLite
+@_CoCoLiteArea
 def query_cocomac_one_area(search_type, bmap, area):
     """Return XML corresponding to a CoCoMac query.
 
@@ -323,7 +326,7 @@ def single_area_ebunch(search_type, bmap, area):
         for prim in tree.iterfind('%s%s' % (P, SPECS[search_type]['primtag'])):
             ebunch.append(_element2edge(prim, search_type))
         if not ebunch:
-            query_cocomac_one_area.remove_entry(search_type, bmap)
+            query_cocomac_one_area.remove_entry(search_type, bmap, area)
         if search_type == 'Mapping':
             return ebunch
         else:

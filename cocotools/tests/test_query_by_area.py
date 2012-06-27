@@ -16,7 +16,7 @@ def mock__scrub_element(e, attr_tag):
     return 'X'
 
 
-def mock_url(search_type, bmap):
+def mock_url(search_type, bmap, area):
     return 'http://www.google.com'
 
 
@@ -24,9 +24,9 @@ def mock__scrub_xml_str(xml):
     return xml[:10]
 
 
-def mock_func(search_type, bmap):
+def mock_func(search_type, bmap, area):
     if search_type and bmap:
-        return 'xml %s %s xml' % (search_type, bmap)
+        return 'xml %s %s-%s xml' % (search_type, bmap, area)
     return
     
     
@@ -149,7 +149,7 @@ def test_scrub_xml_str():
         nt.assert_equal(scrub_xml_str(text), valid)
 
 #------------------------------------------------------------------------------
-# _CoCoLite and query_cocomac_one_area Tests
+# _CoCoLiteArea and query_cocomac_one_area Tests
 #------------------------------------------------------------------------------
 
 @replace('cocotools.query_by_area.url', mock_url)
@@ -157,47 +157,51 @@ def test_scrub_xml_str():
 def test_query_cocomac_one_area():
     # query_cocomac_one_area has been decorated.  Test __init__ and
     # setup_connection.
-    nt.assert_true(isinstance(cq.query_cocomac_one_area.con, sqlite3.Connection))
+    nt.assert_true(isinstance(cq.query_cocomac_one_area.con,
+                              sqlite3.Connection))
     # But the undecorated function can be used within the decorated one.
     undecorated = cq.query_cocomac_one_area.func
-    nt.assert_equal(undecorated(None, None), '<!doctype ')
+    nt.assert_equal(undecorated(None, None, None), '<!doctype ')
     
     
 @replace('cocotools.query_by_area.DBPATH', ':memory:')
-def test__CoCoLite():
-    db = cq._CoCoLite(mock_func)
+def test__CoCoLiteArea():
+    db = cq._CoCoLiteArea(mock_func)
     # Test that mock_func works as expected.
-    nt.assert_equal(db.func(None, None), None)
-    nt.assert_equal(db.func('Mapping', 'A'), 'xml Mapping A xml')
+    nt.assert_equal(db.func(None, None, None), None)
+    nt.assert_equal(db.func('Mapping', 'A', 'B'), 'xml Mapping A-B xml')
     # Test selection when cache has no matching entries (select_xml).
-    nt.assert_raises(IndexError, db.select_xml, 'Mapping', 'A')
+    nt.assert_raises(IndexError, db.select_xml, 'Mapping', 'A', 'B')
     # Test insertion (__call__, select_xml, and func).
-    nt.assert_equal(db('Mapping', 'A'), 'xml Mapping A xml')
+    nt.assert_equal(db('Mapping', 'A', 'B'), 'xml Mapping A-B xml')
     # Test selection when cache has one matching entry (select_xml).
-    nt.assert_equal(db.select_xml('Mapping', 'A'), 'xml Mapping A xml')
+    nt.assert_equal(db.select_xml('Mapping', 'A', 'B'), 'xml Mapping A-B xml')
     # Test selection with __call__, mocking select_xml.
     with Replacer() as r:
-        mock_select_xml = lambda self, s, b: 'stuff'
-        r.replace('cocotools.query_by_area._CoCoLite.select_xml', mock_select_xml)
-        nt.assert_equal(db('Mapping', 'A'), 'stuff')
+        mock_select_xml = lambda self, s, b, a: 'stuff'
+        r.replace('cocotools.query_by_area._CoCoLiteArea.select_xml',
+                  mock_select_xml)
+        nt.assert_equal(db('Mapping', 'A', 'B'), 'stuff')
     # Test selection when cache has multiple matching entries
     # (select_xml).
     db.con.execute("""
 INSERT INTO cache
-VALUES ('A', 'Mapping', 'entry #2')
+VALUES ('A-B', 'Mapping', 'entry #2')
 """)
-    nt.assert_raises(sqlite3.IntegrityError, db.select_xml, 'Mapping', 'A')
+    nt.assert_raises(sqlite3.IntegrityError, db.select_xml, 'Mapping', 'A', 'B')
 
     
 @replace('cocotools.query_by_area.DBPATH', ':memory:')
 def test_remove_entry():
     cq.query_cocomac_one_area.con.execute("""
 INSERT INTO cache
-VALUES ('A', 'B', 'Blah')
+VALUES ('A-B', 'Connectivity', 'Blah')
 """)
-    nt.assert_equal(cq.query_cocomac_one_area.select_xml('B', 'A'), 'Blah')
-    cq.query_cocomac_one_area.remove_entry('B', 'A')
-    nt.assert_raises(IndexError, cq.query_cocomac_one_area.select_xml, 'B', 'A')
+    nt.assert_equal(cq.query_cocomac_one_area.select_xml('Connectivity', 'A',
+                                                         'B'), 'Blah')
+    cq.query_cocomac_one_area.remove_entry('Connectivity', 'A', 'B')
+    nt.assert_raises(IndexError, cq.query_cocomac_one_area.select_xml,
+                     'Connectivity', 'A', 'B')
     
 #------------------------------------------------------------------------------
 # Public Function Unit Tests
@@ -205,9 +209,10 @@ VALUES ('A', 'B', 'Blah')
 
 def test_url():
     url = """http://134.95.56.239/URLSearch.asp?Search=Mapping&SearchString=\
-%28%27PP99%27%29%5BSourceMap%5DOR%28%27PP99%27%29%5BTargetMap%5D&user=\
+%28%28%27PP99%27%29%5BSourceMap%5DOR%28%27PP99%27%29%5BTargetMap%5D%29AND%28\
+%28%2710%27%29%5BSourceSite%5DOR%28%2710%27%29%5BTargetSite%5D%29&user=\
 teamcoco&password=teamcoco&OutputType=XML_Browser&DataSet=PrimRel"""
-    nt.assert_equal(cq.url('Mapping', 'PP99'), url)
+    nt.assert_equal(cq.url('Mapping', 'PP99', '10'), url)
 
     
 @replace('cocotools.query_by_area.query_cocomac_one_area',
