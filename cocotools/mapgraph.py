@@ -1159,12 +1159,15 @@ its own map.""" % node_x)
         # to be AHIPC?)  5, although listed, does not appear in any
         # figures.  Note that we're really using PHPT08 -- we haven't
         # looked in PHT00 itself.
+
+        # BB47-OA and BB47-TEO have an RC of O.  Remove TEO because it
+        # has fewer neighbors in the initial MapGraph.
         self.remove_nodes_from(['DU86-DMZ', 'UD86A-DMZ', 'SP89B-MST',
                                 'SP89A-MST', 'SA90-TE', 'MCSGP04-M3',
                                 'MV92-M3', 'AHGWU00-P1', 'SMKB95-45A+8AR',
                                 'PHT00-4C', 'PHT00-5', 'PHT00-6VD',
                                 'PHT00-6VV', 'PHT00-AHIPM', 'PHT00-CXA',
-                                'PHT00-ST2G', 'PHT00-ST2S'])
+                                'PHT00-ST2G', 'PHT00-ST2S', 'BB47-TEO'])
         # Although CoCoMac contains the following edges, they are not
         # supported by the original papers.
         self.remove_edges_from([('FV91-VOT', 'GSG88-V4'),
@@ -1225,7 +1228,11 @@ its own map.""" % node_x)
                 self[target][source]['RC'] = rc2
                 self[target][source]['PDC'] = pdc
         # Add edges missing from CoCoMac:
-        missing_edges = [('PHT00-PTG', 'LSB86-PPT', {'RC': 'I', 'PDC': 15}),
+        missing_edges = [('O52-VP', 'O52-VPLC', {'RC': 'L', 'PDC': 2}),
+                         ('O52-VP', 'O52-VPLO', {'RC': 'L', 'PDC': 2}),
+                         ('O52-GL', 'O52-GLVC', {'RC': 'L', 'PDC': 2}),
+                         ('O52-GL', 'O52-GLVO', {'RC': 'L', 'PDC': 2}),
+                         ('PHT00-PTG', 'LSB86-PPT', {'RC': 'I', 'PDC': 15}),
                          ('PHT00-24/23', 'PHT00-24/23A', {'RC': 'L',
                                                           'PDC': 15}),
                          ('PHT00-24/23', 'PHT00-24/23B', {'RC': 'L',
@@ -1574,6 +1581,10 @@ its own map.""" % node_x)
                          ('BB47-PEM', 'BB47-PEP', {'RC': 'L', 'PDC': 15}),
                          ('UD86A-MT*', 'UD86A-MTP', {'RC': 'L', 'PDC': 2}),
                          ('APPC92-PAC', 'APPC92-COA', {'RC': 'L', 'PDC': 15}),
+                         ('APPC92-PAC', 'APPC92-PACS-III',
+                          {'RC': 'L', 'PDC': 15}),
+                         ('APPC92-PAC', 'APPC92-PACS-II',
+                          {'RC': 'L', 'PDC': 15}),
                          ('APPC92-PAC', 'APPC92-COP', {'RC': 'L', 'PDC': 15}),
                          ('YTHI90-TE', 'YTHI90-TEAD', {'RC': 'L', 'PDC': 0}),
                          ('YTHI90-TE', 'YTHI90-TEPD', {'RC': 'L', 'PDC': 0}),
