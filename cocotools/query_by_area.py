@@ -14,7 +14,7 @@ from brain_maps import MAPPING_TIMEOUTS, CONNECTIVITY_TIMEOUTS, TIMEOUT_AREAS
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
             'O', 'M', 'P', 'Q', 'R', None)
-DBPATH = os.path.join(os.environ['HOME'], '.cache', 'cocotools_area.sqlite')
+DBPATH = os.path.join(os.path.expanduser('~'),'.cache','cocotools_area.sqlite')
 DBDIR = os.path.dirname(DBPATH)
 P = './/{http://www.cocomac.org}'
 SPECS = {'Mapping': {'data_set': 'PrimRel', 'primtag': 'PrimaryRelation',
