@@ -1,6 +1,7 @@
 import copy
 
 import networkx as nx
+import scipy
 
 
 def write_A_to_mat(g, path):
