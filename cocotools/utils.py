@@ -12,7 +12,8 @@ def write_A_to_mat(g, path):
     g : NetworkX Graph or DiGraph
 
     path : string
-      Path to which .mat file should be written.
+      Path to which .mat file should be written.  File name must be included,
+      but .mat extension is optional.
     """
     A = nx.adjacency_matrix(g)
     scipy.io.savemat(path, mdict={'A': A})

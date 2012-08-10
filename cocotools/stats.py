@@ -1,8 +1,33 @@
+from __future__ import division
 import copy
 
 import numpy as np
 import scipy.io
 import networkx as nx
+
+
+def directed_clustering(g):
+    """Compute the clustering coefficient for a DiGraph.
+
+    Edges are considered binary (i.e., unweighted).  All directed triangles
+    are used.
+
+    G. Fagiolo, 2007, Physical Review E
+
+    See also clustering_coef_bd in the Sporns Matlab toolbox.
+    """
+    A = nx.adjacency_matrix(g)
+    S = A + A.transpose()
+    K = np.array(S.sum(axis=1)) # Make array for elementwise operations.
+    cyc3 = np.array((S**3).diagonal() / 2.0).reshape(g.number_of_nodes(), 1)
+    CYC3 = K*(K-1) - np.array(2*(A**2).diagonal()).reshape(g.number_of_nodes(),
+                                                           1)
+    # If there are zero possible 3-cycles, make the value in CYC3 Inf,
+    # so that C = 0.  This is the definition of Rubinov & Sporns,
+    # 2010, NeuroImage.
+    CYC3[np.where(CYC3==0)] = np.inf
+    C = cyc3/CYC3
+    return C.mean()
 
 
 def _compute_directed_closeness(path_lengths, node, num_nodes, all_nodes,
