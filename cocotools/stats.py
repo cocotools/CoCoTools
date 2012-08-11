@@ -6,6 +6,26 @@ import scipy.io
 import networkx as nx
 
 
+def directed_char_path_length(g):
+    """Compute the char. path length for a DiGraph.
+
+    This matches charpath in the Sporns Matlab toolbox.
+    """
+    A = nx.adjacency_matrix(g)
+    D = np.eye(g.number_of_nodes())
+    n = 1
+    n_path = np.array(A)
+    L = n_path != 0
+    while nonzero(L)[0][0]:
+        D += n * L
+        n += 1
+        n_path *= G
+        L = n_path * D == 0
+    D(not D) = np.inf
+    D -= np.eye(g.number_of_nodes())
+    # Now do the charpath stuff.
+    
+
 def directed_clustering(g):
     """Compute the clustering coefficient for a DiGraph.
 
