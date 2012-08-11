@@ -11,19 +11,37 @@ def directed_char_path_length(g):
 
     This matches charpath in the Sporns Matlab toolbox.
     """
+    # First get the distance matrix D.
     A = nx.adjacency_matrix(g)
     D = np.eye(g.number_of_nodes())
     n = 1
-    n_path = np.array(A)
-    L = n_path != 0
-    while nonzero(L)[0][0]:
+    n_path_matrix = copy.deepcopy(A) # We don't want to f with A.
+    n_path_array = np.array(n_path_matrix)
+    L = np.nan_to_num(n_path_array / n_path_array)
+    try:
+        nonzero = np.nonzero(L)[0][0]
+    except IndexError:
+        nonzero = False
+    else:
+        nonzero = True          # If index is 0, we still want True condition.
+    while nonzero:
         D += n * L
         n += 1
-        n_path *= G
-        L = n_path * D == 0
-    D(not D) = np.inf
+        n_path_matrix *= A
+        n_path_array = np.array(n_path_matrix)
+        D_zeros = np.zeros(D.shape)
+        D_zeros[D == 0] = 1
+        L = np.nan_to_num(n_path_array / n_path_array) * D_zeros
+        try:
+            nonzero = np.nonzero(L)[0][0]
+        except IndexError:
+            nonzero = False
+        else:
+            nonzero = True
+    D[D==0] = np.inf
     D -= np.eye(g.number_of_nodes())
-    # Now do the charpath stuff.
+    # Now use D to compute the characteristic path length.
+    return np.sum(np.sum(D[D!=np.inf]))/len(np.nonzero(D[D!=np.inf])[0])
     
 
 def directed_clustering(g):

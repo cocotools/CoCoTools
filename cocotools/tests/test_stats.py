@@ -6,6 +6,12 @@ import nose.tools as nt
 import cocotools.stats as cocostats
 
 
+def test_directed_char_path_length():
+    g = nx.DiGraph()
+    g.add_edges_from([(1,2),(1,3),(2,4),(3,5),(4,1),(4,2),(4,3),(5,4)])
+    nt.assert_equal(cocostats.directed_char_path_length(g), 1.75)
+
+
 def test_average_path_length():
     g = nx.DiGraph()
     g.add_edges_from([('A', 'B'), ('A', 'D'), ('B', 'C'), ('B', 'D'),
