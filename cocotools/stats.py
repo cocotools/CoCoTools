@@ -6,6 +6,38 @@ import scipy.io
 import networkx as nx
 
 
+def random_stats(g, n):
+    """Return mean and SD clustering and char. path length for random graphs.
+
+    Parameters
+    ----------
+    g : NetworkX DiGraph
+
+    n : number of random graphs to generate
+
+    Returns
+    -------
+    mean_clust
+    sd_clust
+    mean_charpath
+    sd_charpath
+
+    Notes
+    -----
+    The random graphs created are pseudo-graphs in that parallel edges and
+    self-loops are allowed.
+    """
+    clusts = []
+    charpaths = []
+    in_seq = g.in_degree().values()
+    out_seq = g.out_degree().values()
+    for i in range(n):
+        r = directed_configuration_model(in_seq, out_seq, nx.DiGraph)
+        clusts.append(directed_clustering(r))
+        charpaths.append(directed_char_path_length(r))
+    return np.mean(clusts),np.std(clusts),np.mean(charpaths),np.std(charpaths)
+            
+
 def directed_char_path_length(g):
     """Compute the char. path length for a DiGraph.
 
