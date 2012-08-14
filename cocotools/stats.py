@@ -32,7 +32,7 @@ def random_stats(g, n):
     in_seq = g.in_degree().values()
     out_seq = g.out_degree().values()
     for i in range(n):
-        r = nx.directed_configuration_model(in_seq, out_seq, nx.DiGraph)
+        r = nx.directed_configuration_model(in_seq, out_seq, nx.DiGraph())
         clusts.append(directed_clustering(r))
         charpaths.append(directed_char_path_length(r))
     return np.mean(clusts),np.std(clusts),np.mean(charpaths),np.std(charpaths)
