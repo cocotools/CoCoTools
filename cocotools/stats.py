@@ -6,47 +6,78 @@ import scipy.io
 import networkx as nx
 
 
-def random_stats(g, n):
-    """Return mean and SD clustering and char. path length for random graphs.
+def random_stats(g, n_rand):
+    """Return clustering coeffs and char. path lengths for random graphs.
 
     Parameters
     ----------
     g : NetworkX DiGraph
 
-    n : number of random graphs to generate
+    n_rand : number of random graphs to generate
 
     Returns
     -------
-    mean_clust
-    sd_clust
-    mean_charpath
-    sd_charpath
+    clust_coeffs
+    char_paths
 
     Notes
     -----
-    The random graphs created are pseudo-graphs in that parallel edges and
-    self-loops are allowed.
+    This routine matches randmio_dir in the Sporns Matlab toolbox, with ITER
+    set to 1.
     """
-    clusts = []
-    charpaths = []
-    in_seq = g.in_degree().values()
-    out_seq = g.out_degree().values()
-    for i in range(n):
-        r = nx.directed_configuration_model(in_seq, out_seq,
-                                            create_using=nx.DiGraph())
-        clusts.append(directed_clustering(r))
-        charpaths.append(directed_char_path_length(r))
-    return np.mean(clusts),np.std(clusts),np.mean(charpaths),np.std(charpaths)
+    clust_coeffs = []
+    char_paths = []
+    A = nx.adjacency_matrix(g)
+    n = A.shape[0]
+    x_indices, y_indices = np.nonzero(A)
+    K = len(x_indices)
+    max_attempts = round(n*K/(n*(n-1)))
+    for i in range(n_rand):
+        R = copy.deepcopy(A)
+        eff = 0
+        att = 0
+        while att <= max_attempts:
+            while True:
+                r1, r2 = np.random.rand(2)
+                e1 = np.floor(K*r1)
+                e2 = np.floor(K*r2)
+                while e1 == e2:
+                    e2 = np.floor(K*np.random.rand(1)[0])
+                a = x_indices[e1]
+                b = y_indices[e1]
+                c = x_indices[e2]
+                d = y_indices[e2]
+                if a not in (c, d) and b not in (c, d):
+                    break
+            if not (R[a,d] or R[c,b]):
+                R[a,d] = R[a,b]
+                R[a,b] = 0
+                R[c,b] = R[c,d]
+                R[c,d] = 0
+                y_indices[e1] = d
+                y_indices[e2] = b
+                eff += 1
+                break
+            att += 1
+        clust_coeffs.append(directed_clustering(R))
+        char_paths.append(directed_char_path_length(R))
+    return clust_coeffs, char_paths
             
 
-def directed_char_path_length(g):
+def directed_char_path_length(A):
     """Compute the char. path length for a DiGraph.
 
     This matches charpath in the Sporns Matlab toolbox.
+
+    Parameters
+    ----------
+    A : NetworkX DiGraph or Numpy matrix
+      Graph or adjacency matrix
     """
+    if isinstance(A, nx.DiGraph):
+        A = nx.adjacency_matrix(A)
     # First get the distance matrix D.
-    A = nx.adjacency_matrix(g)
-    D = np.eye(g.number_of_nodes())
+    D = np.eye(A.shape[0])
     n = 1
     n_path_matrix = copy.deepcopy(A) # We don't want to f with A.
     n_path_array = np.array(n_path_matrix)
@@ -72,7 +103,7 @@ def directed_char_path_length(g):
         else:
             nonzero = True
     D[D==0] = np.inf
-    D -= np.eye(g.number_of_nodes())
+    D -= np.eye(A.shape[0])
     # Now use D to compute the characteristic path length.
     return np.sum(np.sum(D[D!=np.inf]))/len(np.nonzero(D[D!=np.inf])[0])
     
@@ -87,12 +118,12 @@ def directed_clustering(g):
 
     See also clustering_coef_bd in the Sporns Matlab toolbox.
     """
-    A = nx.adjacency_matrix(g)
+    if isinstance(A, nx.DiGraph):
+        A = nx.adjacency_matrix(A)
     S = A + A.transpose()
     K = np.array(S.sum(axis=1)) # Make array for elementwise operations.
-    cyc3 = np.array((S**3).diagonal() / 2.0).reshape(g.number_of_nodes(), 1)
-    CYC3 = K*(K-1) - np.array(2*(A**2).diagonal()).reshape(g.number_of_nodes(),
-                                                           1)
+    cyc3 = np.array((S**3).diagonal() / 2.0).reshape(A.shape[0], 1)
+    CYC3 = K*(K-1) - np.array(2*(A**2).diagonal()).reshape(A.shape[0], 1)
     # If there are zero possible 3-cycles, make the value in CYC3 Inf,
     # so that C = 0.  This is the definition of Rubinov & Sporns,
     # 2010, NeuroImage.
