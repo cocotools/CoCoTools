@@ -29,12 +29,11 @@ def random_stats(g, n_rand):
     char_paths = []
     A = nx.adjacency_matrix(g)
     n = A.shape[0]
-    x_indices, y_indices = np.nonzero(A)
     K = len(x_indices)
     max_attempts = round(n*K/(n*(n-1)))
     for i in range(n_rand):
         R = copy.deepcopy(A)
-        eff = 0
+        x_indices, y_indices = np.nonzero(A)
         att = 0
         while att <= max_attempts:
             while True:
@@ -56,7 +55,6 @@ def random_stats(g, n_rand):
                 R[c,d] = 0
                 y_indices[e1] = d
                 y_indices[e2] = b
-                eff += 1
                 break
             att += 1
         clust_coeffs.append(directed_clustering(R))
