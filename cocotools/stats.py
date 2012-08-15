@@ -6,6 +6,89 @@ import scipy.io
 import networkx as nx
 
 
+def lattice_stats(g, n_latt):
+    """Return clustering coeffs and char. path lengths for lattice graphs.
+
+    Parameters
+    ----------
+    g : NetworkX DiGraph
+
+    n_latt : number of random graphs to generate
+
+    Returns
+    -------
+    clust_coeffs
+    char_paths
+
+    Notes
+    -----
+    This routine matches latmio_dir in the Sporns Matlab toolbox, with ITER
+    set to 1 and default D.
+    """
+    clust_coeffs = []
+    char_paths = []
+    A = np.array(nx.adjacency_matrix(g))
+    n = A.shape[0]
+    ind_rp = range(n)
+    for i in range(n_latt):
+        R = copy.deepcopy(A)
+        np.random.shuffle(ind_rp)
+        R = R[ind_rp]
+        R = R.transpose()
+        R = R[ind_rp]
+        R = R.transpose()
+        D = np.zeros((n,n))
+        forwards = np.mod(range(1, n), n)
+        backwards = np.mod(range(n-1, 0, -1), n)
+        u = np.array([0] + [min(pair) for pair in zip(forwards, backwards)])
+        for v in range(1, int(np.ceil(n/2)+1)):
+            D[n-v,:] = np.append(u[v:], u[:v])
+            D[v-1,:] = D[n-v, range(n-1, -1, -1)]
+        x_indices, y_indices = np.nonzero(R)
+        # For some reason x_indices and y_indices are unwriteable.
+        # Using copies of them enables writeability.
+        x_indices = np.copy(x_indices)
+        y_indices = np.copy(y_indices)
+        K = len(x_indices)
+        max_attempts = round(n*K/(n*(n-1)))
+        for iteration in range(K):
+            att = 0
+            while att <= max_attempts:
+                while True:
+                    r1, r2 = np.random.rand(2)
+                    e1 = np.floor(K*r1)
+                    e2 = np.floor(K*r2)
+                    while e1 == e2:
+                        e2 = np.floor(K*np.random.rand(1)[0])
+                    a = x_indices[e1]
+                    b = y_indices[e1]
+                    c = x_indices[e2]
+                    d = y_indices[e2]
+                    if a not in (c, d) and b not in (c, d):
+                        break
+                if not (R[a,d] or R[c,b]):
+                    if (D[a,b]*R[a,b]+D[c,d]*R[c,d]) >= (D[a,d]*R[a,b]+
+                                                         D[c,b]*R[c,d]):
+                        R[a,d] = R[a,b]
+                        R[a,b] = 0
+                        R[c,b] = R[c,d]
+                        R[c,d] = 0
+                        y_indices[e1] = d
+                        y_indices[e2] = b
+                        break
+                att += 1
+        # Need to reverse the random permutation here!
+        ind_rp_reverse = np.argsort(ind_rp)
+        Rlatt = R[ind_rp_reverse]
+        Rlatt = Rlatt.transpose()
+        Rlatt = Rlatt[ind_rp_reverse]
+        Rlatt = Rlatt.transpose()
+        r = nx.DiGraph(Rlatt)
+        clust_coeffs.append(directed_clustering(r))
+        char_paths.append(directed_char_path_length(r))
+    return clust_coeffs, char_paths
+
+
 def random_stats(g, n_rand):
     """Return clustering coeffs and char. path lengths for random graphs.
 
