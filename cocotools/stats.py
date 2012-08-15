@@ -51,7 +51,7 @@ def lattice_stats(g, n_latt):
         y_indices = np.copy(y_indices)
         K = len(x_indices)
         max_attempts = round(n*K/(n*(n-1)))
-        for iteration in range(K):
+        for iteration in range(K*500):
             att = 0
             while att <= max_attempts:
                 while True:
