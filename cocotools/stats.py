@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function
 import copy
 
 import numpy as np
@@ -27,53 +27,53 @@ def random_stats(g, n_rand):
     """
     clust_coeffs = []
     char_paths = []
-    A = nx.adjacency_matrix(g)
+    A = np.array(nx.adjacency_matrix(g))
     n = A.shape[0]
-    K = len(x_indices)
-    max_attempts = round(n*K/(n*(n-1)))
     for i in range(n_rand):
-        R = copy.deepcopy(A)
         x_indices, y_indices = np.nonzero(A)
-        att = 0
-        while att <= max_attempts:
-            while True:
-                r1, r2 = np.random.rand(2)
-                e1 = np.floor(K*r1)
-                e2 = np.floor(K*r2)
-                while e1 == e2:
-                    e2 = np.floor(K*np.random.rand(1)[0])
-                a = x_indices[e1]
-                b = y_indices[e1]
-                c = x_indices[e2]
-                d = y_indices[e2]
-                if a not in (c, d) and b not in (c, d):
+        # For some reason x_indices and y_indices are unwriteable.
+        # Using copies of them enables writeability.
+        x_indices = np.copy(x_indices)
+        y_indices = np.copy(y_indices)
+        R = copy.deepcopy(A)
+        K = len(x_indices)
+        max_attempts = round(n*K/(n*(n-1)))
+        for iteration in range(K):
+            att = 0
+            while att <= max_attempts:
+                while True:
+                    r1, r2 = np.random.rand(2)
+                    e1 = np.floor(K*r1)
+                    e2 = np.floor(K*r2)
+                    while e1 == e2:
+                        e2 = np.floor(K*np.random.rand(1)[0])
+                    a = x_indices[e1]
+                    b = y_indices[e1]
+                    c = x_indices[e2]
+                    d = y_indices[e2]
+                    if a not in (c, d) and b not in (c, d):
+                        break
+                if not (R[a,d] or R[c,b]):
+                    R[a,d] = R[a,b]
+                    R[a,b] = 0
+                    R[c,b] = R[c,d]
+                    R[c,d] = 0
+                    y_indices[e1] = d
+                    y_indices[e2] = b
                     break
-            if not (R[a,d] or R[c,b]):
-                R[a,d] = R[a,b]
-                R[a,b] = 0
-                R[c,b] = R[c,d]
-                R[c,d] = 0
-                y_indices[e1] = d
-                y_indices[e2] = b
-                break
-            att += 1
-        clust_coeffs.append(directed_clustering(R))
-        char_paths.append(directed_char_path_length(R))
+                att += 1
+        r = nx.DiGraph(R)
+        clust_coeffs.append(directed_clustering(r))
+        char_paths.append(directed_char_path_length(r))
     return clust_coeffs, char_paths
             
 
-def directed_char_path_length(A):
+def directed_char_path_length(g):
     """Compute the char. path length for a DiGraph.
 
     This matches charpath in the Sporns Matlab toolbox.
-
-    Parameters
-    ----------
-    A : NetworkX DiGraph or Numpy matrix
-      Graph or adjacency matrix
     """
-    if isinstance(A, nx.DiGraph):
-        A = nx.adjacency_matrix(A)
+    A = nx.adjacency_matrix(g)
     # First get the distance matrix D.
     D = np.eye(A.shape[0])
     n = 1
@@ -116,8 +116,7 @@ def directed_clustering(g):
 
     See also clustering_coef_bd in the Sporns Matlab toolbox.
     """
-    if isinstance(A, nx.DiGraph):
-        A = nx.adjacency_matrix(A)
+    A = nx.adjacency_matrix(g)
     S = A + A.transpose()
     K = np.array(S.sum(axis=1)) # Make array for elementwise operations.
     cyc3 = np.array((S**3).diagonal() / 2.0).reshape(A.shape[0], 1)
