@@ -82,7 +82,7 @@ def lattice_stats(g, n_latt):
         y_indices = np.copy(y_indices)
         K = len(x_indices)
         max_attempts = round(n*K/(n*(n-1)))
-        for iteration in range(K*500):
+        for iteration in range(K*50):
             att = 0
             while att <= max_attempts:
                 while True:
@@ -382,7 +382,8 @@ def strip_absent_and_unknown_edges(end):
     """
     g = nx.DiGraph()
     for source, target in end.edges_iter():
-        source_ec, target_ec = end[source][target]['ECs']
+        source_ec = end[source][target]['EC_Source']
+        target_ec = end[source][target]['EC_Target']
         ns = ('N', 'Nc', 'Np', 'Nx', 'Up', 'Ux', 'U')
         if source_ec not in ns and target_ec not in ns:
             g.add_edge(source, target)
