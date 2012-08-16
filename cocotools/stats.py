@@ -6,6 +6,37 @@ import scipy.io
 import networkx as nx
 
 
+def random_stats_NX(g, n):
+    """Return mean and SD clustering and char. path length for random graphs.
+
+    Parameters
+    ----------
+    g : NetworkX DiGraph
+
+    n : number of random graphs to generate
+
+    Returns
+    -------
+    clusts
+    charpaths
+
+    Notes
+    -----
+    The random graphs created are pseudo-graphs in that parallel edges and
+    self-loops are allowed.
+    """
+    clusts = []
+    charpaths = []
+    in_seq = g.in_degree().values()
+    out_seq = g.out_degree().values()
+    for i in range(n):
+        r = nx.directed_configuration_model(in_seq, out_seq,
+                                            create_using=nx.DiGraph())
+        clusts.append(directed_clustering(r))
+        charpaths.append(directed_char_path_length(r))
+    return clusts, charpaths
+
+
 def lattice_stats(g, n_latt):
     """Return clustering coeffs and char. path lengths for lattice graphs.
 
@@ -333,7 +364,7 @@ def get_top_ten(measures, better='greater'):
     return top_ten
 
 
-def strip_absent_edges(end):
+def strip_absent_and_unknown_edges(end):
     """Return graph with known-absent edges removed.
 
     Do not modify the graph passed as input; return a new graph.
@@ -352,7 +383,7 @@ def strip_absent_edges(end):
     g = nx.DiGraph()
     for source, target in end.edges_iter():
         source_ec, target_ec = end[source][target]['ECs']
-        ns = ('N', 'Nc', 'Np', 'Nx')
+        ns = ('N', 'Nc', 'Np', 'Nx', 'Up', 'Ux', 'U')
         if source_ec not in ns and target_ec not in ns:
             g.add_edge(source, target)
     return g
