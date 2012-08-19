@@ -64,10 +64,10 @@ class GraphStatsTestCase(TestCase):
         self.assertEqual(cocostats.directed_closeness(self.g), desired)
 
         
-def test_strip_absent_edges():
+def test_strip_absent_and_unknown_edges():
     e = nx.DiGraph()
-    e.add_edges_from([('A', 'B', {'ECs': ('N', 'P')}),
-                      ('C', 'D', {'ECs': ('P', 'X')})])
-    g = cocostats.strip_absent_edges(e)
+    e.add_edges_from([('A', 'B', {'EC_Source': 'N', 'EC_Target': 'P'}),
+                      ('C', 'D', {'EC_Source': 'P', 'EC_Target': 'X'})])
+    g = cocostats.strip_absent_and_unknown_edges(e)
     nt.assert_equal(g.number_of_edges(), 1)
     nt.assert_equal(g['C']['D'], {})

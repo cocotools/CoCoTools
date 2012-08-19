@@ -19,6 +19,22 @@ def write_A_to_mat(g, path):
     scipy.io.savemat(path, mdict={'A': A})
 
 
+def strip_brain_map_prefix(g):
+    """Remove BrainMap prefix from nodes, merging those with the same name.
+
+    g is not modified.
+    """
+    nodes = g.nodes()
+    while nodes:
+        n = nodes.pop()
+        no_prefix = n.split('-',1)[1]
+        same_name = [x for x in nodes if no_prefix == x.split('-',1)[1]]
+        for x in same_name:
+            nodes.remove(x)
+        g = merge_nodes(g, no_prefix, same_name + [n])
+    return g
+    
+
 def merge_nodes(g, new_name, nodes):
     """Return new g with nodes merged into a single node with new_name.
 

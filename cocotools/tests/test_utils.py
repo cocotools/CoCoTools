@@ -1,8 +1,17 @@
 from unittest import TestCase
 
 import networkx as nx
+import nose.tools as nt
 
 import cocotools.utils as utils
+
+
+def test_strip_brain_map_prefix():
+    g = nx.DiGraph()
+    g.add_edges_from([('A-1', 'B-1'), ('A-1', 'B-2'), ('B-3', 'B-1'),
+                      ('C-4', 'A-1'), ('B-2', 'D-4')])
+    g = utils.strip_brain_map_prefix(g)
+    nt.assert_equal(g.edges(), [('1','2'), ('3','1'), ('2','4'), ('4','1')])
 
 
 class MergeNodesTestCase(TestCase):
