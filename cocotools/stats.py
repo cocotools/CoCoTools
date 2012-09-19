@@ -381,6 +381,7 @@ def strip_absent_and_unknown_edges(end):
       attributes are not transferred to this graph.
     """
     g = nx.DiGraph()
+    g.add_nodes_from(end.nodes())
     for source, target in end.edges_iter():
         source_ec = end[source][target]['EC_Source']
         target_ec = end[source][target]['EC_Target']
