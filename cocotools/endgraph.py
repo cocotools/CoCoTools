@@ -568,7 +568,10 @@ latter are not disjoint""" % (new, originals))
           or 'modified'
         """
         self.map = desired_map
-        for node in mapp.nodes_iter():
+        # Add all target-map nodes to the EndGraph.  We need to search both
+        # the map and con graphs because one can contain nodes the other
+        # doesn't have.
+        for node in set(mapp.nodes()+conn.nodes()):
             if node.split('-')[0] == desired_map:
                 self.add_node(node.split('-', 1)[-1])
         at_setting = {'original': self._translate_attr_original,

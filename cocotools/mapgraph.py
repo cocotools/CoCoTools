@@ -605,9 +605,7 @@ class MapGraph(nx.DiGraph):
                 self.add_edge(keeper, n, rc=self[loser][n]['RC'],
                               pdc=self[loser][n]['PDC'])
         self.remove_node(loser)
-        # Give loser's conn edges to keeper.  We don't need to remove
-        # loser or its edges from conn because once removed from the
-        # current graph it is untranslatable.
+        # Give loser's conn edges to keeper, and remove loser from conn.
         try:
             predecessors = self.cong.predecessors(loser)
             successors = self.cong.successors(loser)
@@ -621,6 +619,7 @@ class MapGraph(nx.DiGraph):
             for s in successors:
                 attributes = self.cong[loser][s]
                 self.cong.add_edge(keeper, s, attributes)
+            self.cong.remove_node(loser)
 
     def _relate_node_to_others(self, node_x, others):
         """Return others to which node_x is related and the corresponding RC.
