@@ -1,3 +1,4 @@
+from unittest import TestCase
 from testfixtures import replace
 from networkx import DiGraph
 import nose.tools as nt
@@ -5,7 +6,35 @@ import nose.tools as nt
 from cocotools import EndGraph, EndGraphError
 
 
-# Deliberately not tested: add_edge, add_translated_edges.
+# Deliberately not tested: add_edge.
+
+#------------------------------------------------------------------------------
+# Integration Tests
+#------------------------------------------------------------------------------
+
+class OrtTestCase(TestCase):
+
+    def setUp(self):
+        self.m = DiGraph()
+        self.c = DiGraph()
+        self.e = EndGraph()
+        
+    def test_unknown_input_does_not_pollute(self):
+        self.m.add_edges_from([('A-1', 'B-1', {'RC': 'S', 'PDC': 0}),
+                          ('B-1', 'A-1', {'RC': 'L', 'PDC': 0}),
+                          ('A-2', 'B-1', {'RC': 'S', 'PDC': 0}),
+                          ('B-1', 'A-2', {'RC': 'L', 'PDC': 0}),
+                          ('A-3', 'B-2', {'RC': 'S', 'PDC': 0}),
+                          ('B-2', 'A-3', {'RC': 'L', 'PDC': 0}),
+                          ('A-4', 'B-2', {'RC': 'S', 'PDC': 0}),
+                          ('B-2', 'A-4', {'RC': 'L', 'PDC': 0})])
+        self.c.add_edge('A-2', 'A-3', EC_Source='P', EC_Target='P',
+                        PDC_EC_Source=0, PDC_EC_Target=0, PDC_Site_Source=0,
+                        PDC_Site_Target=0)
+        self.e.add_translated_edges(self.m, self.c, 'B', 'original')
+        self.assertEqual(self.e.number_of_edges(), 1)
+        self.assertEqual(self.e['1']['2']['EC_Source'], 'P')
+        self.assertEqual(self.e['1']['2']['EC_Target'], 'P')
 
 #------------------------------------------------------------------------------
 # Unit Tests
@@ -13,11 +42,13 @@ from cocotools import EndGraph, EndGraphError
 
 def test_new_attributes_are_better():
     mock_endg = DiGraph()
-    mock_endg.add_edge('A', 'B', PDC=5)
+    mock_endg.add_edge('A', 'B', {'PDC': 5, 'Connection': 'Unknown'})
     method = EndGraph._new_attributes_are_better.im_func
-    nt.assert_false(method(mock_endg, 'A', 'B', 18))
-    nt.assert_true(method(mock_endg, 'A', 'B', 2))
-    nt.assert_false(method(mock_endg, 'A', 'B', 5))
+    nt.assert_false(method(mock_endg, 'A', 'B', {'Connection': 'Unknown'}))
+    nt.assert_true(method(mock_endg, 'A', 'B', {'Connection': 'Present',
+                                                'PDC': 2}))
+    nt.assert_false(method(mock_endg, 'A', 'B', {'EC_Source': 'U',
+                                                 'EC_Target': 'X'}))
 
 
 def test_resolve_connections():

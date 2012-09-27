@@ -273,8 +273,7 @@ def test_merge_identical_nodes():
                          ('A-1', 'A-2', {'RC': 'I', 'PDC': 12})])
     mapp.cong = mock_conn
     mapp._merge_identical_nodes('A-2', 'A-1')
-    nt.assert_equal(mapp.cong.edges(), [('A-1', 'A-5'), ('A-2', 'A-5'),
-                                        ('A-4', 'A-1'), ('A-4', 'A-2')])
+    nt.assert_equal(mapp.cong.edges(), [('A-2', 'A-5'), ('A-4', 'A-2')])
     nt.assert_equal(mapp.edges(), [('A-2', 'B-1'), ('A-2', 'C-1')])
 
 

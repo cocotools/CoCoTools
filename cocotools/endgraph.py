@@ -12,7 +12,7 @@ class EndGraph(nx.DiGraph):
 
     """Subclass of the NetworkX DiGraph designed to hold post-ORT data."""
 
-    def _new_attributes_are_better(self, source, target, new_pdc):
+    def _new_attributes_are_better(self, source, target, attributes):
         """Return True if PDC is an improvement and False otherwise.
 
         The PDC in new_attributes is compared to the one already in the
@@ -26,9 +26,7 @@ class EndGraph(nx.DiGraph):
         target : string
           Another BrainSite from the desired BrainMap in CoCoMac format.
 
-        new_pdc : integer
-          Value between 0 and 18 representing an index in the PDC
-          hierarchy.
+        attributes : dict
 
         Returns
         -------
@@ -36,7 +34,14 @@ class EndGraph(nx.DiGraph):
           True if supplied attributes are better than those in the graph.
           False otherwise.
         """
-        if new_pdc < self[source][target]['PDC']:
+        if attributes.has_key('Connection'):
+            if attributes['Connection'] == 'Unknown':
+                return False
+        else:
+            us = ('Up', 'Ux', 'U')
+            if attributes['EC_Source'] in us or attributes['EC_Target'] in us:
+                return False
+        if attributes['PDC'] < self[source][target]['PDC']:
             return True
         return False
 
@@ -60,12 +65,9 @@ class EndGraph(nx.DiGraph):
         """
         if source == target:
             return
-        if attributes.has_key('Connection'):
-            if attributes['Connection'] == 'Unknown':
-                return
         if not self.has_edge(source, target):
             nx.DiGraph.add_edge.im_func(self, source, target, attributes)
-        elif self._new_attributes_are_better(source, target, attributes['PDC']):
+        elif self._new_attributes_are_better(source, target, attributes):
             nx.DiGraph.add_edge.im_func(self, source, target, attributes)
 
     def _resolve_connections(self, connections):
