@@ -383,9 +383,13 @@ def strip_absent_and_unknown_edges(end):
     g = nx.DiGraph()
     g.add_nodes_from(end.nodes())
     for source, target in end.edges_iter():
-        source_ec = end[source][target]['EC_Source']
-        target_ec = end[source][target]['EC_Target']
-        ns = ('N', 'Nc', 'Np', 'Nx', 'Up', 'Ux', 'U')
-        if source_ec not in ns and target_ec not in ns:
-            g.add_edge(source, target)
+        if end[source][target].has_key('Connection'):
+            if end[source][target]['Connection'] in ('Present', 'Absent'):
+                g.add_edge(source, target)
+        else:
+            source_ec = end[source][target]['EC_Source']
+            target_ec = end[source][target]['EC_Target']
+            ns = ('N', 'Nc', 'Np', 'Nx', 'Up', 'Ux', 'U')
+            if source_ec not in ns and target_ec not in ns:
+                g.add_edge(source, target)
     return g
