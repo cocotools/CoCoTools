@@ -37,10 +37,15 @@ class EndGraph(nx.DiGraph):
         if attributes.has_key('Connection'):
             if attributes['Connection'] == 'Unknown':
                 return False
+            elif self[source][target]['Connection'] == 'Unknown':
+                return True
         else:
             us = ('Up', 'Ux', 'U')
             if attributes['EC_Source'] in us or attributes['EC_Target'] in us:
                 return False
+            elif self[source][target]['EC_Source'] in us or \
+                    self[source][target]['EC_Target'] in us:
+                return True
         if attributes['PDC'] < self[source][target]['PDC']:
             return True
         return False
