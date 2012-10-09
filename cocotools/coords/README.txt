@@ -24,14 +24,20 @@ other files in this directory, which are comma-separated.
 standard_labels_template.csv: This is the template from which to start
 the integration of the labels from INCF and CoCoMac.
 
-standard_labels.csv: This is the key file for displaying PHT00 coords and end4 nodes.
-There are 118 entries.There is comment column for potentially confusing naming differences ot to explain
-entries. Check out the comments for some supernodes I arbitrarily idiosyncracies (e.g. CoCoMac's
-10 I assigned to 10L's coordinates). This is for display only; these regions are not isomorphic. This file
-is optimized for end4. Rob thinks it may be a good idea When we make a major change in endgraph, like using a diff
-target space, we should make a new standard_labels file. 
-N.B1: The end4 node: 5 does not exist on the incf list and i don't have the time to invest in making up sensible coords and colors for it.
-N.B2: I added a column for frontal nodes, because I hoped this would be easy for F to reference into and find relevant frontal nodes
+standard_labels.csv: This is the key file for displaying PHT00 coords and end4
+nodes.  There are 118 entries.There is comment column for potentially confusing
+naming differences ot to explain entries. Check out the comments for some
+supernodes I arbitrarily idiosyncracies (e.g. CoCoMac's 10 I assigned to 10L's
+coordinates). This is for display only; these regions are not isomorphic. This
+file is optimized for end4. Rob thinks it may be a good idea When we make a
+major change in endgraph, like using a diff target space, we should make a new
+standard_labels file.
+
+N.B1: The end4 node: 5 does not exist on the incf list and i don't have the
+  time to invest in making up sensible coords and colors for it.
+
+N.B2: I added a column for frontal nodes, because I hoped this would be easy
+  for F to reference into and find relevant frontal nodes
 
 1incf_2coco.csv: This file details the nodes that are essentially
 duplicates. For instance F2 and 6DC have separate entries in our
