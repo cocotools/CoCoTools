@@ -9,7 +9,7 @@ import xml.etree.ElementTree as etree
 from cStringIO import StringIO
 from socket import timeout
 
-from brain_maps import MAPPING_TIMEOUTS, CONNECTIVITY_TIMEOUTS, TIMEOUT_AREAS
+from brain_maps import MAPPING_TIMEOUTS, CONNECTIVITY_TIMEOUTS, TIMEOUT_AREAS, CON_TO_AREAS, MAP_TO_AREAS
 
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
@@ -368,6 +368,10 @@ def query_maps_by_area(search_type, subset=False):
     Integrated primary projections are returned for Connectivity queries,
     and primary relations are returned for Mapping queries.
     """
+    if search_type == 'Mapping':
+        areas = MAP_TO_AREAS
+    elif search_type == 'Connectivity':
+        areas = CON_TO_AREAS
     if not subset:
         if search_type == 'Mapping':
             bmaps = MAPPING_TIMEOUTS
@@ -380,7 +384,7 @@ def query_maps_by_area(search_type, subset=False):
     big_ebunch = []
     failures = []
     for bmap in bmaps:
-        for area in TIMEOUT_AREAS[bmap]:
+        for area in areas[bmap]:
             little_ebunch = single_area_ebunch(search_type, bmap, area)
             if little_ebunch:
                 big_ebunch += little_ebunch
