@@ -42,6 +42,7 @@ connectivity statements
 Connectivity statements describe the extent of staining in two regions
 that resulted from injecting tracer in one of them.
 These data are captured in extension codes (ECs), for which there are four possible values
+
 * *C*: staining covered the region completely
 * *P*: staining covered only part of the region
 * *X*: staining exists in the region, but with unknown extent.

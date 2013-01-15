@@ -59,14 +59,66 @@
 All the high-level commands in <strong>CoCoTools</strong> that are exposed to the user implement
 a major process along the processing stream.
 These commands should be run in order.</p>
-<p>Below we will discuss the major processes that are implemented in <strong>CoCoTools</strong>.</p>
+<p>Below we will discuss the major processes that are implemented in <strong>CoCoTools</strong>. But before reading these sections,
+it is a good idea to first familiarize yourself with the basics of CoCoMac (CoCoMac at a glance)</p>
 <ol class="arabic simple">
 <li>Querying the CoCoMac Database</li>
 <li>Pre-Processing Query Results</li>
 <li>Applying Coordinate-Free Registration</li>
 <li>Post-processing</li>
-<li>Plotting</li>
+<li>Plotting &amp; Analysis</li>
 </ol>
+<div class="section" id="querying-the-cocomac-database">
+<h2>Querying the CoCoMac Database<a class="headerlink" href="#querying-the-cocomac-database" title="Permalink to this headline">¶</a></h2>
+<p>To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
+However, this method might be a bit cumbersome for most users.
+Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
+This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.</p>
+<p>CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function: multi_map_ebunch.
+This function calls lower-level routines that:</p>
+<blockquote>
+<div><ul class="simple">
+<li>form SQL query from user&#8217;s command-line input, pass it to CoCoMac server</li>
+<li>parse resulting XML output</li>
+<li>caches XML results locally to speed up repeated queries (i.e. will check cache before querying server)</li>
+<li>populates a special container object which we call a multi-map ebunch with query results</li>
+</ul>
+</div></blockquote>
+<p>You dont need to know much about the multi-map ebunch format. It is a handy format for holding query results, but that is all this good for. In fact, the first thing you want to do after your query is returned
+is to place the output into  You can read more about the multi_map_ebunch method <strong>here</strong>, but for now, users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe <em>ebunch</em> th</p>
+<blockquote>
+<div>The ebunch that Query results are true to the data stored on CoCoMac.</div></blockquote>
+</div>
+<div class="section" id="pre-processing-query-results">
+<h2>Pre-Processing Query Results<a class="headerlink" href="#pre-processing-query-results" title="Permalink to this headline">¶</a></h2>
+<p>The results you obtain from queries are more or less <em>raw</em>. The first thing you want to do is place them into directed graph objects (congraphs and mapgraphs) that are more amenable for processing.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Congraphs contain connectivity results, whereby each directed edge represents a single result or statement from a tracer study about the presence or absence of staining that would connect two regions.</li>
+<li>Mapgraphs contain mapping results, whereby each edge represents a single statement about the logical relationship shared between two brain regions in the same or different parcellation schemes.</li>
+</ul>
+</div></blockquote>
+<p>For users just interested in interrogating query results from a specific study or set of studies this may be all that you need.</p>
+<p>However, most most users&#8217; ultimate goal with CoCoTools will be to agregate connectivity results from several studies into a single connectivity matrix.
+In this case, users will need to <em>pre-processes</em> this data so coordinate-free registration can be applied efficably.</p>
+<p>Pre-Processing is performed in three steps in CoCoTools</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Clean the data</li>
+<li>Remove hierarchies and instate only one level of resolution in the target space (the space you want your data registered to)</li>
+<li>Deduce edges</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="applying-coordinate-free-registration">
+<h2>Applying Coordinate-Free Registration<a class="headerlink" href="#applying-coordinate-free-registration" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="post-processing">
+<h2>Post-Processing<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="plotting-analysis">
+<h2>Plotting &amp; Analysis<a class="headerlink" href="#plotting-analysis" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -75,6 +127,18 @@ These commands should be run in order.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overall Design Logic &amp; Processing Stream</a><ul>
+<li><a class="reference internal" href="#querying-the-cocomac-database">Querying the CoCoMac Database</a></li>
+<li><a class="reference internal" href="#pre-processing-query-results">Pre-Processing Query Results</a></li>
+<li><a class="reference internal" href="#applying-coordinate-free-registration">Applying Coordinate-Free Registration</a></li>
+<li><a class="reference internal" href="#post-processing">Post-Processing</a></li>
+<li><a class="reference internal" href="#plotting-analysis">Plotting &amp; Analysis</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="overview.html"
                         title="previous chapter">Overview</a></p>
