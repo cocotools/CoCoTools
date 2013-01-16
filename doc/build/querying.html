@@ -1,7 +1,5 @@
 
 
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; CoCoTools 0.0.1 documentation</title>
+    <title>Querying &mdash; CoCoTools 0.0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -34,7 +32,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
+          <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
       </ul>
@@ -45,56 +43,34 @@
         <div class="bodywrapper">
           <div class="body">
             
+  <div class="section" id="querying">
+<h1>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h1>
+<p>To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
+However, this method will be a bit cumbersome for most users.
+Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
+This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.</p>
+<p>CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="multi_map_ebunch">
+<tt class="descname">multi_map_ebunch</tt><big>(</big><em>query type</em>, <em>subset</em><big>)</big><a class="headerlink" href="#multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- <a href="#C"><strong>C</strong></a>
- | <a href="#D"><strong>D</strong></a>
- | <a href="#K"><strong>K</strong></a>
- | <a href="#M"><strong>M</strong></a>
- 
+</div></blockquote>
+<p>This function calls lower-level routines that:</p>
+<blockquote>
+<div><ul class="simple">
+<li>form SQL query from user&#8217;s command-line input, pass it to CoCoMac server</li>
+<li>parse resulting XML output</li>
+<li>caches XML results locally to speed up repeated queries (i.e. will check cache before querying server)</li>
+<li>populates a special container object with query results</li>
+</ul>
+</div></blockquote>
+<p>You dont need to know much about the multi-map ebunch format. It is a handy format for holding query results, but that is all this good for. In fact, the first thing you want to do after your query is returned
+is to place the output into  You can read more about the multi_map_ebunch method <strong>here</strong>, but for now, users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe <em>ebunch</em> th</p>
+<blockquote>
+<div>The ebunch that Query results are true to the data stored on CoCoMac.</div></blockquote>
 </div>
-<h2 id="C">C</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="preprocessing.html#clean_data">clean_data() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="D">D</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="preprocessing.html#deduce_edges">deduce_edges() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="preprocessing.html#keep_one_level_of_resolution">keep_one_level_of_resolution() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
-<h2 id="M">M</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="querying.html#multi_map_ebunch">multi_map_ebunch() (built-in function)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
 
 
           </div>
@@ -102,9 +78,11 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-
-   
-
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/querying.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -126,7 +104,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="#" title="General Index"
+          <a href="genindex.html" title="General Index"
              >index</a></li>
         <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
       </ul>

@@ -1,0 +1,134 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pre-Processing Query Results &mdash; CoCoTools 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="CoCoTools 0.0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pre-processing-query-results">
+<h1>Pre-Processing Query Results<a class="headerlink" href="#pre-processing-query-results" title="Permalink to this headline">¶</a></h1>
+<p>The results you obtain from queries are more or less <em>raw</em>. The first thing you want to do is place them into directed graph objects (congraphs and mapgraphs) that are more amenable for processing.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Congraphs contain connectivity results, whereby each directed edge represents a single result or statement from a tracer study about the presence or absence of staining that would connect two regions.</li>
+<li>Mapgraphs contain mapping results, whereby each edge represents a single statement about the logical relationship shared between two brain regions in the same or different parcellation schemes.</li>
+</ul>
+</div></blockquote>
+<p>For users just interested in interrogating query results from a specific study or set of studies this may be all that you need.</p>
+<p>However, most most users&#8217; ultimate goal with CoCoTools will be to agregate connectivity results from several studies into a single connectivity matrix.
+In this case, users will need to <em>pre-processes</em> this data so coordinate-free registration can be applied efficably.</p>
+<p>Pre-Processing is performed in three steps in CoCoTools</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Clean the mapping data of various ommisions and errors using:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="clean_data">
+<tt class="descname">clean_data</tt><big>(</big><em>mapgraph</em><big>)</big><a class="headerlink" href="#clean_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div></blockquote>
+</li>
+<li><p class="first">Remove hierarchies and instate only one level of resolution in the target space (the space you want your data registered to) using:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="keep_one_level_of_resolution">
+<tt class="descname">keep_one_level_of_resolution</tt><big>(</big><em>congraph</em>, <em>targetmap</em><big>)</big><a class="headerlink" href="#keep_one_level_of_resolution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div></blockquote>
+</li>
+<li><p class="first">Only a fraction of all possible mapping relationships have been explicitly stated in the literature and recorded in CoCoMac. However, a very large set of new mapping relationships can be logically deduced using:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="deduce_edges">
+<tt class="descname">deduce_edges</tt><big>(</big><em>mapgraph</em><big>)</big><a class="headerlink" href="#deduce_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/preprocessing.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Daniel Bliss, Rob Blumenfeld and Fernando Perez.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

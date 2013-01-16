@@ -7,71 +7,53 @@ All the high-level commands in **CoCoTools** that are exposed to the user implem
 a major process along the processing stream.
 These commands should be run in order.
 
-Below we will discuss the major processes that are implemented in **CoCoTools**. But before reading these sections,
-it is a good idea to first familiarize yourself with the basics of CoCoMac (CoCoMac at a glance)
+Below we will give a quick synopsis of the major processes that are implemented in **CoCoTools**.
+Where possible in this synopsis, we avoid discussing the actual code or specific functions to help provide a clearer
+understanding of the *why* rather than the *how* of CoCoTools
 
+.. Note::
+*For those unfamiliar with the CoCoMac database, you can familiarize yourself with the basics here: :ref:`CoCoMac Primer <Quick CoComac>`* .
 
-#. Querying the CoCoMac Database
-#. Pre-Processing Query Results
-#. Applying Coordinate-Free Registration
-#. Post-processing
-#. Plotting & Analysis
+Here are the 5 major steps in the CoCoTools processing pipeline
 
+1. Querying the CoCoMac Database
+------------------------------------
 
+    * To gather data directly from the CoCoMac server, you would need to know how to write SQL queries and how to parse XML headers to obtain the results.
+      Then you would have to place the raw data into a machine or human readable format. CoCoTools does all this for you, all you need to know is one or two functions that you can pass to the command line.
+    * After this step is performed you will have raw connectivity and raw mapping data from multiple studies across the literature.
+    * more info :ref:`here <Detail Querying>`  Broken link but the page is built in the build folder
+      
 
-Querying the CoCoMac Database
-------------------------------
+2. Pre-Processing Query Results
+------------------------------------
 
-To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
-However, this method might be a bit cumbersome for most users.
-Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
-This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.
+    * If you are using CoCoTools to make a connectivity matrix that agregates results across studies, then you will need to *pre-process* the query results to prepare it for *coordinate-free registration*. Pre-processing consists of 3 steps.
+    * After pre-processing is performed you will have connectivity and mapping data that is ready to integrated for registration.
+      Most notably, the final pre-processing step in which you deduce new mapping data, will net you a much larger set of mapping data to work with.
+    * more info :ref:`here <Detail PreProc>` Broken link but the page is built in the build folder
 
-CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function: multi_map_ebunch.
-This function calls lower-level routines that:
-
-    * form SQL query from user's command-line input, pass it to CoCoMac server
-    * parse resulting XML output
-    * caches XML results locally to speed up repeated queries (i.e. will check cache before querying server)
-    * populates a special container object which we call a multi-map ebunch with query results
+3. Applying Coordinate-Free Registration
+-----------------------------------------
+ 
+    * Combining connectivity data from different brain regions and from differemt parcellation schemes to form large scale descriptions of the macaque cortex without the aid of spatial coordinates presents a significant challenge that require sound theory and computational solutions.
+      CoCoTools offers two slightly different methods (algorithms) for tackling this problem. First we implemented what we consider to be the best version of the Stephan, Kotter and colleagues Objective Relational Transformation (ORT). The second approach is a slight modification of ORT (mORT), that uses a  more conservative transformation logic.
+    * Both of these approaches can be alternatively performed quite simply using a single command-line function. You just need to specify which approach to use and what parcellation scheme you want the data to be translated to. You also need to pass it the pre-processed connectivity and mapping data.
+    * After coordinate-free transformation is applied, you will have a connectivity matrix in the parcellarion scheme of your choosing with connections culled from all of the connectivity data you supplied.
+    * more info :ref:`here <Detail Coordinate Free>` Broken link but the page is built in the build folder
     
+4. Post-processing
+------------------------------------
 
-You dont need to know much about the multi-map ebunch format. It is a handy format for holding query results, but that is all this good for. In fact, the first thing you want to do after your query is returned
-is to place the output into  You can read more about the multi_map_ebunch method **here**, but for now, users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe *ebunch* th
-    The ebunch that Query results are true to the data stored on CoCoMac.
+    * During registration, a natural outcome is for some of the connections in your aggegate connectivity matrix to be of *unknown* and/or of *absent* status. Most users will want to remove both of these connections from the final matrix. Post-processing does just this.
+    * After post-processing you will have a clean end-stage connectivity matrix with only at least *present* connections.
+    * more info :ref:`here <Detail PostProc>` Broken link but the page is built in the build folder
+    
+5. Plotting & Analysis
+------------------------------------
 
-
-Pre-Processing Query Results
-------------------------------
-
-The results you obtain from queries are more or less *raw*. The first thing you want to do is place them into directed graph objects (congraphs and mapgraphs) that are more amenable for processing.
-
-    * Congraphs contain connectivity results, whereby each directed edge represents a single result or statement from a tracer study about the presence or absence of staining that would connect two regions.
-
-    * Mapgraphs contain mapping results, whereby each edge represents a single statement about the logical relationship shared between two brain regions in the same or different parcellation schemes.
-
-
-For users just interested in interrogating query results from a specific study or set of studies this may be all that you need.
-
-However, most most users' ultimate goal with CoCoTools will be to agregate connectivity results from several studies into a single connectivity matrix.
-In this case, users will need to *pre-processes* this data so coordinate-free registration can be applied efficably.
-
-Pre-Processing is performed in three steps in CoCoTools
-
-    1. Clean the data
-    2. Remove hierarchies and instate only one level of resolution in the target space (the space you want your data registered to)
-    3. Deduce edges
+    * We offer some functionality for basic plots
+    * CoCoTools integrates with NetworkX which is designed for analyzing grpah data.
+    * more info :ref:`here <Detail Plotting>` Broken link but the page is built in the build folder
 
 
-
-Applying Coordinate-Free Registration
----------------------------------------
-
-
-
-Post-Processing
-----------------
-
-
-Plotting & Analysis
----------------------

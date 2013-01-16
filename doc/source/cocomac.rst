@@ -1,7 +1,8 @@
 =============================
 Quick Introduction to CoCoMac
 =============================
-
+.. _Quick CoComac:
+    
 The CoCoMac (Collation of Connectivity on the Macaque Brain) database (Kötter, 2004; Stephan et al., 2001)
 is the largest repository of macaque anatomical data, housing results from over 400 original
 reports spanning 100 years of research. This data supplies more than 200
