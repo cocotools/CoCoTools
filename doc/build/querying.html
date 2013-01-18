@@ -38,6 +38,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="preprocessing.html" title="Pre-Processing Query Results"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -61,13 +64,11 @@ However, this method will be a bit cumbersome for most users.
 Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
 This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.</p>
 <p>CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function:</p>
-<blockquote>
-<div><dl class="function">
+<dl class="function">
 <dt id="multi_map_ebunch">
 <tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</div></blockquote>
 <p>This function calls lower-level routines that:</p>
 <blockquote>
 <div><ul class="simple">
@@ -77,10 +78,98 @@ This is by far a preferrable method, but does require knowledge of SQL and XML a
 <li>populates a special container object, a multi-map ebunch, with query results</li>
 </ul>
 </div></blockquote>
-<p>You dont need to know much about the multi-map ebunch format. It is a handy format for holding query results, but that is all this good for. In fact, the first thing you want to do after your query is returned
-is to place the output into  You can read more about the multi_map_ebunch method <strong>here</strong>, but for now, users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe <em>ebunch</em> th</p>
+<div class="section" id="search-type">
+<h2>Search type<a class="headerlink" href="#search-type" title="Permalink to this headline">¶</a></h2>
+<p>Mapping and Connectivity queries need to be performed seperately.</p>
+<dl class="function">
+<dt>
+<tt class="descname">multi_map_ebunch</tt><big>(</big><em>'Mapping' or 'Connectivity'</em>, <em>...</em><big>)</big></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="subset">
+<h2>Subset<a class="headerlink" href="#subset" title="Permalink to this headline">¶</a></h2>
+<p>With the subset parameter you can specify the studies you want to query. By default <em>multi_map_ebunch</em> will query the entire CoCoMac database.
+Querying certain mapping and connectivity studies will produce CoCoMac server timeouts. Therefore, it is preferrable to query from the following lists:</p>
 <blockquote>
-<div>The ebunch that Query results are true to the data stored on CoCoMac.</div></blockquote>
+<div><ul class="simple">
+<li>coco.MAPPING_NON_TIMEOUTS</li>
+<li>coco.CONNECTIVITY_NON_TIMEOUTS</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<dl class="function">
+<dt>
+<tt class="descname">multi_map_ebunch</tt><big>(</big><em>'Mapping'</em>, <em>coco.MAPPING_NON_TIMEOUTS</em><big>)</big></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="query-map-by-area">
+<h2>Query map by area<a class="headerlink" href="#query-map-by-area" title="Permalink to this headline">¶</a></h2>
+<p>To gather the data from the studies that are known to produce server timeouts (when querying the entire study), you will need to query the study, region by region
+This is done using the</p>
+<dl class="function">
+<dt id="query_maps_by_area">
+<tt class="descname">query_maps_by_area</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#query_maps_by_area" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>These lists are studies that are known to produce timeouts</p>
+<blockquote>
+<div><ul class="simple">
+<li>coco.MAPPING_TIMEOUTS</li>
+<li>coco.CONNECTIVITY_TIMEOUTS</li>
+</ul>
+</div></blockquote>
+<p>thus it is preferrable to:</p>
+<dl class="function">
+<dt id="coco.query_maps_by_area">
+<tt class="descclassname">coco.</tt><tt class="descname">query_maps_by_area</tt><big>(</big><em>'Mapping'</em>, <em>coco.MAPPING_TIMEOUTS</em><big>)</big><a class="headerlink" href="#coco.query_maps_by_area" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="ebunch-format">
+<h2>ebunch format<a class="headerlink" href="#ebunch-format" title="Permalink to this headline">¶</a></h2>
+<p>You dont need to know much about the ebunch format. We borrowed it from NetworkX. It holds edges as tuples.
+It is a handy format for holding query results, but that is all this good for.</p>
+<p>In fact, the first thing you want to do after your query is returned is to place the output into
+one of two special networkx digraph objects</p>
+</div>
+<div class="section" id="mapgraphs-and-congraphs-cocotool-directed-graph-container-variables">
+<h2>mapgraphs and congraphs: CoCoTool directed graph container variables<a class="headerlink" href="#mapgraphs-and-congraphs-cocotool-directed-graph-container-variables" title="Permalink to this headline">¶</a></h2>
+<p>Place your queries here</p>
+<dl class="docutils">
+<dt>users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe <em>ebunch</em> th</dt>
+<dd>The ebunch that Query results are true to the data stored on CoCoMac.</dd>
+</dl>
+<span class="target" id="module-cocotools"></span><dl class="function">
+<dt id="cocotools.multi_map_ebunch">
+<tt class="descclassname">cocotools.</tt><tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#cocotools.multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct and return ebunch from data for several BrainMaps.</p>
+<p>Also return the BrainMaps for which queries failed.</p>
+<dl class="docutils">
+<dt>search_type <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>&#8216;Mapping&#8217; or &#8216;Connectivity&#8217;</dd>
+<dt>subset <span class="classifier-delimiter">:</span> <span class="classifier">sequence or string (optional)</span></dt>
+<dd>Subset of BrainMaps to query.  Default is to query all BrainMaps in
+CoCoMac.  If a string is supplied, it must be the name of a text
+file with one BrainMap per line.</dd>
+</dl>
+<dl class="docutils">
+<dt>big_ebunch <span class="classifier-delimiter">:</span> <span class="classifier">list of tuples</span></dt>
+<dd>Each tuple specifies a source and target node and edge attributes.</dd>
+<dt>failures <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd>These are the BrainMaps for which no data were acquired.</dd>
+</dl>
+<p>Querying a BrainMap for which there is only Mapping data using the
+Connectivity search type would result in its being a failure.
+Failures can also result from CoCoMac server errors.</p>
+<p>The term ebunch, borrowed from NetworkX, refers to a sequence of
+graph theory edges.</p>
+<p>Integrated primary projections are returned for Connectivity queries,
+and primary relations are returned for Mapping queries.</p>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -89,6 +178,18 @@ is to place the output into  You can read more about the multi_map_ebunch method
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Querying</a><ul>
+<li><a class="reference internal" href="#search-type">Search type</a></li>
+<li><a class="reference internal" href="#subset">Subset</a></li>
+<li><a class="reference internal" href="#query-map-by-area">Query map by area</a></li>
+<li><a class="reference internal" href="#ebunch-format">ebunch format</a></li>
+<li><a class="reference internal" href="#mapgraphs-and-congraphs-cocotool-directed-graph-container-variables">mapgraphs and congraphs: CoCoTool directed graph container variables</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="details.html"
                         title="previous chapter">Processing Pipeline in Detail</a></p>
@@ -123,6 +224,9 @@ is to place the output into  You can read more about the multi_map_ebunch method
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="preprocessing.html" title="Pre-Processing Query Results"
              >next</a> |</li>
