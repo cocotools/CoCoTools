@@ -7,6 +7,7 @@
 Welcome to CoCoTools!
 =====================================
 
+
 **CoCoTools** is a library that provides utilities for users to gather, process and register
 macaque neuroanatomical data stored on the **CoCoTools** database.
 Using only high-level commands, users of **CoCoTools** can query, process and register the
@@ -20,7 +21,8 @@ Contents:
 
    documentation
    examples
-
+   
+.. automodule:: snork
 
 
     
