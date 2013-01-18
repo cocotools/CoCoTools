@@ -1,6 +1,7 @@
 =============================
 Pre-Processing Query Results
 =============================
+.. _Detail PreProc:
 
 The results you obtain from queries are more or less *raw*. The first thing you want to do is place them into directed graph objects (congraphs and mapgraphs) that are more amenable for processing.
 

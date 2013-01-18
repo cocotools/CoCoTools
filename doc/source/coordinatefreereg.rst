@@ -1,6 +1,7 @@
 =======================================
 Applying Coordinate-Free Registration
 =======================================
+.. _Detail Coordinate Free:
 
 Next, what is needed is to bring together or translate the connectivity statements (stored in congraph) in various different parcellation schemes into a single parcellation scheme.
 As the basis for this translation, we will need to use the logical spatial relationships that exist between regions in the various parcellation schemes (stored in congraph).

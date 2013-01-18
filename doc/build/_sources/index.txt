@@ -15,13 +15,12 @@ wealth of CoCoMac data to create customized matrices (graphs) depicting the macr
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :titlesonly: 
+   :maxdepth: 1
 
    documentation
    examples
 
-
-.. Comments from Rob: I would love for the whole nested tree not show up
 
 
     

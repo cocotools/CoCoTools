@@ -25,7 +25,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="CoCoTools 0.0.1 documentation" href="index.html" /> 
+    <link rel="top" title="CoCoTools 0.0.1 documentation" href="index.html" />
+    <link rel="up" title="Processing Pipeline in Detail" href="details.html" />
+    <link rel="next" title="Pre-Processing Query Results" href="preprocessing.html" />
+    <link rel="prev" title="Processing Pipeline in Detail" href="details.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +37,15 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="preprocessing.html" title="Pre-Processing Query Results"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="details.html" title="Processing Pipeline in Detail"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="documentation.html" >CoCoTools&#8217;s documentation</a> &raquo;</li>
+          <li><a href="details.html" accesskey="U">Processing Pipeline in Detail</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,7 +56,7 @@
             
   <div class="section" id="querying">
 <h1>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h1>
-<p>To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
+<p id="detail-querying">To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
 However, this method will be a bit cumbersome for most users.
 Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
 This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.</p>
@@ -53,7 +64,7 @@ This is by far a preferrable method, but does require knowledge of SQL and XML a
 <blockquote>
 <div><dl class="function">
 <dt id="multi_map_ebunch">
-<tt class="descname">multi_map_ebunch</tt><big>(</big><em>query type</em>, <em>subset</em><big>)</big><a class="headerlink" href="#multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div></blockquote>
@@ -63,7 +74,7 @@ This is by far a preferrable method, but does require knowledge of SQL and XML a
 <li>form SQL query from user&#8217;s command-line input, pass it to CoCoMac server</li>
 <li>parse resulting XML output</li>
 <li>caches XML results locally to speed up repeated queries (i.e. will check cache before querying server)</li>
-<li>populates a special container object with query results</li>
+<li>populates a special container object, a multi-map ebunch, with query results</li>
 </ul>
 </div></blockquote>
 <p>You dont need to know much about the multi-map ebunch format. It is a handy format for holding query results, but that is all this good for. In fact, the first thing you want to do after your query is returned
@@ -78,6 +89,12 @@ is to place the output into  You can read more about the multi_map_ebunch method
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="details.html"
+                        title="previous chapter">Processing Pipeline in Detail</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="preprocessing.html"
+                        title="next chapter">Pre-Processing Query Results</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/querying.txt"
@@ -106,7 +123,15 @@ is to place the output into  You can read more about the multi_map_ebunch method
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="preprocessing.html" title="Pre-Processing Query Results"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="details.html" title="Processing Pipeline in Detail"
+             >previous</a> |</li>
+        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="documentation.html" >CoCoTools&#8217;s documentation</a> &raquo;</li>
+          <li><a href="details.html" >Processing Pipeline in Detail</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

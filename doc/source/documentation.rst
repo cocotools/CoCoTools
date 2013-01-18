@@ -7,11 +7,13 @@ Here is where you can learn about all things **CoCoTools**
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :titlesonly: 
+   :maxdepth: 1
 
    overview
    design
    cocomac
+   details
    objects
    infomap
    
