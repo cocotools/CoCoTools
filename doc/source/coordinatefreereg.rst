@@ -13,6 +13,7 @@ In CoCoTools, we have implemented two *coordinate-free registration* algorithms 
 1) Objective Relaional Transformation (ORT): Proposed and described by Stephan, Kotter and colleagues through several articles and one book chapter,  our implementation integrates features in all of these different descriptions to provide what we found to be the most sensible and least error-prone algorithm.
    ORT uses the full set of Relation Codes (RC's) in the mapgraph (see :ref:`CoComac in brief <Quick CoCoMac>` for a desciptions of RC's) in its transformation ruleset
 
+
 2) modified Objective Relation Transformation (mORT): ORT's use of the full set of RC's is based on the assumption that extent of staining = extent of connectivity. For this assumption to hold, both retrograde and anterograde tracer needs to be injected in each region per parcellation scheme to determine the origin and termination points. Unfortunately, CoCoMac does not cpature this information, and thus we can not logically justify using extent information.
    In mORT, only three labels for input connections are used: Present, Absent, and Unknown. 
    This may seem to imply that mORT will generally label fewer connections in the target map as present compared to ORT, but this is not the case, as ORT oversteps not only in its assignments of connection presence, but also when affirming a connection’s absence (see the example with areas R and T above).
@@ -20,11 +21,39 @@ In CoCoTools, we have implemented two *coordinate-free registration* algorithms 
 
 In practice, we have found only small differences between the results of these approaches. mORT has the main advantages of being more conservative, faster and theoretically more accurate.
 
+Coordinate-Free Registration steps
+---------------------------------------------------------
+You will need to initialize a new type of cocotools directed graph container the EndGraph ::
+
+    endg=coco.EndGraph()
+
+
+Next you can run coordinate-free registration using the:
+    .. function:: endg.add_translated_edges(mapgraph, congraph, desired_map, method)
+    where mapgraph and congraph are the pre-processed mapping and connectivity data (respectively). The desired map is the CoCoMac acronym of the target map that you want the data translated to.
+    The method refers to the algorithm that you want to apply. *'original'* for ORT and *'modified'* for mORT
+    
+
+And that is it!
+
+Coordinate-Free Registration Example
+---------------------------------------------
+Here is a quick example::
+
+    endg=coco.EndGraph()
+    endg.add_translated_edges(mapg, cong, 'PHT00', 'modified')
+
+    
+
 .. IMPORTANT::
     *It is hard to appreciate the complexity of the problems that must be overcome by coordinate-free registration algorithms to obtain a meaniningful final connectivity graphs.
     In CoCoTools, we do not claim that the algorithms that we provide will converge on the "ground truth", but rather we aim for our methods to be clearly defined and transparent,
     but most of all, we aim for our coordinate-free registrations methods to be easy-to-use and produce sensible results given the complexity of the data.*
 
 
+Doc strings
+-----------------
+.. automodule:: cocotools
+.. autofunction:: endg.add_translated_edges
 
-
+..autoclass: EndGraph

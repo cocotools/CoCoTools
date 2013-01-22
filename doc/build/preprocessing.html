@@ -38,6 +38,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="coordinatefreereg.html" title="Applying Coordinate-Free Registration"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -56,16 +59,14 @@
             
   <div class="section" id="pre-processing-query-results">
 <h1>Pre-Processing Query Results<a class="headerlink" href="#pre-processing-query-results" title="Permalink to this headline">¶</a></h1>
-<p id="detail-preproc">The results you obtain from queries are more or less <em>raw</em>. The first thing you want to do is place them into directed graph objects (congraphs and mapgraphs) that are more amenable for processing.</p>
-<blockquote>
-<div><ul class="simple">
-<li>Congraphs contain connectivity results, whereby each directed edge represents a single result or statement from a tracer study about the presence or absence of staining that would connect two regions.</li>
-<li>Mapgraphs contain mapping results, whereby each edge represents a single statement about the logical relationship shared between two brain regions in the same or different parcellation schemes.</li>
-</ul>
-</div></blockquote>
-<p>For users just interested in interrogating query results from a specific study or set of studies this may be all that you need.</p>
+<div class="section" id="do-you-need-to-pre-process">
+<span id="detail-preproc"></span><h2>Do you need to Pre-Process?<a class="headerlink" href="#do-you-need-to-pre-process" title="Permalink to this headline">¶</a></h2>
+<p>For users just interested in interrogating query results from a specific study or set of studies, the MapGraph and ConGraphs derived from querying is all that you may need.</p>
 <p>However, most most users&#8217; ultimate goal with CoCoTools will be to agregate connectivity results from several studies into a single connectivity matrix.
 In this case, users will need to <em>pre-processes</em> this data so coordinate-free registration can be applied efficably.</p>
+</div>
+<div class="section" id="pre-processing-steps">
+<h2>Pre-Processing Steps<a class="headerlink" href="#pre-processing-steps" title="Permalink to this headline">¶</a></h2>
 <p>Pre-Processing is performed in three steps in CoCoTools</p>
 <blockquote>
 <div><ol class="arabic">
@@ -77,17 +78,29 @@ In this case, users will need to <em>pre-processes</em> this data so coordinate-
 <dd></dd></dl>
 
 </div></blockquote>
+<p>This function only fixes the issues that we have identified. This function adds and removes specific edges from the mapgraph. <em>To see the list of edges, and our comments, view the mapgraph.py</em></p>
 </li>
 <li><p class="first">Remove hierarchies and instate only one level of resolution in the target space (the space you want your data registered to) using:</p>
 <blockquote>
 <div><dl class="function">
-<dt id="keep_one_level_of_resolution">
-<tt class="descname">keep_one_level_of_resolution</tt><big>(</big><em>congraph</em>, <em>targetmap</em><big>)</big><a class="headerlink" href="#keep_one_level_of_resolution" title="Permalink to this definition">¶</a></dt>
+<dt id="keep_only_one_level_of_resolution">
+<tt class="descname">keep_only_one_level_of_resolution</tt><big>(</big><em>congraph</em>, <em>targetmap</em><big>)</big><a class="headerlink" href="#keep_only_one_level_of_resolution" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<p>The coordinate-free registration algorithms that we have implemented require that the target data is represented at one resolution and that all regions within the target map are mutually disjoint (lest the algorithm crashes or produce errors). This is not the case for many studies in CoCoMac.
+To resolve this problem, this function:</p>
+<blockquote>
+<div><ul class="simple">
+<li>builds a hierarchy for each map based on its spatial relationships</li>
+<li>and removes from each map all but one level of resolution ? ensuring that the areas kept in the graph are disjoint.</li>
+<li>By default, this command keeps the level with the most anatomical connections, and then translates connections from the other levels to the one that is retained.</li>
+</ul>
+</div></blockquote>
 </div></blockquote>
 </li>
-<li><p class="first">Only a fraction of all possible mapping relationships have been explicitly stated in the literature and recorded in CoCoMac. However, a very large set of new mapping relationships can be logically deduced using:</p>
+<li><p class="first">Only a fraction of all possible mapping relationships have been explicitly stated in the literature and recorded in CoCoMac. However, a very large set of new mapping relationships can be logically deduced using these mapping relationships.
+This process is explained by Stephan et al. (2000). After making the insight that spatial relationships between areas can be represented as a mathematical graph (as in the MapGraph), Stephan et al. (2000) applied a classic technique from graph theory, Floyd?s algorithm (Floyd, 1962), to infer chains of relationships among brain areas. Depending on the relationships in each chain, they can be used to deduce a single RC between the area at the beginning of each chain and the one at the end.
+CoCoTools implements this procedure (and updates from K?tter &amp; Wanke, 2005) with the:</p>
 <blockquote>
 <div><dl class="function">
 <dt id="deduce_edges">
@@ -95,9 +108,23 @@ In this case, users will need to <em>pre-processes</em> this data so coordinate-
 <dd></dd></dl>
 
 </div></blockquote>
+<p>Chains of relationships can be reduced to single RCs with variable levels of ambiguity, but in CoCoTools we allow new relationships to be added to the graph only in unambiguous cases. When different chains imply a relationship between the same two areas, we keep the RC implied by the chain with the fewest areas  .</p>
 </li>
 </ol>
 </div></blockquote>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>Here is a quick example of the cocotools commands needed for pre-processing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapg</span><span class="o">.</span><span class="n">clean_data</span><span class="p">()</span>
+<span class="n">cong</span><span class="o">=</span><span class="n">mapg</span><span class="o">.</span><span class="n">keep_only_one_level_of_resolution</span><span class="p">(</span><span class="n">cong</span><span class="p">,</span> <span class="s">&#39;PHT00&#39;</span><span class="p">)</span>
+<span class="n">mapg</span><span class="o">.</span><span class="n">deduce_edges</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="doc-strings">
+<h2>Doc strings<a class="headerlink" href="#doc-strings" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 
@@ -106,6 +133,17 @@ In this case, users will need to <em>pre-processes</em> this data so coordinate-
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pre-Processing Query Results</a><ul>
+<li><a class="reference internal" href="#do-you-need-to-pre-process">Do you need to Pre-Process?</a></li>
+<li><a class="reference internal" href="#pre-processing-steps">Pre-Processing Steps</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#doc-strings">Doc strings</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="querying.html"
                         title="previous chapter">Querying</a></p>
@@ -140,6 +178,9 @@ In this case, users will need to <em>pre-processes</em> this data so coordinate-
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="coordinatefreereg.html" title="Applying Coordinate-Free Registration"
              >next</a> |</li>

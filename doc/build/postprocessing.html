@@ -64,7 +64,25 @@
 <h2>Strip Absent and Unknown Edges<a class="headerlink" href="#strip-absent-and-unknown-edges" title="Permalink to this headline">¶</a></h2>
 <p>It is likely that many of the edges that result from translation will come back with labels of absent or unknown. Absent edges are returned when edges labelled as asbent in their original space are translated to the target space. An edge will be labelled as unknown when there is not sufficient information to infer whether a connection is present or absent. Both of these results are not errors, but are rather natural outcomes the registration process.
 However, most users will not want to keep these edges in their final endgraph.</p>
-<p>The function, coco.strip_absent_and_unknown_edges removes these from the endgraph.</p>
+<dl class="docutils">
+<dt>To remove these edges use::</dt>
+<dd><dl class="first last function">
+<dt id="coco.strip_absent_and_unknown_edges">
+<tt class="descclassname">coco.</tt><tt class="descname">strip_absent_and_unknown_edges</tt><big>(</big><em>endgraph</em><big>)</big><a class="headerlink" href="#coco.strip_absent_and_unknown_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+<div class="section" id="post-processing-example">
+<h2>Post-Processing Example<a class="headerlink" href="#post-processing-example" title="Permalink to this headline">¶</a></h2>
+<p>Here is a quick example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">coco</span><span class="o">.</span><span class="n">strip_absent_and_unknown_edges</span><span class="p">(</span><span class="n">endg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-cocotools">
+<span id="doc-strings"></span><h2>Doc strings:<a class="headerlink" href="#module-cocotools" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -78,6 +96,8 @@ However, most users will not want to keep these edges in their final endgraph.</
   <ul>
 <li><a class="reference internal" href="#">Post-Processing</a><ul>
 <li><a class="reference internal" href="#strip-absent-and-unknown-edges">Strip Absent and Unknown Edges</a></li>
+<li><a class="reference internal" href="#post-processing-example">Post-Processing Example</a></li>
+<li><a class="reference internal" href="#module-cocotools">Doc strings:</a></li>
 </ul>
 </li>
 </ul>

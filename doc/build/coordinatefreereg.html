@@ -71,11 +71,42 @@ In mORT, only three labels for input connections are used: Present, Absent, and 
 This may seem to imply that mORT will generally label fewer connections in the target map as present compared to ORT, but this is not the case, as ORT oversteps not only in its assignments of connection presence, but also when affirming a connection?s absence (see the example with areas R and T above).</li>
 </ol>
 <p>In practice, we have found only small differences between the results of these approaches. mORT has the main advantages of being more conservative, faster and theoretically more accurate.</p>
+<div class="section" id="coordinate-free-registration-steps">
+<h2>Coordinate-Free Registration steps<a class="headerlink" href="#coordinate-free-registration-steps" title="Permalink to this headline">¶</a></h2>
+<p>You will need to initialize a new type of cocotools directed graph container the EndGraph</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">endg</span><span class="o">=</span><span class="n">coco</span><span class="o">.</span><span class="n">EndGraph</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Next you can run coordinate-free registration using the:</dt>
+<dd><dl class="first function">
+<dt id="endg.add_translated_edges">
+<tt class="descclassname">endg.</tt><tt class="descname">add_translated_edges</tt><big>(</big><em>mapgraph</em>, <em>congraph</em>, <em>desired_map</em>, <em>method</em><big>)</big><a class="headerlink" href="#endg.add_translated_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="last">where mapgraph and congraph are the pre-processed mapping and connectivity data (respectively). The desired map is the CoCoMac acronym of the target map that you want the data translated to.
+The method refers to the algorithm that you want to apply. <em>&#8216;original&#8217;</em> for ORT and <em>&#8216;modified&#8217;</em> for mORT</p>
+</dd>
+</dl>
+<p>And that is it!</p>
+</div>
+<div class="section" id="coordinate-free-registration-example">
+<h2>Coordinate-Free Registration Example<a class="headerlink" href="#coordinate-free-registration-example" title="Permalink to this headline">¶</a></h2>
+<p>Here is a quick example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">endg</span><span class="o">=</span><span class="n">coco</span><span class="o">.</span><span class="n">EndGraph</span><span class="p">()</span>
+<span class="n">endg</span><span class="o">.</span><span class="n">add_translated_edges</span><span class="p">(</span><span class="n">mapg</span><span class="p">,</span> <span class="n">cong</span><span class="p">,</span> <span class="s">&#39;PHT00&#39;</span><span class="p">,</span> <span class="s">&#39;modified&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="admonition important">
 <p class="first admonition-title">Important</p>
 <p class="last"><em>It is hard to appreciate the complexity of the problems that must be overcome by coordinate-free registration algorithms to obtain a meaniningful final connectivity graphs.
 In CoCoTools, we do not claim that the algorithms that we provide will converge on the &#8220;ground truth&#8221;, but rather we aim for our methods to be clearly defined and transparent,
 but most of all, we aim for our coordinate-free registrations methods to be easy-to-use and produce sensible results given the complexity of the data.</em></p>
+</div>
+</div>
+<div class="section" id="module-cocotools">
+<span id="doc-strings"></span><h2>Doc strings<a class="headerlink" href="#module-cocotools" title="Permalink to this headline">¶</a></h2>
+<p>..autoclass: EndGraph</p>
 </div>
 </div>
 
@@ -85,6 +116,16 @@ but most of all, we aim for our coordinate-free registrations methods to be easy
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Applying Coordinate-Free Registration</a><ul>
+<li><a class="reference internal" href="#coordinate-free-registration-steps">Coordinate-Free Registration steps</a></li>
+<li><a class="reference internal" href="#coordinate-free-registration-example">Coordinate-Free Registration Example</a></li>
+<li><a class="reference internal" href="#module-cocotools">Doc strings</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="preprocessing.html"
                         title="previous chapter">Pre-Processing Query Results</a></p>

@@ -5,12 +5,12 @@ Querying
 
 To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
 However, this method will be a bit cumbersome for most users.
-Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
+Alternatively, you can pass customized SQL (structured query language) queries directly to the server (which is an excellent feature of the cocomac server!) and it will return query results in XML.
 This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.
 
 CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function:
     
-.. function:: multi_map_ebunch(search_type, subset=False)
+.. function:: coco.multi_map_ebunch(search_type, subset=False)
         
 
 This function calls lower-level routines that:
@@ -25,7 +25,7 @@ Search type
 --------------
 Mapping and Connectivity queries need to be performed seperately.
 
-.. function:: multi_map_ebunch('Mapping' or 'Connectivity', ...)
+.. function:: coco.multi_map_ebunch('Mapping' or 'Connectivity', ...)
 
 Subset
 -----------
@@ -37,7 +37,7 @@ Querying certain mapping and connectivity studies will produce CoCoMac server ti
 
 Example:
     
-.. function:: multi_map_ebunch('Mapping', coco.MAPPING_NON_TIMEOUTS )
+.. function:: map_bunch=coco.multi_map_ebunch('Mapping', coco.MAPPING_NON_TIMEOUTS )
 
 
 Query map by area
@@ -52,9 +52,9 @@ These lists are studies that are known to produce timeouts
     * coco.MAPPING_TIMEOUTS
     * coco.CONNECTIVITY_TIMEOUTS
 
-thus it is preferrable to:
+thus, where we querying the *non-timeout* studies using **multi_map_ebunch**, now we want to query the *timeouts using:
     
-.. function:: coco.query_maps_by_area('Mapping', coco.MAPPING_TIMEOUTS)
+.. function:: map_bunch_to=coco.query_maps_by_area('Mapping', coco.MAPPING_TIMEOUTS)
 
 
 ebunch format
@@ -63,17 +63,40 @@ You dont need to know much about the ebunch format. We borrowed it from NetworkX
 It is a handy format for holding query results, but that is all this good for.
 
 In fact, the first thing you want to do after your query is returned is to place the output into
-one of two special networkx digraph objects
+one of two special networkx directed graph (digraph) objects
 
 
 mapgraphs and congraphs: CoCoTool directed graph container variables
 ----------------------------------------------------------------------
-Place your queries here
+These are the special cocotools directed graph containers for holding mapping data (MapGraph) and connectivity data (ConGraph) that are much easier to address and manipulate using standard networkx commands and more amenable for CoCoTools processing.
 
-users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe *ebunch* th
-    The ebunch that Query results are true to the data stored on CoCoMac.
+    * ConGraphs contain connectivity results, whereby each directed edge represents a single result or statement from a tracer study about the presence or absence of staining that would connect two regions.
 
+    * MapGraphs contain mapping results, whereby each edge represents a single statement about the logical relationship shared between two brain regions in the same or different parcellation schemes.
 
+To place your query results into them::
+    
+   mapg=coco.MapGraph()
+   mapg=mapg.add_edges_from(map_bunch)
+    
+the same can be done for the connectivity data::
+    
+   cong=coco.ConGraph()
+   cong=cong.add_edges_from(con_bunch)
+
+Doc strings
+----------------
 .. automodule:: cocotools
 .. autofunction:: multi_map_ebunch
 
+
+
+.. autofunction:: query_maps_by_area
+
+
+
+.. autoclass:: MapGraph
+
+
+
+.. autoclass:: ConGraph

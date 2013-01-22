@@ -61,12 +61,12 @@
 <h1>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h1>
 <p id="detail-querying">To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
 However, this method will be a bit cumbersome for most users.
-Alternatively, you can pass customized SQL (structured query language) queries directly to the server and the webserver will return query results in XML.
+Alternatively, you can pass customized SQL (structured query language) queries directly to the server (which is an excellent feature of the cocomac server!) and it will return query results in XML.
 This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.</p>
 <p>CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function:</p>
 <dl class="function">
-<dt id="multi_map_ebunch">
-<tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
+<dt id="coco.multi_map_ebunch">
+<tt class="descclassname">coco.</tt><tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#coco.multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p>This function calls lower-level routines that:</p>
@@ -83,7 +83,7 @@ This is by far a preferrable method, but does require knowledge of SQL and XML a
 <p>Mapping and Connectivity queries need to be performed seperately.</p>
 <dl class="function">
 <dt>
-<tt class="descname">multi_map_ebunch</tt><big>(</big><em>'Mapping' or 'Connectivity'</em>, <em>...</em><big>)</big></dt>
+<tt class="descclassname">coco.</tt><tt class="descname">multi_map_ebunch</tt><big>(</big><em>'Mapping' or 'Connectivity'</em>, <em>...</em><big>)</big></dt>
 <dd></dd></dl>
 
 </div>
@@ -100,7 +100,7 @@ Querying certain mapping and connectivity studies will produce CoCoMac server ti
 <p>Example:</p>
 <dl class="function">
 <dt>
-<tt class="descname">multi_map_ebunch</tt><big>(</big><em>'Mapping'</em>, <em>coco.MAPPING_NON_TIMEOUTS</em><big>)</big></dt>
+<tt class="descname">map_bunch=coco.multi_map_ebunch('Mapping', coco.MAPPING_NON_TIMEOUTS )</tt></dt>
 <dd></dd></dl>
 
 </div>
@@ -120,10 +120,10 @@ This is done using the</p>
 <li>coco.CONNECTIVITY_TIMEOUTS</li>
 </ul>
 </div></blockquote>
-<p>thus it is preferrable to:</p>
+<p>thus, where we querying the <em>non-timeout</em> studies using <strong>multi_map_ebunch</strong>, now we want to query the <a href="#id1"><span class="problematic" id="id2">*</span></a>timeouts using:</p>
 <dl class="function">
-<dt id="coco.query_maps_by_area">
-<tt class="descclassname">coco.</tt><tt class="descname">query_maps_by_area</tt><big>(</big><em>'Mapping'</em>, <em>coco.MAPPING_TIMEOUTS</em><big>)</big><a class="headerlink" href="#coco.query_maps_by_area" title="Permalink to this definition">¶</a></dt>
+<dt>
+<tt class="descname">map_bunch_to=coco.query_maps_by_area('Mapping', coco.MAPPING_TIMEOUTS)</tt></dt>
 <dd></dd></dl>
 
 </div>
@@ -132,16 +132,31 @@ This is done using the</p>
 <p>You dont need to know much about the ebunch format. We borrowed it from NetworkX. It holds edges as tuples.
 It is a handy format for holding query results, but that is all this good for.</p>
 <p>In fact, the first thing you want to do after your query is returned is to place the output into
-one of two special networkx digraph objects</p>
+one of two special networkx directed graph (digraph) objects</p>
 </div>
 <div class="section" id="mapgraphs-and-congraphs-cocotool-directed-graph-container-variables">
 <h2>mapgraphs and congraphs: CoCoTool directed graph container variables<a class="headerlink" href="#mapgraphs-and-congraphs-cocotool-directed-graph-container-variables" title="Permalink to this headline">¶</a></h2>
-<p>Place your queries here</p>
-<dl class="docutils">
-<dt>users should note the query output format, a multi-graph, is a collection of graphs, where each graph is  multi-grpathe <em>ebunch</em> th</dt>
-<dd>The ebunch that Query results are true to the data stored on CoCoMac.</dd>
-</dl>
-<span class="target" id="module-cocotools"></span><dl class="function">
+<p>These are the special cocotools directed graph containers for holding mapping data (MapGraph) and connectivity data (ConGraph) that are much easier to address and manipulate using standard networkx commands and more amenable for CoCoTools processing.</p>
+<blockquote>
+<div><ul class="simple">
+<li>ConGraphs contain connectivity results, whereby each directed edge represents a single result or statement from a tracer study about the presence or absence of staining that would connect two regions.</li>
+<li>MapGraphs contain mapping results, whereby each edge represents a single statement about the logical relationship shared between two brain regions in the same or different parcellation schemes.</li>
+</ul>
+</div></blockquote>
+<p>To place your query results into them:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapg</span><span class="o">=</span><span class="n">coco</span><span class="o">.</span><span class="n">MapGraph</span><span class="p">()</span>
+<span class="n">mapg</span><span class="o">=</span><span class="n">mapg</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">map_bunch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>the same can be done for the connectivity data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cong</span><span class="o">=</span><span class="n">coco</span><span class="o">.</span><span class="n">ConGraph</span><span class="p">()</span>
+<span class="n">cong</span><span class="o">=</span><span class="n">cong</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">con_bunch</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-cocotools">
+<span id="doc-strings"></span><h2>Doc strings<a class="headerlink" href="#module-cocotools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
 <dt id="cocotools.multi_map_ebunch">
 <tt class="descclassname">cocotools.</tt><tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#cocotools.multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct and return ebunch from data for several BrainMaps.</p>
@@ -169,6 +184,102 @@ graph theory edges.</p>
 and primary relations are returned for Mapping queries.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="cocotools.query_maps_by_area">
+<tt class="descclassname">cocotools.</tt><tt class="descname">query_maps_by_area</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#cocotools.query_maps_by_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct and return ebunch from data for several BrainMaps.</p>
+<p>Also return the BrainMaps for which queries failed.</p>
+<dl class="docutils">
+<dt>search_type <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>&#8216;Mapping&#8217; or &#8216;Connectivity&#8217;</dd>
+<dt>subset <span class="classifier-delimiter">:</span> <span class="classifier">sequence or string (optional)</span></dt>
+<dd>Subset of BrainMaps to query.  Default is to query all BrainMaps in
+CoCoMac.  If a string is supplied, it must be the name of a text
+file with one BrainMap per line.</dd>
+</dl>
+<dl class="docutils">
+<dt>big_ebunch <span class="classifier-delimiter">:</span> <span class="classifier">list of tuples</span></dt>
+<dd>Each tuple specifies a source and target node and edge attributes.</dd>
+<dt>failures <span class="classifier-delimiter">:</span> <span class="classifier">list of strings</span></dt>
+<dd>These are the BrainMaps for which no data were acquired.</dd>
+</dl>
+<p>Querying a BrainMap for which there is only Mapping data using the
+Connectivity search type would result in its being a failure.
+Failures can also result from CoCoMac server errors.</p>
+<p>The term ebunch, borrowed from NetworkX, refers to a sequence of
+graph theory edges.</p>
+<p>Integrated primary projections are returned for Connectivity queries,
+and primary relations are returned for Mapping queries.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cocotools.MapGraph">
+<em class="property">class </em><tt class="descclassname">cocotools.</tt><tt class="descname">MapGraph</tt><a class="headerlink" href="#cocotools.MapGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of the NetworkX DiGraph designed to hold CoCoMac Mapping data.</p>
+<p>Each node must be specified in CoCoMac format as a string:
+&#8216;BrainMap-BrainSite&#8217;.  Nodes not in this format are rejected.  Node
+attributes are not allowed.</p>
+<p>Edges have the following attributes (but only RC and PDC should be
+supplied by the user):</p>
+<p>(1) RC (relation code).  Allowable values are &#8216;I&#8217; (identical to),
+&#8216;S&#8217; (smaller than), &#8216;L&#8217; (larger than), or &#8216;O&#8217; (overlaps with).  These
+values complete the sentence, The source node is _____ the target node.</p>
+<p>(2) TP (transformation path).  This is a list of regions representing
+the chain of relationships (the path within the graph) that mediates
+the relationship between the source and the target.  When the
+relationship between the source and the target has been pulled directly
+from the literature, TP is an empty list.  When source&#8217;s relationship
+to target is known because of source&#8217;s relationship to region X and
+region X&#8217;s relationship to target, TP is [&#8216;X&#8217;].  The list grows with
+the number of intervening nodes.  Of note, the TP for the edge from
+target to source must be the reverse of the TP for the edge from
+source to target.</p>
+<p>(3) PDC (precision description code).  An integer (from zero to 18,
+with zero being the best) corresponding to an index in the PDC
+hierarchy (cocotools.query.PDC_HIER), which was developed by the
+CoCoMac curators.  Entries in the hierarchy represent levels of
+precision with which a statement in the original literature can be
+made.  When the edge is absent from the literature and has been
+deduced based on other edges (i.e., when the TP length is greater
+than zero), the PDC corresponds to the worst PDC of the edges
+represented by TP.</p>
+<p>Accurate deduction of new spatial relationships among regions and
+accurate translation of connectivity data between maps demand that each
+map be represented at just one level of resolution.  This implies that
+when a suite of spatially related regions from the same map is
+identified, one or more regions must be excluded from the MapGraph
+until all remaining are disjoint.</p>
+<p>When keep_only_one_level_of_resolution is called, all but one level of
+resolution is removed from the graph (and cong).  The level with the
+most anatomical connections (i.e., edges in cong) is chosen; in the
+event of a tie, the finest level of resolution is chosen for all maps
+but the target map, for which the coarsest level of resolution is
+chosen.</p>
+<p>Redundant nodes within a map are merged into a single node in this
+graph and in the associated ConGraph.  A name for the node is chosen
+from the list of redundant ones arbitrarily.</p>
+<p>New spatial relationships are deduced using an enhanced version of
+Objective Relational Transformation (ORT) with the deduce_edges method.
+The strategy used in MapGraph for handling intra-map spatial
+relationships described above ensures that levels of resolution will
+not be mixed within maps when deduce_edges is called.  This allows
+deduce_edges to assume all regions within a map are disjoint, which
+enables, after all possible deductions have been made, automatic
+identification and removal of relationships that cannot be true due to
+their implication (in combination with other known relationships) of
+spatial overlap between regions in the same map.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cocotools.ConGraph">
+<em class="property">class </em><tt class="descclassname">cocotools.</tt><tt class="descname">ConGraph</tt><big>(</big><em>data=None</em>, <em>**attr</em><big>)</big><a class="headerlink" href="#cocotools.ConGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of the NetworkX DiGraph designed to hold Connectivity data.</p>
+<p>The DiGraph methods add_edge and add_edges_from have been overridden,
+to enforce that edges have valid attributes with the highest likelihood
+of correctness referring to their extension codes (ECs), precision
+description codes (PDCs), and degree.</p>
+</dd></dl>
+
 </div>
 </div>
 
@@ -186,6 +297,7 @@ and primary relations are returned for Mapping queries.</p>
 <li><a class="reference internal" href="#query-map-by-area">Query map by area</a></li>
 <li><a class="reference internal" href="#ebunch-format">ebunch format</a></li>
 <li><a class="reference internal" href="#mapgraphs-and-congraphs-cocotool-directed-graph-container-variables">mapgraphs and congraphs: CoCoTool directed graph container variables</a></li>
+<li><a class="reference internal" href="#module-cocotools">Doc strings</a></li>
 </ul>
 </li>
 </ul>
