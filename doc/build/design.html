@@ -38,6 +38,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="cocomac.html" title="Quick Introduction to CoCoMac"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -71,9 +74,9 @@ understanding of the <em>why</em> rather than the <em>how</em> of CoCoTools</p>
 <li>To gather data directly from the CoCoMac server, you would need to know how to write SQL queries and how to parse XML headers to obtain the results.
 Then you would have to place the raw data into a machine or human readable format. CoCoTools does all this for you, all you need to know is one or two functions that you can pass to the command line.</li>
 <li>After this step is performed you will have raw connectivity and raw mapping data from multiple studies across the literature.</li>
-<li>more info <em class="xref std std-ref">here</em>  Broken link but the page is built in the build folder</li>
 </ul>
 </div></blockquote>
+<p>To learn more about Querying click <a class="reference internal" href="querying.html#detail-querying"><em>here</em></a></p>
 </div>
 <div class="section" id="pre-processing-query-results">
 <h2>2. Pre-Processing Query Results<a class="headerlink" href="#pre-processing-query-results" title="Permalink to this headline">¶</a></h2>
@@ -82,21 +85,21 @@ Then you would have to place the raw data into a machine or human readable forma
 <li>If you are using CoCoTools to make a connectivity matrix that agregates results across studies, then you will need to <em>pre-process</em> the query results to prepare it for <em>coordinate-free registration</em>. Pre-processing consists of 3 steps.</li>
 <li>After pre-processing is performed you will have connectivity and mapping data that is ready to integrated for registration.
 Most notably, the final pre-processing step in which you deduce new mapping data, will net you a much larger set of mapping data to work with.</li>
-<li>more info <em class="xref std std-ref">here</em> Broken link but the page is built in the build folder</li>
 </ul>
 </div></blockquote>
+<p>To learn more about Pre-Processing click <a class="reference internal" href="preprocessing.html#detail-preproc"><em>here</em></a></p>
 </div>
 <div class="section" id="applying-coordinate-free-registration">
 <h2>3. Applying Coordinate-Free Registration<a class="headerlink" href="#applying-coordinate-free-registration" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li>Combining connectivity data from different brain regions and from differemt parcellation schemes to form large scale descriptions of the macaque cortex without the aid of spatial coordinates presents a significant challenge that require sound theory and computational solutions.
-CoCoTools offers two slightly different methods (algorithms) for tackling this problem. First we implemented what we consider to be the best version of the Stephan, Kotter and colleagues Objective Relational Transformation (ORT). The second approach is a slight modification of ORT (mORT), that uses a  more conservative transformation logic.</li>
+CoCoTools offers two slightly different methods (algorithms) for tackling this problem. First we implemented a version of the Stephan, Kotter and colleagues Objective Relational Transformation (ORT) algorithm that integrates key features that have been described across several papers <a class="footnote-reference" href="#id5" id="id1">[1]</a> <a class="footnote-reference" href="#id6" id="id2">[2]</a> <a class="footnote-reference" href="#id7" id="id3">[3]</a> <a class="footnote-reference" href="#id8" id="id4">[4]</a>. The second approach is a slight modification of ORT (mORT), that uses a  more conservative transformation logic.</li>
 <li>Both of these approaches can be alternatively performed quite simply using a single command-line function. You just need to specify which approach to use and what parcellation scheme you want the data to be translated to. You also need to pass it the pre-processed connectivity and mapping data.</li>
 <li>After coordinate-free transformation is applied, you will have a connectivity matrix in the parcellarion scheme of your choosing with connections culled from all of the connectivity data you supplied.</li>
-<li>more info <em class="xref std std-ref">here</em> Broken link but the page is built in the build folder</li>
 </ul>
 </div></blockquote>
+<p>To learn more about Coordinate-Free Registration click <a class="reference internal" href="coordinatefreereg.html#detail-coordinate-free"><em>here</em></a></p>
 </div>
 <div class="section" id="post-processing">
 <h2>4. Post-processing<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h2>
@@ -104,9 +107,9 @@ CoCoTools offers two slightly different methods (algorithms) for tackling this p
 <div><ul class="simple">
 <li>During registration, a natural outcome is for some of the connections in your aggegate connectivity matrix to be of <em>unknown</em> and/or of <em>absent</em> status. Most users will want to remove both of these connections from the final matrix. Post-processing does just this.</li>
 <li>After post-processing you will have a clean end-stage connectivity matrix with only at least <em>present</em> connections.</li>
-<li>more info <a class="reference internal" href="postprocessing.html#detail-postproc"><em>here</em></a> Broken link but the page is built in the build folder</li>
 </ul>
 </div></blockquote>
+<p>To learn more about Post-Processing  click <a class="reference internal" href="postprocessing.html#detail-postproc"><em>here</em></a></p>
 </div>
 <div class="section" id="plotting-analysis">
 <h2>5. Plotting &amp; Analysis<a class="headerlink" href="#plotting-analysis" title="Permalink to this headline">¶</a></h2>
@@ -114,9 +117,36 @@ CoCoTools offers two slightly different methods (algorithms) for tackling this p
 <div><ul class="simple">
 <li>We offer some functionality for basic plots</li>
 <li>CoCoTools integrates with NetworkX which is designed for analyzing grpah data.</li>
-<li>more info <a class="reference internal" href="plotting.html#detail-plotting"><em>here</em></a> Broken link but the page is built in the build folder</li>
 </ul>
 </div></blockquote>
+<p>To learn more about Plotting and Analysis click <a class="reference internal" href="plotting.html#detail-plotting"><em>here</em></a></p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Stephan, K E, Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P., &amp; K?tter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Stephan, K E, Zilles, K., &amp; K?tter, R. (2000). Coordinate-independent mapping of structural and functional data by objective relational transformation (ORT).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Stephan, Klaas E, &amp; K?tter, R. (1999). One cortex ? many maps: An introduction to coordinate-independent mapping by Objective Relational Transformation (ORT).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Stephan, Klaas E., &amp; K?tter, R. (1998). A formal approach to the translation of cortical maps.</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -134,6 +164,7 @@ CoCoTools offers two slightly different methods (algorithms) for tackling this p
 <li><a class="reference internal" href="#applying-coordinate-free-registration">3. Applying Coordinate-Free Registration</a></li>
 <li><a class="reference internal" href="#post-processing">4. Post-processing</a></li>
 <li><a class="reference internal" href="#plotting-analysis">5. Plotting &amp; Analysis</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>
@@ -172,6 +203,9 @@ CoCoTools offers two slightly different methods (algorithms) for tackling this p
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="cocomac.html" title="Quick Introduction to CoCoMac"
              >next</a> |</li>

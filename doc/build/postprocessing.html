@@ -25,7 +25,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="CoCoTools 0.0.1 documentation" href="index.html" /> 
+    <link rel="top" title="CoCoTools 0.0.1 documentation" href="index.html" />
+    <link rel="up" title="Processing Pipeline in Detail" href="details.html" />
+    <link rel="next" title="Plotting &amp; Analysis" href="plotting.html" />
+    <link rel="prev" title="Applying Coordinate-Free Registration" href="coordinatefreereg.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +37,18 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="Plotting &amp; Analysis"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="coordinatefreereg.html" title="Applying Coordinate-Free Registration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="documentation.html" >CoCoTools&#8217;s documentation</a> &raquo;</li>
+          <li><a href="details.html" accesskey="U">Processing Pipeline in Detail</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,7 +59,14 @@
             
   <div class="section" id="post-processing">
 <h1>Post-Processing<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="detail-postproc"></span></div>
+<p id="detail-postproc">Currently there is only one post-processing step.</p>
+<div class="section" id="strip-absent-and-unknown-edges">
+<h2>Strip Absent and Unknown Edges<a class="headerlink" href="#strip-absent-and-unknown-edges" title="Permalink to this headline">¶</a></h2>
+<p>It is likely that many of the edges that result from translation will come back with labels of absent or unknown. Absent edges are returned when edges labelled as asbent in their original space are translated to the target space. An edge will be labelled as unknown when there is not sufficient information to infer whether a connection is present or absent. Both of these results are not errors, but are rather natural outcomes the registration process.
+However, most users will not want to keep these edges in their final endgraph.</p>
+<p>The function, coco.strip_absent_and_unknown_edges removes these from the endgraph.</p>
+</div>
+</div>
 
 
           </div>
@@ -53,6 +74,20 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Post-Processing</a><ul>
+<li><a class="reference internal" href="#strip-absent-and-unknown-edges">Strip Absent and Unknown Edges</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="coordinatefreereg.html"
+                        title="previous chapter">Applying Coordinate-Free Registration</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plotting.html"
+                        title="next chapter">Plotting &amp; Analysis</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/postprocessing.txt"
@@ -81,7 +116,18 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plotting.html" title="Plotting &amp; Analysis"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="coordinatefreereg.html" title="Applying Coordinate-Free Registration"
+             >previous</a> |</li>
+        <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li>
+          <li><a href="documentation.html" >CoCoTools&#8217;s documentation</a> &raquo;</li>
+          <li><a href="details.html" >Processing Pipeline in Detail</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

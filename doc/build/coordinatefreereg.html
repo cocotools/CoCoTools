@@ -38,6 +38,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="postprocessing.html" title="Post-Processing"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -56,10 +59,18 @@
             
   <div class="section" id="applying-coordinate-free-registration">
 <h1>Applying Coordinate-Free Registration<a class="headerlink" href="#applying-coordinate-free-registration" title="Permalink to this headline">¶</a></h1>
-<p id="detail-coordinate-free">Next, what is needed is to bring together or translate the connectivity statements (stored in congraph) in various different parcellation schemes into a single parcellation scheme.
-As the basis for this translation, we will need to use the logical spatial relationships that exist between regions in the various parcellation schemes (stored in congraph).
-Moreover, we will need to use an algorithm with formal transformation rules to apply the neccessary translations.</p>
-<p>In CoCoTools, we have implemented two algosss....</p>
+<p id="detail-coordinate-free">Next, what is needed is to bring together and translate the connectivity statements (stored in congraph) in various different parcellation schemes into a single parcellation scheme.
+As the basis for this translation, we will need to use the logical spatial relationships that exist between regions in the various parcellation schemes (stored in mapgraph).
+With this data, we will then apply an alogrithm that contains, at its core, a formal transformation logic that produces a transparent, unambiguous and as best as possible, accurate translations.</p>
+<p>In CoCoTools, we have implemented two <em>coordinate-free registration</em> algorithms that contain different transformation logic.</p>
+<ol class="arabic simple">
+<li>Objective Relaional Transformation (ORT): Proposed and described by Stephan, Kotter and colleagues through several articles and one book chapter,  our implementation integrates features in all of these different descriptions to provide what we found to be the most sensible and least error-prone algorithm.
+ORT uses the full set of Relation Codes (RC&#8217;s) in the mapgraph (see <a class="reference internal" href="cocomac.html#quick-cocomac"><em>CoComac in brief</em></a> for a desciptions of RC&#8217;s) in its transformation ruleset</li>
+<li>modified Objective Relation Transformation (mORT): ORT&#8217;s use of the full set of RC&#8217;s is based on the assumption that extent of staining = extent of connectivity. For this assumption to hold, both retrograde and anterograde tracer needs to be injected in each region per parcellation scheme to determine the origin and termination points. Unfortunately, CoCoMac does not cpature this information, and thus we can not logically justify using extent information.
+In mORT, only three labels for input connections are used: Present, Absent, and Unknown.
+This may seem to imply that mORT will generally label fewer connections in the target map as present compared to ORT, but this is not the case, as ORT oversteps not only in its assignments of connection presence, but also when affirming a connection?s absence (see the example with areas R and T above).</li>
+</ol>
+<p>In practice, we have found only small differences between the results of these approaches. mORT has the main advantages of being more conservative, faster and theoretically more accurate.</p>
 <div class="admonition important">
 <p class="first admonition-title">Important</p>
 <p class="last"><em>It is hard to appreciate the complexity of the problems that must be overcome by coordinate-free registration algorithms to obtain a meaniningful final connectivity graphs.
@@ -108,6 +119,9 @@ but most of all, we aim for our coordinate-free registrations methods to be easy
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="postprocessing.html" title="Post-Processing"
              >next</a> |</li>
