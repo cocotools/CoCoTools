@@ -121,6 +121,22 @@ However, most users will not want to keep these edges in their final endgraph.</
 </div>
 <div class="section" id="module-cocotools">
 <span id="doc-strings"></span><h2>Doc strings:<a class="headerlink" href="#module-cocotools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cocotools.strip_absent_and_unknown_edges">
+<tt class="descclassname">cocotools.</tt><tt class="descname">strip_absent_and_unknown_edges</tt><big>(</big><em>end</em><big>)</big><a class="headerlink" href="#cocotools.strip_absent_and_unknown_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return graph with known-absent edges removed.</p>
+<p>Do not modify the graph passed as input; return a new graph.</p>
+<dl class="docutils">
+<dt>end <span class="classifier-delimiter">:</span> <span class="classifier">EndGraph</span></dt>
+<dd>EndGraph after translated edges have been added.</dd>
+</dl>
+<dl class="docutils">
+<dt>g <span class="classifier-delimiter">:</span> <span class="classifier">NetworkX DiGraph</span></dt>
+<dd>Graph with those edges in EndGraph known to be present.  Edge
+attributes are not transferred to this graph.</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 

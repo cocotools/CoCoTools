@@ -12,7 +12,7 @@ Where possible in this synopsis, we avoid discussing the actual code or specific
 understanding of the *why* rather than the *how* of CoCoTools
 
 .. Important::
-    *For those unfamiliar with the CoCoMac database, you can familiarize yourself with the basics* :ref:`CoCoMac Primer <Quick CoComac>` 
+    *For those unfamiliar with the CoCoMac database, you can familiarize yourself with the basics in our* :ref:`CoCoMac Primer <Quick CoComac>` 
 
 Here are the 5 major steps in the CoCoTools processing pipeline
 

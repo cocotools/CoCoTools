@@ -15,13 +15,11 @@ wealth of CoCoMac data to create customized matrices (graphs) depicting the macr
 Contents:
 
 .. toctree::
-   :titlesonly: 
    :maxdepth: 1
 
+   install
    documentation
    examples
-   
-.. automodule:: cocotools
 
 
     

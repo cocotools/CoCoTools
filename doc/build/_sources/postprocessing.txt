@@ -24,8 +24,9 @@ Here is a quick example::
 Doc strings:
 -----------------------
 .. automodule:: cocotools
-.. autofunction: strip_absent_and_unknown_edges
-
+   :members:
+       strip_absent_and_unknown_edges
+       
 
 
 

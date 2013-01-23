@@ -172,7 +172,31 @@ but most of all, we aim for our coordinate-free registrations methods to be easy
 </div>
 <div class="section" id="module-cocotools">
 <span id="doc-strings"></span><h2>Doc strings<a class="headerlink" href="#module-cocotools" title="Permalink to this headline">¶</a></h2>
-<p>..autoclass: EndGraph</p>
+<dl class="class">
+<dt id="cocotools.EndGraph">
+<em class="property">class </em><tt class="descclassname">cocotools.</tt><tt class="descname">EndGraph</tt><big>(</big><em>data=None</em>, <em>**attr</em><big>)</big><a class="headerlink" href="#cocotools.EndGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass of the NetworkX DiGraph designed to hold post-ORT data.</p>
+<dl class="method">
+<dt id="cocotools.EndGraph.add_translated_edges">
+<tt class="descname">add_translated_edges</tt><big>(</big><em>mapp</em>, <em>conn</em>, <em>desired_map</em>, <em>method</em><big>)</big><a class="headerlink" href="#cocotools.EndGraph.add_translated_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate edges in conn to nomenclature of desired_bmap.</p>
+<p>Add all desired_map nodes in mapp to this graph.</p>
+<dl class="docutils">
+<dt>mapp <span class="classifier-delimiter">:</span> <span class="classifier">MapGraph</span></dt>
+<dd>Graph of spatial relationships between BrainSites from various
+BrainMaps.</dd>
+<dt>conn <span class="classifier-delimiter">:</span> <span class="classifier">ConGraph</span></dt>
+<dd>Graph of anatomical connections between BrainSites.</dd>
+<dt>desired_map <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Name of BrainMap to which translation will be performed.</dd>
+<dt>method <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>AT method to be used: &#8216;original&#8217; (that of Stephan &amp; Kotter)
+or &#8216;modified&#8217;</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 

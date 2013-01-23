@@ -50,6 +50,8 @@ Pre-Processing is performed in three steps in CoCoTools
            However this step is essential; adding a huge number of unstated mapping relationships (numbering in the hundreds of thousands).
            Without these deduced relationships, many translations would be impossible.
 
+           
+
 Example
 ---------
 Here is a quick example of the cocotools commands needed for pre-processing::
@@ -62,12 +64,6 @@ Here is a quick example of the cocotools commands needed for pre-processing::
 Doc strings
 --------------
 .. automodule:: cocotools
-.. autoclass:: MapGraph
-.. autofunction:: clean_data
 
-
-.. autofunction:: cocotools.MapGraph.clean_data
-
-.. autofunction:: MapGraph.keep_only_one_level_of_resolution
-
-.. autofunction:: MapGraph.deduce_edges
+    .. autoclass:: MapGraph
+       :members: clean_data, keep_only_one_level_of_resolution, deduce_edges

@@ -227,6 +227,38 @@ enables, after all possible deductions have been made, automatic
 identification and removal of relationships that cannot be true due to
 their implication (in combination with other known relationships) of
 spatial overlap between regions in the same map.</p>
+<dl class="method">
+<dt id="cocotools.MapGraph.clean_data">
+<tt class="descname">clean_data</tt><big>(</big><big>)</big><a class="headerlink" href="#cocotools.MapGraph.clean_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove errors and add missing data.</p>
+<p>See comments for more information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cocotools.MapGraph.keep_only_one_level_of_resolution">
+<tt class="descname">keep_only_one_level_of_resolution</tt><big>(</big><em>cong</em>, <em>target_map</em><big>)</big><a class="headerlink" href="#cocotools.MapGraph.keep_only_one_level_of_resolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine each map&#8217;s hierarchy and keep only one level.</p>
+<dl class="docutils">
+<dt>cong <span class="classifier-delimiter">:</span> <span class="classifier">ConGraph instance</span></dt>
+<dd>Associated Connectivity data.</dd>
+<dt>target_map <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Name of BrainMap to which translation will be performed.</dd>
+</dl>
+<dl class="docutils">
+<dt>cong <span class="classifier-delimiter">:</span> <span class="classifier">ConGraph instance</span></dt>
+<dd>Updated Connectivity data.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cocotools.MapGraph.deduce_edges">
+<tt class="descname">deduce_edges</tt><big>(</big><big>)</big><a class="headerlink" href="#cocotools.MapGraph.deduce_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deduce new edges based on those in the graph and add them.</p>
+<p>Intra-map edges are disallowed.  It is assumed that all regions
+in the graph from the same BrainMap are disjoint (i.e., at the same
+level of resolution).</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

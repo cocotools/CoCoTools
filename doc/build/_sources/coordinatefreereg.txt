@@ -72,9 +72,12 @@ References
 Doc strings
 -----------------
 .. automodule:: cocotools
-.. autofunction:: endg.add_translated_edges
 
-..autoclass: EndGraph
+    .. autoclass:: EndGraph
+       :members:
+           add_translated_edges
+
+
 
 
 
