@@ -22,8 +22,8 @@ We have designed the **CoCoTools** project as a software library allow users of 
     
     2. *To not re-invent the wheel:*
 
-        * integrates with and borrows functionality from Python standard library allowing users to perform a multitude of functions from well maintained sources
-        * depends on NumPy, matplotlib and NetworkX
+        * integrates with and borrows functionality from Python standard library allowing users to perform a multitude of functions from well maintained sources (NumPy, matplotlib, etc.)
+        * We utilize the `NetworkX <http://networkx.github.com/>`_ software library which provides CoCoTools with an extensive suite of graph theory tools and functions.
 
 
     

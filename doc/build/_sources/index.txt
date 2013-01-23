@@ -8,10 +8,9 @@ Welcome to CoCoTools!
 =====================================
 
 
-**CoCoTools** is a library that provides utilities for users to gather, process and register
-macaque neuroanatomical data stored on the **CoCoTools** database.
+**CoCoTools** is a library that provides utilities for working with the data stored on the CoCoMac macaque neuroanatomical data stored on the **CoCoTools** database.
 Using only high-level commands, users of **CoCoTools** can query, process and register the
-wealth of CoCoMac data to create customized matrices (graphs) depicting the macro-connections of the macaque brain
+wealth of CoCoMac data to create customized matrices (graphs) depicting the macro-connections of the macaque brain.
 
 Contents:
 

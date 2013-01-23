@@ -8,7 +8,10 @@ Do you need to Pre-Process?
 For users just interested in interrogating query results from a specific study or set of studies, the MapGraph and ConGraphs derived from querying is all that you may need.
 
 However, most most users' ultimate goal with CoCoTools will be to agregate connectivity results from several studies into a single connectivity matrix.
-In this case, users will need to *pre-processes* this data so coordinate-free registration can be applied efficably.
+In this case, the mapping and connectivity data that was gathered during the query step, will serve as input to CoCoTools' coordinate-free registration machinery.
+
+For the best registration outcomes, users will need to *pre-process* this mapping and connectivity input data.
+
 
 Pre-Processing Steps
 -----------------------
@@ -40,7 +43,12 @@ Pre-Processing is performed in three steps in CoCoTools
 
         .. function:: deduce_edges(mapgraph)
         
-       Chains of relationships can be reduced to single RCs with variable levels of ambiguity, but in CoCoTools we allow new relationships to be added to the graph only in unambiguous cases. When different chains imply a relationship between the same two areas, we keep the RC implied by the chain with the fewest areas  .
+       Chains of relationships can be reduced to single RCs with variable levels of ambiguity, but in CoCoTools we allow new relationships to be added to the graph only in unambiguous cases. When different chains imply a relationship between the same two areas, we keep the RC implied by the chain with the fewest areas.
+
+       Important::
+           The **deduce_edges** step can take a very long time to run. With the entire CoCoMac corpus, it can take **days** to run on standard laptop computers (as of 2012).   Floyd’s algorithm requires approximately N\ :sup:`3` computations, with N being the number of nodes.
+           However this step is essential; adding a huge number of unstated mapping relationships (numbering in the hundreds of thousands).
+           Without these deduced relationships, many translations would be impossible.
 
 Example
 ---------
@@ -53,9 +61,13 @@ Here is a quick example of the cocotools commands needed for pre-processing::
 
 Doc strings
 --------------
-.. automodule:: cocotools as coco
-.. autofunction:: coco.mapg.clean_data
+.. automodule:: cocotools
+.. autoclass:: MapGraph
+.. autofunction:: clean_data
 
-.. autofunction:: coco.mapg.keep_only_one_level_of_resolution
 
-.. autofunction:: coco.mapg.deduce_edges
+.. autofunction:: cocotools.MapGraph.clean_data
+
+.. autofunction:: MapGraph.keep_only_one_level_of_resolution
+
+.. autofunction:: MapGraph.deduce_edges

@@ -11,8 +11,8 @@ Below we will give a quick synopsis of the major processes that are implemented 
 Where possible in this synopsis, we avoid discussing the actual code or specific functions to help provide a clearer
 understanding of the *why* rather than the *how* of CoCoTools
 
-.. Note::
-*For those unfamiliar with the CoCoMac database, you can familiarize yourself with the basics here: :ref:`CoCoMac Primer <Quick CoComac>`* .
+.. Important::
+    *For those unfamiliar with the CoCoMac database, you can familiarize yourself with the basics* :ref:`CoCoMac Primer <Quick CoComac>` 
 
 Here are the 5 major steps in the CoCoTools processing pipeline
 
@@ -30,7 +30,7 @@ To learn more about Querying click :ref:`here <Detail Querying>`
 ------------------------------------
 
     * If you are using CoCoTools to make a connectivity matrix that agregates results across studies, then you will need to *pre-process* the query results to prepare it for *coordinate-free registration*. Pre-processing consists of 3 steps.
-    * After pre-processing is performed you will have connectivity and mapping data that is ready to integrated for registration.
+    * After pre-processing is performed you will have connectivity and mapping data that is ready to be integrated for registration.
       Most notably, the final pre-processing step in which you deduce new mapping data, will net you a much larger set of mapping data to work with.
     
 To learn more about Pre-Processing click :ref:`here <Detail PreProc>`
@@ -38,9 +38,10 @@ To learn more about Pre-Processing click :ref:`here <Detail PreProc>`
 3. Applying Coordinate-Free Registration
 -----------------------------------------
  
-    * Combining connectivity data from different brain regions and from differemt parcellation schemes to form large scale descriptions of the macaque cortex without the aid of spatial coordinates presents a significant challenge that require sound theory and computational solutions.
-      CoCoTools offers two slightly different methods (algorithms) for tackling this problem. First we implemented a version of the Stephan, Kotter and colleagues Objective Relational Transformation (ORT) algorithm that integrates key features that have been described across several papers [1]_ [2]_ [3]_ [4]_. The second approach is a slight modification of ORT (mORT), that uses a  more conservative transformation logic.      
-    * Both of these approaches can be alternatively performed quite simply using a single command-line function. You just need to specify which approach to use and what parcellation scheme you want the data to be translated to. You also need to pass it the pre-processed connectivity and mapping data.
+    * Combining connectivity data from different brain regions and from differemt parcellation schemes to form large scale descriptions of the macaque cortex without the aid of spatial coordinates is a difficult problem that requires sound theory and computational solutions.
+    * Coordinate-free registration methods have been described in the literature but (until CoCoTools) have not been made openly available.
+    * CoCoTools offers two slightly different methods (algorithms) for tackling this problem. First we implemented a version of the Stephan, Kotter and colleagues Objective Relational Transformation (ORT) algorithm that integrates key features that have been described across several papers [1]_ [2]_ [3]_ [4]_. The second approach is a slight modification of ORT (mORT), that uses a  more conservative transformation logic.      
+    * Both of these approaches can be alternatively performed quite simply using a single command-line function. You just need to pass this function the pre-processed mapping and connectivity, specify what parcellation scheme you want the data to be translated to and which approach to use.
     * After coordinate-free transformation is applied, you will have a connectivity matrix in the parcellarion scheme of your choosing with connections culled from all of the connectivity data you supplied.
     
 To learn more about Coordinate-Free Registration click :ref:`here <Detail Coordinate Free>`
@@ -57,7 +58,7 @@ To learn more about Post-Processing  click :ref:`here <Detail PostProc>`
 ------------------------------------
 
     * We offer some functionality for basic plots
-    * CoCoTools integrates with NetworkX which is designed for analyzing grpah data.
+    * CoCoTools integrates with NetworkX which is designed for analyzing graph data.
 
 To learn more about Plotting and Analysis click :ref:`here <Detail Plotting>`
 

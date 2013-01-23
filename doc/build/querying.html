@@ -10,7 +10,7 @@
     
     <title>Querying &mdash; CoCoTools 0.0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -50,7 +50,51 @@
           <li><a href="documentation.html" >CoCoTools&#8217;s documentation</a> &raquo;</li>
           <li><a href="details.html" accesskey="U">Processing Pipeline in Detail</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Querying</a><ul>
+<li><a class="reference internal" href="#querying-the-hard-way">Querying the <em>hard</em> way</a></li>
+<li><a class="reference internal" href="#querying-the-easy-way-using-cocotools">Querying the <em>easy</em> way using CoCoTools</a></li>
+<li><a class="reference internal" href="#search-type">Search type</a></li>
+<li><a class="reference internal" href="#subset">Subset</a></li>
+<li><a class="reference internal" href="#query-map-by-area">Query map by area</a></li>
+<li><a class="reference internal" href="#ebunch-format">ebunch format</a></li>
+<li><a class="reference internal" href="#mapgraphs-and-congraphs-cocotool-directed-graph-container-variables">mapgraphs and congraphs: CoCoTool directed graph container variables</a></li>
+<li><a class="reference internal" href="#local-cache">local cache</a></li>
+<li><a class="reference internal" href="#module-cocotools">Doc strings</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="details.html"
+                        title="previous chapter">Processing Pipeline in Detail</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="preprocessing.html"
+                        title="next chapter">Pre-Processing Query Results</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/querying.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -59,11 +103,17 @@
             
   <div class="section" id="querying">
 <h1>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h1>
-<p id="detail-querying">To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
+<p id="detail-querying">Here is where you can learn about how to query the CoCoMac database using CoCoTools</p>
+<div class="section" id="querying-the-hard-way">
+<h2>Querying the <em>hard</em> way<a class="headerlink" href="#querying-the-hard-way" title="Permalink to this headline">¶</a></h2>
+<p>To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
 However, this method will be a bit cumbersome for most users.
 Alternatively, you can pass customized SQL (structured query language) queries directly to the server (which is an excellent feature of the cocomac server!) and it will return query results in XML.
 This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.</p>
-<p>CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function:</p>
+</div>
+<div class="section" id="querying-the-easy-way-using-cocotools">
+<h2>Querying the <em>easy</em> way using CoCoTools<a class="headerlink" href="#querying-the-easy-way-using-cocotools" title="Permalink to this headline">¶</a></h2>
+<p>CoCoTools makes performing custom CoCoMac queries simple. To query the CoCoMac server using CoCoTools users need only to use the function:</p>
 <dl class="function">
 <dt id="coco.multi_map_ebunch">
 <tt class="descclassname">coco.</tt><tt class="descname">multi_map_ebunch</tt><big>(</big><em>search_type</em>, <em>subset=False</em><big>)</big><a class="headerlink" href="#coco.multi_map_ebunch" title="Permalink to this definition">¶</a></dt>
@@ -78,6 +128,7 @@ This is by far a preferrable method, but does require knowledge of SQL and XML a
 <li>populates a special container object, a multi-map ebunch, with query results</li>
 </ul>
 </div></blockquote>
+</div>
 <div class="section" id="search-type">
 <h2>Search type<a class="headerlink" href="#search-type" title="Permalink to this headline">¶</a></h2>
 <p>Mapping and Connectivity queries need to be performed seperately.</p>
@@ -130,7 +181,7 @@ This is done using the</p>
 <div class="section" id="ebunch-format">
 <h2>ebunch format<a class="headerlink" href="#ebunch-format" title="Permalink to this headline">¶</a></h2>
 <p>You dont need to know much about the ebunch format. We borrowed it from NetworkX. It holds edges as tuples.
-It is a handy format for holding query results, but that is all this good for.</p>
+It is a handy format for holding query results, but for CoCoTools, that is all this good for.</p>
 <p>In fact, the first thing you want to do after your query is returned is to place the output into
 one of two special networkx directed graph (digraph) objects</p>
 </div>
@@ -151,6 +202,14 @@ one of two special networkx directed graph (digraph) objects</p>
 <p>the same can be done for the connectivity data:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">cong</span><span class="o">=</span><span class="n">coco</span><span class="o">.</span><span class="n">ConGraph</span><span class="p">()</span>
 <span class="n">cong</span><span class="o">=</span><span class="n">cong</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">con_bunch</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="local-cache">
+<h2>local cache<a class="headerlink" href="#local-cache" title="Permalink to this headline">¶</a></h2>
+<p>By default CoCoTools creates 2 sqlite caches in ~/.cache directory:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cocotools</span><span class="o">.</span><span class="n">sqlite</span>
+<span class="n">cocotools_area</span><span class="o">.</span><span class="n">sqlite</span>
 </pre></div>
 </div>
 </div>
@@ -285,47 +344,6 @@ description codes (PDCs), and degree.</p>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Querying</a><ul>
-<li><a class="reference internal" href="#search-type">Search type</a></li>
-<li><a class="reference internal" href="#subset">Subset</a></li>
-<li><a class="reference internal" href="#query-map-by-area">Query map by area</a></li>
-<li><a class="reference internal" href="#ebunch-format">ebunch format</a></li>
-<li><a class="reference internal" href="#mapgraphs-and-congraphs-cocotool-directed-graph-container-variables">mapgraphs and congraphs: CoCoTool directed graph container variables</a></li>
-<li><a class="reference internal" href="#module-cocotools">Doc strings</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="details.html"
-                        title="previous chapter">Processing Pipeline in Detail</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="preprocessing.html"
-                        title="next chapter">Pre-Processing Query Results</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/querying.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>

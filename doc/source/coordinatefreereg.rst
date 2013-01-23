@@ -10,16 +10,29 @@ With this data, we will then apply an alogrithm that contains, at its core, a fo
  
 In CoCoTools, we have implemented two *coordinate-free registration* algorithms that contain different transformation logic.
 
-1) Objective Relaional Transformation (ORT): Proposed and described by Stephan, Kotter and colleagues through several articles and one book chapter,  our implementation integrates features in all of these different descriptions to provide what we found to be the most sensible and least error-prone algorithm.
-   ORT uses the full set of Relation Codes (RC's) in the mapgraph (see :ref:`CoComac in brief <Quick CoCoMac>` for a desciptions of RC's) in its transformation ruleset
+1) **Objective Relaional Transformation (ORT)** : Proposed and described by Stephan, Kotter and colleagues through several articles and one book chapter. Our implementation integrates features in all of these different descriptions to provide what we found to be the most sensible and least error-prone algorithm. It is important to note that:
+    
+        * We follow most closely the description of Stephan and Kotter (1998) [1]_ for assembling the set of mapping relations and connectivity statement needed to determine the cortical space shared by regions in different parcellation schemes.
+        * Unlike prior descriptions, we allow the "U" extension code to be used as input into ORT. We assign "U" to unstudied connections. This allows CoCoTools to handle situations when information from some regions is absent from CoCoMac.
+        * ORT uses the full set of Relation Codes (RC's) in the mapgraph in its transformation ruleset.
 
+2) **modified Objective Relation Transformation (mORT)** : We designed this method because we realized that ORT has some problems in theory
 
-2) modified Objective Relation Transformation (mORT): ORT's use of the full set of RC's is based on the assumption that extent of staining = extent of connectivity. For this assumption to hold, both retrograde and anterograde tracer needs to be injected in each region per parcellation scheme to determine the origin and termination points. Unfortunately, CoCoMac does not cpature this information, and thus we can not logically justify using extent information.
+        * ORT's use of the full set of RC's is based on the assumption that extent of staining = extent of connectivity.
+        * For this assumption to hold, both retrograde and anterograde tracer needs to be injected in each region per parcellation scheme to determine the origin and termination points.
+        * Unfortunately, CoCoMac does not cpature this information, and thus we can not logically justify using extent information.
+        
    In mORT, only three labels for input connections are used: Present, Absent, and Unknown. 
    This may seem to imply that mORT will generally label fewer connections in the target map as present compared to ORT, but this is not the case, as ORT oversteps not only in its assignments of connection presence, but also when affirming a connection’s absence (see the example with areas R and T above).
 
 
-In practice, we have found only small differences between the results of these approaches. mORT has the main advantages of being more conservative, faster and theoretically more accurate.
+.. Note::
+    In practice, we have found only small differences between the results of these approaches. mORT has the main advantages of being more conservative, faster and theoretically more accurate.
+
+.. Important::
+    Our methods paper describes ORT and mORT in much more detail PUT REF HERE. To review the basics of CoCoMac see :ref:`CoComac in brief <Quick CoCoMac>` .
+
+
 
 Coordinate-Free Registration steps
 ---------------------------------------------------------
@@ -50,6 +63,11 @@ Here is a quick example::
     In CoCoTools, we do not claim that the algorithms that we provide will converge on the "ground truth", but rather we aim for our methods to be clearly defined and transparent,
     but most of all, we aim for our coordinate-free registrations methods to be easy-to-use and produce sensible results given the complexity of the data.*
 
+------------------------
+References
+-------------------------
+.. [1] Stephan, K. E., & Kötter, R. (1998). A formal approach to the translation of cortical maps. In Neural Circuits and Networks (pp. 205–226). Berlin: Springer.
+
 
 Doc strings
 -----------------
@@ -57,3 +75,6 @@ Doc strings
 .. autofunction:: endg.add_translated_edges
 
 ..autoclass: EndGraph
+
+
+

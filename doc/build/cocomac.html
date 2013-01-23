@@ -10,7 +10,7 @@
     
     <title>Quick Introduction to CoCoMac &mdash; CoCoTools 0.0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="CoCoTools 0.0.1 documentation" href="index.html" />
     <link rel="up" title="CoCoTools’s documentation" href="documentation.html" />
-    <link rel="next" title="CoCoTools Objects" href="objects.html" />
+    <link rel="next" title="Processing Pipeline in Detail" href="details.html" />
     <link rel="prev" title="Overall Design Logic &amp; Processing Stream" href="design.html" /> 
   </head>
   <body>
@@ -38,7 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="objects.html" title="CoCoTools Objects"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="details.html" title="Processing Pipeline in Detail"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="design.html" title="Overall Design Logic &amp; Processing Stream"
@@ -46,91 +49,20 @@
         <li><a href="index.html">CoCoTools 0.0.1 documentation</a> &raquo;</li>
           <li><a href="documentation.html" accesskey="U">CoCoTools&#8217;s documentation</a> &raquo;</li> 
       </ul>
-    </div>  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body">
-            
-  <div class="section" id="quick-introduction-to-cocomac">
-<h1>Quick Introduction to CoCoMac<a class="headerlink" href="#quick-introduction-to-cocomac" title="Permalink to this headline">¶</a></h1>
-<p id="quick-cocomac">The CoCoMac (Collation of Connectivity on the Macaque Brain) database (K?tter, 2004; Stephan et al., 2001)
-is the largest repository of macaque anatomical data, housing results from over 400 original
-reports spanning 100 years of research. This data supplies more than 200
-different mapping schemes and 30,000 anatomical connections.</p>
-<p>CoCoMac data fall into two categories:</p>
-<ol class="arabic simple">
-<li>stated spatial relationships between brain regions (mapping statements).</li>
-<li>stated presence or absence of connections between brain regions (connectivity statements).</li>
-</ol>
-<div class="section" id="annotation">
-<h2>annotation<a class="headerlink" href="#annotation" title="Permalink to this headline">¶</a></h2>
-<p>Each brain region in CoCoMac is tied to a specific study and coded by a unique acronym that includes the last initials of the authors, the last two digits of the year of publication, and the name of the region.</p>
-<dl class="docutils">
-<dt>Examples:</dt>
-<dd><ul class="first last simple">
-<li>Brodmann&#8217;s (1905) Area 9 is coded as ?B05-9?</li>
-<li>Petrides and Pandya?s (1994) Area 46 is coded as PP94-46</li>
-</ul>
-</dd>
-</dl>
-</div>
-<div class="section" id="mapping-statements">
-<h2>mapping statements<a class="headerlink" href="#mapping-statements" title="Permalink to this headline">¶</a></h2>
-<p>Mapping statements describe the spatial relationship between two regions
-Each one is assigned a relation code (RC), which takes one of four values</p>
-<ul class="simple">
-<li><em>I</em>: the regions are identical</li>
-<li><em>L</em>: the first region is larger than and fully contains the second</li>
-<li><em>S</em>: the first region is smaller than and is fully contained by the second</li>
-<li><em>O</em>: the two regions overlap partially.</li>
-</ul>
-</div>
-<div class="section" id="connectivity-statements">
-<h2>connectivity statements<a class="headerlink" href="#connectivity-statements" title="Permalink to this headline">¶</a></h2>
-<p>Connectivity statements describe the extent of staining in two regions
-that resulted from injecting tracer in one of them.
-These data are captured in extension codes (ECs), for which there are four possible values</p>
-<ul class="simple">
-<li><em>C</em>: staining covered the region completely</li>
-<li><em>P</em>: staining covered only part of the region</li>
-<li><em>X</em>: staining exists in the region, but with unknown extent.</li>
-<li><em>N</em>: staining covered no part of the region.</li>
-<li><em>U</em>: whether staining covered the region is unknown.</li>
-</ul>
-<p>Connectivity statements are expressed as an ordered pair of ECs,
-one for the source region and one for the target.
-CoCoMac does not report whether anterograde or retrograde tracer was used to test for each connection,
-so although the direction of connectivity is specified, which region was injected is not.</p>
-</div>
-<div class="section" id="precision-description-codes-pdcs">
-<h2>Precision Description Codes (PDCs)<a class="headerlink" href="#precision-description-codes-pdcs" title="Permalink to this headline">¶</a></h2>
-<p>Along with RCs and ECs, CoCoMac stores precision of description codes (PDCs), which indicate the level of detail provided in the original paper. CoCoMac also reports connectivity strength for the subset of studies that collected it (e.g. Walker, 1940)(e.g. Walker, 1940). For further explanation of the codes in CoCoMac, readers are encouraged to review the introduction in (Stephan et al., 2001)Stephan et al. (2001).</p>
-</div>
-<div class="section" id="cocomac-1-0-database">
-<h2>CoCoMac 1.0 database<a class="headerlink" href="#cocomac-1-0-database" title="Permalink to this headline">¶</a></h2>
-<p>The CoCoMac 1.0 database, hosted at <a class="reference external" href="http://cocomac.org">http://cocomac.org</a>,
-provides little support for automated download of statements from many maps at once
-Such download requires knowledge of XML and the initially returned data must
-be reorganized into a format suitable for analysis, and the server is prone to failure.</p>
-</div>
-</div>
-
-
-          </div>
-        </div>
-      </div>
+    </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Quick Introduction to CoCoMac</a><ul>
-<li><a class="reference internal" href="#annotation">annotation</a></li>
-<li><a class="reference internal" href="#mapping-statements">mapping statements</a></li>
-<li><a class="reference internal" href="#connectivity-statements">connectivity statements</a></li>
+<li><a class="reference internal" href="#annotation">Annotation</a></li>
+<li><a class="reference internal" href="#mapping-statements">Mapping statements</a></li>
+<li><a class="reference internal" href="#connectivity-statements">Connectivity statements</a></li>
 <li><a class="reference internal" href="#precision-description-codes-pdcs">Precision Description Codes (PDCs)</a></li>
+<li><a class="reference internal" href="#connection-strength">Connection Strength</a></li>
 <li><a class="reference internal" href="#cocomac-1-0-database">CoCoMac 1.0 database</a></li>
+<li><a class="reference internal" href="#cocomac-2-0-database">CoCoMac 2.0 database</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>
@@ -139,8 +71,8 @@ be reorganized into a format suitable for analysis, and the server is prone to f
   <p class="topless"><a href="design.html"
                         title="previous chapter">Overall Design Logic &amp; Processing Stream</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="objects.html"
-                        title="next chapter">CoCoTools Objects</a></p>
+  <p class="topless"><a href="details.html"
+                        title="next chapter">Processing Pipeline in Detail</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/cocomac.txt"
@@ -161,6 +93,107 @@ be reorganized into a format suitable for analysis, and the server is prone to f
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-introduction-to-cocomac">
+<h1>Quick Introduction to CoCoMac<a class="headerlink" href="#quick-introduction-to-cocomac" title="Permalink to this headline">¶</a></h1>
+<p id="quick-cocomac">The CoCoMac (Collation of Connectivity on the Macaque Brain) database (K?tter, 2004, Stephan et al., 2001) <a class="footnote-reference" href="#id3" id="id1">[1]</a> <a class="footnote-reference" href="#id4" id="id2">[2]</a>
+is the largest repository of macaque anatomical data, housing results from over 400 original
+reports spanning 100 years of research. This data supplies more than 200
+different mapping schemes and 30,000 anatomical connections.</p>
+<p>CoCoMac data fall into two categories:</p>
+<ol class="arabic simple">
+<li>stated spatial relationships between brain regions (mapping statements).</li>
+<li>stated presence or absence of connections between brain regions (connectivity statements).</li>
+</ol>
+<div class="section" id="annotation">
+<h2>Annotation<a class="headerlink" href="#annotation" title="Permalink to this headline">¶</a></h2>
+<p>Each brain region in CoCoMac is tied to a specific study and coded by a unique acronym that includes the last initials of the authors, the last two digits of the year of publication, and the name of the region.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><ul class="first last simple">
+<li>Brodmann&#8217;s (1905) Area 9 is coded as B05-9</li>
+<li>Petrides and Pandya?s (1994) Area 46 is coded as PP94-46</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="mapping-statements">
+<h2>Mapping statements<a class="headerlink" href="#mapping-statements" title="Permalink to this headline">¶</a></h2>
+<p>Mapping statements describe the spatial relationship between two regions
+Each one is assigned a relation code (RC), which takes one of four values</p>
+<ul class="simple">
+<li><em>I</em>: the regions are identical</li>
+<li><em>L</em>: the first region is larger than and fully contains the second</li>
+<li><em>S</em>: the first region is smaller than and is fully contained by the second</li>
+<li><em>O</em>: the two regions overlap partially.</li>
+</ul>
+</div>
+<div class="section" id="connectivity-statements">
+<h2>Connectivity statements<a class="headerlink" href="#connectivity-statements" title="Permalink to this headline">¶</a></h2>
+<p>Connectivity statements describe the extent of staining in two regions
+that resulted from injecting tracer in one of them.
+These data are captured in extension codes (ECs), for which there are four possible values</p>
+<ul class="simple">
+<li><em>C</em>: staining covered the region completely</li>
+<li><em>P</em>: staining covered only part of the region</li>
+<li><em>X</em>: staining exists in the region, but with unknown extent.</li>
+<li><em>N</em>: staining covered no part of the region.</li>
+<li><em>U</em>: whether staining covered the region is unknown.</li>
+</ul>
+<p>Connectivity statements are expressed as an ordered pair of ECs,
+one for the source region and one for the target.
+CoCoMac does not report whether anterograde or retrograde tracer was used to test for each connection,
+so although the direction of connectivity is specified, which region was injected is not.</p>
+</div>
+<div class="section" id="precision-description-codes-pdcs">
+<h2>Precision Description Codes (PDCs)<a class="headerlink" href="#precision-description-codes-pdcs" title="Permalink to this headline">¶</a></h2>
+<p>Along with RCs and ECs, CoCoMac stores precision of description codes (PDCs), which indicate the level of detail provided in the original paper.</p>
+</div>
+<div class="section" id="connection-strength">
+<h2>Connection Strength<a class="headerlink" href="#connection-strength" title="Permalink to this headline">¶</a></h2>
+<p>CoCoMac also reports connectivity strength for the subset of studies that collected it (e.g. Walker, 1940).</p>
+<dl class="docutils">
+<dt>Important::</dt>
+<dd>For further explanation of the codes in CoCoMac, readers are encouraged to review the introduction in (Stephan et al., 2001).</dd>
+</dl>
+</div>
+<div class="section" id="cocomac-1-0-database">
+<h2>CoCoMac 1.0 database<a class="headerlink" href="#cocomac-1-0-database" title="Permalink to this headline">¶</a></h2>
+<p>The CoCoMac 1.0 database, hosted at <a class="reference external" href="http://cocomac.org">http://cocomac.org</a> ,
+provides little support for automated download of statements from many maps at once
+Such download requires knowledge of XML and the initially returned data must
+be reorganized into a format suitable for analysis, and the server is prone to failure.</p>
+</div>
+<div class="section" id="cocomac-2-0-database">
+<h2>CoCoMac 2.0 database<a class="headerlink" href="#cocomac-2-0-database" title="Permalink to this headline">¶</a></h2>
+<p>Is being developed at <a class="reference external" href="http://cocomac.g-node.org/drupal/?">http://cocomac.g-node.org/drupal/?</a></p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>K?tter, R. (2004). Online retrieval, processing, and visualization of primate connectivity data from the CoCoMac database. Neuroinformatics, 2(2), 127?144.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Stephan, K. E., Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P., &amp; K?tter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac). Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences, 356(1412), 1159?1186.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -170,7 +203,10 @@ be reorganized into a format suitable for analysis, and the server is prone to f
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="objects.html" title="CoCoTools Objects"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="details.html" title="Processing Pipeline in Detail"
              >next</a> |</li>
         <li class="right" >
           <a href="design.html" title="Overall Design Logic &amp; Processing Stream"

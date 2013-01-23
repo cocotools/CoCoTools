@@ -3,7 +3,7 @@ Quick Introduction to CoCoMac
 =============================
 .. _Quick CoComac:
     
-The CoCoMac (Collation of Connectivity on the Macaque Brain) database (Kötter, 2004; Stephan et al., 2001)
+The CoCoMac (Collation of Connectivity on the Macaque Brain) database (Kötter, 2004, Stephan et al., 2001) [1]_ [2]_
 is the largest repository of macaque anatomical data, housing results from over 400 original
 reports spanning 100 years of research. This data supplies more than 200
 different mapping schemes and 30,000 anatomical connections.
@@ -14,18 +14,18 @@ CoCoMac data fall into two categories:
 2. stated presence or absence of connections between brain regions (connectivity statements).
 
 ----------
-annotation
+Annotation
 ----------
 
 Each brain region in CoCoMac is tied to a specific study and coded by a unique acronym that includes the last initials of the authors, the last two digits of the year of publication, and the name of the region.
 
 Examples:
-    * Brodmann's (1905) Area 9 is coded as ’B05-9’
+    * Brodmann's (1905) Area 9 is coded as B05-9
     * Petrides and Pandya’s (1994) Area 46 is coded as PP94-46
 
 
 ------------------
-mapping statements
+Mapping statements
 ------------------
 Mapping statements describe the spatial relationship between two regions
 Each one is assigned a relation code (RC), which takes one of four values
@@ -38,7 +38,7 @@ Each one is assigned a relation code (RC), which takes one of four values
 
 
 -----------------------
-connectivity statements
+Connectivity statements
 -----------------------
 Connectivity statements describe the extent of staining in two regions
 that resulted from injecting tracer in one of them.
@@ -59,12 +59,36 @@ so although the direction of connectivity is specified, which region was injecte
 ----------------------------------
 Precision Description Codes (PDCs)
 ----------------------------------
-Along with RCs and ECs, CoCoMac stores precision of description codes (PDCs), which indicate the level of detail provided in the original paper. CoCoMac also reports connectivity strength for the subset of studies that collected it (e.g. Walker, 1940)(e.g. Walker, 1940). For further explanation of the codes in CoCoMac, readers are encouraged to review the introduction in (Stephan et al., 2001)Stephan et al. (2001).
+Along with RCs and ECs, CoCoMac stores precision of description codes (PDCs), which indicate the level of detail provided in the original paper.
+
+-----------------------------------
+Connection Strength
+-----------------------------------
+CoCoMac also reports connectivity strength for the subset of studies that collected it (e.g. Walker, 1940).
+
+
+Important::
+    For further explanation of the codes in CoCoMac, readers are encouraged to review the introduction in (Stephan et al., 2001).
+    
 
 -----------------------
 CoCoMac 1.0 database
 -----------------------
-The CoCoMac 1.0 database, hosted at http://cocomac.org,
+The CoCoMac 1.0 database, hosted at `http://cocomac.org <http://cocomac.org>`_ ,
 provides little support for automated download of statements from many maps at once
 Such download requires knowledge of XML and the initially returned data must
 be reorganized into a format suitable for analysis, and the server is prone to failure.
+
+
+----------------------
+CoCoMac 2.0 database
+----------------------
+Is being developed at `http://cocomac.g-node.org/drupal/? <http://cocomac.g-node.org/drupal/?>`_ 
+
+
+---------------
+References
+---------------
+.. [1] Kötter, R. (2004). Online retrieval, processing, and visualization of primate connectivity data from the CoCoMac database. Neuroinformatics, 2(2), 127–144.
+.. [2] Stephan, K. E., Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P., & Kötter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac). Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences, 356(1412), 1159–1186.
+  

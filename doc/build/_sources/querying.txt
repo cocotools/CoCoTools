@@ -3,12 +3,18 @@ Querying
 ==================
 .. _Detail Querying:
 
+Here is where you can learn about how to query the CoCoMac database using CoCoTools
+
+Querying the *hard* way
+------------------------
 To get data from the CoCoMac database, you could browse the website, click through the dropdown boxes to get the desired data table and copy paste.
 However, this method will be a bit cumbersome for most users.
 Alternatively, you can pass customized SQL (structured query language) queries directly to the server (which is an excellent feature of the cocomac server!) and it will return query results in XML.
 This is by far a preferrable method, but does require knowledge of SQL and XML and then you have to deal with putting the results into some sort of container variable that will be amenable for further processing.
 
-CoCoTools simplifies this step considerably for the user. To query the CoCoMac server using CoCoTools users need only to use the function:
+Querying the *easy* way using CoCoTools
+----------------------------------------
+CoCoTools makes performing custom CoCoMac queries simple. To query the CoCoMac server using CoCoTools users need only to use the function:
     
 .. function:: coco.multi_map_ebunch(search_type, subset=False)
         
@@ -60,7 +66,7 @@ thus, where we querying the *non-timeout* studies using **multi_map_ebunch**, no
 ebunch format
 ----------------------
 You dont need to know much about the ebunch format. We borrowed it from NetworkX. It holds edges as tuples.
-It is a handy format for holding query results, but that is all this good for.
+It is a handy format for holding query results, but for CoCoTools, that is all this good for.
 
 In fact, the first thing you want to do after your query is returned is to place the output into
 one of two special networkx directed graph (digraph) objects
@@ -83,6 +89,14 @@ the same can be done for the connectivity data::
     
    cong=coco.ConGraph()
    cong=cong.add_edges_from(con_bunch)
+
+local cache
+-----------------
+By default CoCoTools creates 2 sqlite caches in ~/.cache directory::
+
+    cocotools.sqlite
+    cocotools_area.sqlite
+
 
 Doc strings
 ----------------
