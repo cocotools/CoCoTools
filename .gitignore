@@ -2,4 +2,4 @@
 *.pyc
 .coverage
 TAGS
-doc/build
+doc/build/
