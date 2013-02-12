@@ -12,10 +12,10 @@ class EndGraph(nx.DiGraph):
 
     """Subclass of the NetworkX DiGraph designed to hold post-ORT data."""
 
-    def _new_attributes_are_better(self, source, target, attributes):
+    def _new_attributes_are_better(self, source, target, attr):
         """Return True if PDC is an improvement and False otherwise.
 
-        The PDC in new_attributes is compared to the one already in the
+        The PDC in attr is compared to the one already in the
         graph for the edge from source to target.
 
         Parameters
@@ -26,27 +26,37 @@ class EndGraph(nx.DiGraph):
         target : string
           Another BrainSite from the desired BrainMap in CoCoMac format.
 
-        attributes : dict
+        attr : dict
+          Edge attributes, potentially to be added to the graph.
 
         Returns
         -------
         bool
-          True if supplied attributes are better than those in the graph.
+          True if supplied attr are better than those in the graph.
           False otherwise.
         """
-        if attributes.has_key('Connection'):
-            if attributes['Connection'] == 'Unknown':
+        if attr.has_key('Connection'):
+            if attr['Connection'] == 'Unknown':
                 return False
             elif self[source][target]['Connection'] == 'Unknown':
                 return True
         else:
             us = ('Up', 'Ux', 'U')
-            if attributes['EC_Source'] in us or attributes['EC_Target'] in us:
+            ns = ('Np', 'Nx', 'Nc', 'N')
+            if attr['EC_Source'] in us or attr['EC_Target'] in us:
+                return False
+            elif (attr['EC_Source'] in ns or attr['EC_Target'] in ns) and \
+                    'C' not in (attr['EC_Source'], attr['EC_Target']):
                 return False
             elif self[source][target]['EC_Source'] in us or \
                     self[source][target]['EC_Target'] in us:
                 return True
-        if attributes['PDC'] < self[source][target]['PDC']:
+            elif (self[source][target]['EC_Source'] in ns or \
+                      self[source][target]['EC_Target'] in ns) and \
+                      'C' not in ([source][target]['EC_Source'], \
+                                      self[source][target]['EC_Target']):
+                return True
+        if attr['PDC'] < self[source][target]['PDC']:
             return True
         return False
 
