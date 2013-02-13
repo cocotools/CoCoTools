@@ -53,7 +53,7 @@ class EndGraph(nx.DiGraph):
                 return True
             elif (self[source][target]['EC_Source'] in ns or \
                       self[source][target]['EC_Target'] in ns) and \
-                      'C' not in ([source][target]['EC_Source'], \
+                      'C' not in (self[source][target]['EC_Source'], \
                                       self[source][target]['EC_Target']):
                 return True
         if attr['PDC'] < self[source][target]['PDC']:
