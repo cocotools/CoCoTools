@@ -458,7 +458,7 @@ latter are not disjoint""" % (new, originals))
             reduced_s_ecs.append(best_ec)
         reduced_t_ecs = []
         for t in original_targets:
-            best_rank = 4
+            best_rank = 5
             for ec in orig_t_ecs[t]:
                 current_rank = extensiveness_rank.index(ec[0])
                 if current_rank < best_rank:
