@@ -31,7 +31,7 @@ In CoCoTools, we have implemented two *coordinate-free registration* algorithms 
 .. Note::
     In practice, we have found only small differences between the results of these approaches. mORT has the main advantages of being more conservative, faster and theoretically more accurate.
 
-.. Important::
+.. Warning::
     Our methods paper describes ORT and mORT in much more detail PUT REF HERE. To review the basics of CoCoMac see :ref:`CoComac in brief <Quick CoCoMac>` .
 
 

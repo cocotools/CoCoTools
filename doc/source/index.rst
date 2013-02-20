@@ -19,7 +19,9 @@ Contents:
 
    install
    documentation
-   examples
+
+   
+We also have a collection of  `Interactive Notebook Examples <https://github.com/cocotools/CoCoTools/tree/master/examples#a-collection-of-notebooks-for-using-cocotools>`_.
 
 
     

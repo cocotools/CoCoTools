@@ -16,6 +16,8 @@ Contents:
    details
    objects
    infomap
+   api
+
    
 Indices and tables
 ==================

@@ -5,11 +5,16 @@ Installation Instructions
 Need to Install Python?
 ---------------------------
 
-If so, check out the Enthough Python Distribution: http://www.enthought.com/products/epd.php
+If so, check out the `Enthough Python Distribution`__.
+
+.. __: http://www.enthought.com/products/epd.php
 
 If you using it for academic purposes, the academic distribution is free.
 
-We'd also recommend visiting this page: http://fperez.org/py4science/starter_kit.html for a great overview for how to getting started using Python for scientific computing 
+We'd also recommend visiting `this page`_ for a great overview for how to
+getting started using Python for scientific computing.
+
+.. _this page: http://fperez.org/py4science/starter_kit.html
 
 
 Install CocoTools
@@ -35,4 +40,4 @@ NetworkX
 ----------------------
 You will need to install networkX (its also free)
 
-Download instructions here: http://networkx.github.com/download.html 
+Download instructions `here <http://networkx.github.com/download.html>`_.

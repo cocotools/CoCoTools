@@ -1,3 +1,7 @@
+# Welcome to the CoCoTools project
+
+We have designed the CoCoTools project as a software library allow users of various interests and technical proficiencies to mine the CoCoMac database in its current form.
+
 Installation instructions:
 Installation of cocotools is not required to access the module.
 However, if you do not install it, you can only access the cocotools' modules while your python session is inside the cocotools directory,

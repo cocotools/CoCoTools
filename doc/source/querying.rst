@@ -97,20 +97,3 @@ By default CoCoTools creates 2 sqlite caches in ~/.cache directory::
     cocotools.sqlite
     cocotools_area.sqlite
 
-
-Doc strings
-----------------
-.. automodule:: cocotools
-.. autofunction:: multi_map_ebunch
-
-
-
-.. autofunction:: query_maps_by_area
-
-
-
-.. autoclass:: MapGraph
-
-
-
-.. autoclass:: ConGraph
