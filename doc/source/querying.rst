@@ -41,9 +41,9 @@ Querying certain mapping and connectivity studies will produce CoCoMac server ti
     * coco.MAPPING_NON_TIMEOUTS
     * coco.CONNECTIVITY_NON_TIMEOUTS
 
-Example:
+Example::
     
-.. function:: map_bunch=coco.multi_map_ebunch('Mapping', coco.MAPPING_NON_TIMEOUTS )
+    map_bunch=coco.multi_map_ebunch('Mapping', coco.MAPPING_NON_TIMEOUTS)
 
 
 Query map by area
@@ -58,9 +58,9 @@ These lists are studies that are known to produce timeouts
     * coco.MAPPING_TIMEOUTS
     * coco.CONNECTIVITY_TIMEOUTS
 
-thus, where we querying the *non-timeout* studies using **multi_map_ebunch**, now we want to query the *timeouts using:
+thus, where we querying the *non-timeout* studies using **multi_map_ebunch**, now we want to query the *timeouts* using::
     
-.. function:: map_bunch_to=coco.query_maps_by_area('Mapping', coco.MAPPING_TIMEOUTS)
+    map_bunch_to=coco.query_maps_by_area('Mapping', coco.MAPPING_TIMEOUTS)
 
 
 ebunch format

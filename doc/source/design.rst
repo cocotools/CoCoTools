@@ -40,7 +40,11 @@ To learn more about Pre-Processing click :ref:`here <Detail PreProc>`
  
     * Combining connectivity data from different brain regions and from differemt parcellation schemes to form large scale descriptions of the macaque cortex without the aid of spatial coordinates is a difficult problem that requires sound theory and computational solutions.
     * Coordinate-free registration methods have been described in the literature but (until CoCoTools) have not been made openly available.
-    * CoCoTools offers two slightly different methods (algorithms) for tackling this problem. First we implemented a version of the Stephan, Kotter and colleagues Objective Relational Transformation (ORT) algorithm that integrates key features that have been described across several papers [1]_ [2]_ [3]_ [4]_. The second approach is a slight modification of ORT (mORT), that uses a  more conservative transformation logic.      
+    * CoCoTools offers two slightly different methods (algorithms) for tackling this problem:
+
+        * First we implemented a version of the Stephan, Kotter and colleagues *Objective Relational Transformation algorithm* or  **ORT**. Our implementation integrates key features that have been described across several papers [1]_ [2]_ [3]_ [4]_.
+        * The second approach is a slight modification of ORT (**mORT**), that uses a  simpler transformation logic which tends to lead to more conservative results.      
+
     * Both of these approaches can be alternatively performed quite simply using a single command-line function. You just need to pass this function the pre-processed mapping and connectivity, specify what parcellation scheme you want the data to be translated to and which approach to use.
     * After coordinate-free transformation is applied, you will have a connectivity matrix in the parcellarion scheme of your choosing with connections culled from all of the connectivity data you supplied.
     
