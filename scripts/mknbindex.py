@@ -7,7 +7,7 @@ import urllib
 
 notebooks = sorted(glob.glob('*.ipynb'))
 
-tpl = ( '* [{0}](http://nbviewer.ipython.org/url/github.com/cocotools/CoCoTools'
+tpl = ( '* [{0}](http://nbviewer.ipython.org/url/github.com/cocotools/CoCoTools/'
         'raw/master/examples/{1})' )
 
 idx = [ 
