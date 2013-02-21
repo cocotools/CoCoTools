@@ -15,8 +15,7 @@ This is by far a preferrable method, but does require knowledge of SQL and XML a
 Querying the *easy* way using CoCoTools
 ----------------------------------------
 CoCoTools makes performing custom CoCoMac queries simple. To query the CoCoMac server using CoCoTools users need only to use the function:
-    
-.. function:: coco.multi_map_ebunch(search_type, subset=False)
+    :func:`cocotools.multi_map_ebunch`
         
 
 This function calls lower-level routines that:
@@ -26,24 +25,30 @@ This function calls lower-level routines that:
     * caches XML results locally to speed up repeated queries (i.e. will check cache before querying server)
     * populates a special container object, a multi-map ebunch, with query results
 
+This function takes 1 mandatory and 1 option inputs
 
-Search type
---------------
-Mapping and Connectivity queries need to be performed seperately.
+Search type (*mandatory*)
+=========================
+Mapping and Connectivity queries need to be performed seperately. Here you specify `Mapping` to run a mapping query or `Connectivity` for a connectivity query.
 
-.. function:: coco.multi_map_ebunch('Mapping' or 'Connectivity', ...)
+Examples::
+    
+    map_bunch=coco.multi_map_ebunch('Mapping')
+    con_bunch=coco.multi_map_ebunch('Connectivity')
 
-Subset
------------
-With the subset parameter you can specify the studies you want to query. By default *multi_map_ebunch* will query the entire CoCoMac database.
+
+Subset (*optional*)
+===================
+With the subset parameter you can specify the studies you want to query. By default :func:`cocotools.multi_map_ebunch` will query the entire CoCoMac database.
 Querying certain mapping and connectivity studies will produce CoCoMac server timeouts. Therefore, it is preferrable to query from the following lists:
 
-    * coco.MAPPING_NON_TIMEOUTS
-    * coco.CONNECTIVITY_NON_TIMEOUTS
+    * `coco.MAPPING_NON_TIMEOUTS` lists all the mapping studies that do not lead to a server timeout
+    * `coco.CONNECTIVITY_NON_TIMEOUTS` lists all the connectivity studies that do not lead to a server timeout
 
-Example::
+Examples::
     
     map_bunch=coco.multi_map_ebunch('Mapping', coco.MAPPING_NON_TIMEOUTS)
+    con_bunch=coco.multi_map_ebunch('Connectivity', coco.CONNECTIVITY_NON_TIMEOUTS)
 
 
 Query map by area
@@ -51,7 +56,7 @@ Query map by area
 To gather the data from the studies that are known to produce server timeouts (when querying the entire study), you will need to query the study, region by region
 This is done using the
 
-.. function:: query_maps_by_area(search_type, subset=False)
+    :func:`cocotools.query_maps_by_area`
 
 These lists are studies that are known to produce timeouts
 

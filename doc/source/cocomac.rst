@@ -3,7 +3,7 @@ Quick Introduction to CoCoMac
 =============================
 .. _Quick CoComac:
     
-The CoCoMac (Collation of Connectivity on the Macaque Brain) database (Kötter, 2004, Stephan et al., 2001) [1]_ [2]_
+The CoCoMac (Collation of Connectivity on the Macaque Brain) database (Kotter, 2004, Stephan et al., 2001) [1]_ [2]_
 is the largest repository of macaque anatomical data, housing results from over 400 original
 reports spanning 100 years of research. This data supplies more than 200
 different mapping schemes and 30,000 anatomical connections.
@@ -21,7 +21,7 @@ Each brain region in CoCoMac is tied to a specific study and coded by a unique a
 
 Examples:
     * Brodmann's (1905) Area 9 is coded as B05-9
-    * Petrides and Pandya’s (1994) Area 46 is coded as PP94-46
+    * Petrides and Pandya's (1994) Area 46 is coded as PP94-46
 
 
 ------------------
@@ -67,14 +67,14 @@ Connection Strength
 CoCoMac also reports connectivity strength for the subset of studies that collected it (e.g. Walker, 1940).
 
 
-Important::
-    For further explanation of the codes in CoCoMac, readers are encouraged to review the introduction in (Stephan et al., 2001).
+.. Important::
+    For further explanation of the codes in CoCoMac, readers are encouraged to review the introduction in (Stephan et al., 2001) [2]_ .
     
 
 -----------------------
 CoCoMac 1.0 database
 -----------------------
-The CoCoMac 1.0 database, hosted at `http://cocomac.org <http://cocomac.org>`_ ,
+The CoCoMac 1.0 database, hosted at `cocomac.org <http://cocomac.org>`_ ,
 provides little support for automated download of statements from many maps at once
 Such download requires knowledge of XML and the initially returned data must
 be reorganized into a format suitable for analysis, and the server is prone to failure.
@@ -83,12 +83,13 @@ be reorganized into a format suitable for analysis, and the server is prone to f
 ----------------------
 CoCoMac 2.0 database
 ----------------------
-Is being developed at `http://cocomac.g-node.org/drupal/? <http://cocomac.g-node.org/drupal/?>`_ 
+CoCoMac 2.0 is in development and is available in preliminary form `here <http://cocomac.g-node.org/drupal/?>`_
+When complete, the CoCoMac 2.0 website may address many of these limitations of the CoCoMac 1.0 site.
 
 
 ---------------
 References
 ---------------
-.. [1] Kötter, R. (2004). Online retrieval, processing, and visualization of primate connectivity data from the CoCoMac database. Neuroinformatics, 2(2), 127–144.
-.. [2] Stephan, K. E., Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P., & Kötter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac). Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences, 356(1412), 1159–1186.
+.. [1] Kotter, R. (2004). Online retrieval, processing, and visualization of primate connectivity data from the CoCoMac database. Neuroinformatics, 2(2), 127 thru 144.
+.. [2] Stephan, K. E., Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P.,  Kotter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac). Philosophical Transactions of the Royal Society of London. Series B, Biological Sciences, 356(1412), 1159 thru 1186.
   

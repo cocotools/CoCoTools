@@ -69,7 +69,7 @@ To learn more about Plotting and Analysis click :ref:`here <Detail Plotting>`
 References
 -----------------------
 
-.. [1] Stephan, K E, Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P., & Kötter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac).
-.. [2] Stephan, K E, Zilles, K., & Kötter, R. (2000). Coordinate-independent mapping of structural and functional data by objective relational transformation (ORT).
-.. [3] Stephan, Klaas E, & Kötter, R. (1999). One cortex – many maps: An introduction to coordinate-independent mapping by Objective Relational Transformation (ORT).
-.. [4] Stephan, Klaas E., & Kötter, R. (1998). A formal approach to the translation of cortical maps.
+.. [1] Stephan, K E, Kamper, L., Bozkurt, A., Burns, G. A., Young, M. P., & Kotter, R. (2001). Advanced database methodology for the Collation of Connectivity data on the Macaque brain (CoCoMac).
+.. [2] Stephan, K E, Zilles, K., & Kotter, R. (2000). Coordinate-independent mapping of structural and functional data by objective relational transformation (ORT).
+.. [3] Stephan, Klaas E, & Kotter, R. (1999). One cortex – many maps: An introduction to coordinate-independent mapping by Objective Relational Transformation (ORT).
+.. [4] Stephan, Klaas E., & Kotter, R. (1998). A formal approach to the translation of cortical maps.
