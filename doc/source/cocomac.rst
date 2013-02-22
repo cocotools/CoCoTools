@@ -20,8 +20,8 @@ Annotation
 Each brain region in CoCoMac is tied to a specific study and coded by a unique acronym that includes the last initials of the authors, the last two digits of the year of publication, and the name of the region.
 
 Examples:
-    * Brodmann's (1905) Area 9 is coded as B05-9
-    * Petrides and Pandya's (1994) Area 46 is coded as PP94-46
+    * Brodmann's (1905) Area 9 is coded as *B05-9*
+    * Petrides and Pandya's (1994) Area 46 is coded as *PP94-46*
 
 
 ------------------

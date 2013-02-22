@@ -66,7 +66,7 @@ CoCoTools implements this procedure (and updates from Kotter & Wanke, 2005)[2]_ 
 
         :meth:`cocotools.MapGraph.deduce_edges`
         
-       Chains of relationships can be reduced to single RCs with variable levels of ambiguity, but in CoCoTools we allow new relationships to be added to the graph only in unambiguous cases. When different chains imply a relationship between the same two areas, we keep the RC implied by the chain with the fewest areas.
+Chains of relationships can be reduced to single RCs with variable levels of ambiguity, but in CoCoTools we allow new relationships to be added to the graph only in unambiguous cases. When different chains imply a relationship between the same two areas, we keep the RC implied by the chain with the fewest areas.
 
 ..  Important::
     The **deduce_edges** step can take a very long time to run. With the entire CoCoMac corpus, it can take **days** to run on standard laptop computers (as of 2012).   Floyd's algorithm requires approximately N\ :sup:`3` computations, with N being the number of nodes.

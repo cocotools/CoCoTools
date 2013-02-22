@@ -79,7 +79,7 @@ Coordinate-Free Registration Examples
     
 .. Warning::
     *It is hard to appreciate the complexity of the problems that must be overcome by coordinate-free registration algorithms to obtain a meaniningful final connectivity graphs. Our methods paper describes ORT and mORT in much more detail PUT REF HERE.
-    To review the basics of CoCoMac see :ref:`CoComac in brief <Quick CoCoMac>` . In CoCoTools, we do not claim that the algorithms that we provide will converge on the "ground truth", but rather we aim for our methods to be clearly defined and transparent,
+    To review the basics of CoCoMac see* :ref:`CoComac in brief <Quick CoCoMac>` *. In CoCoTools, we do not claim that the algorithms that we provide will converge on the "ground truth", but rather we aim for our methods to be clearly defined and transparent,
     but most of all, we aim for our coordinate-free registrations methods to be easy-to-use and produce sensible results given the complexity of the data.*
 
 
