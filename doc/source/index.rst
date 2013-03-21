@@ -12,7 +12,7 @@ Welcome to CoCoTools!
 Using only high-level commands, users of **CoCoTools** can query, process and register the
 wealth of CoCoMac data to create customized matrices (graphs) depicting the macro-connections of the macaque brain.
 
-Contents:
+**Contents:**
 
 .. toctree::
    :maxdepth: 1
@@ -23,7 +23,7 @@ Contents:
    
 We also have a collection of  `Interactive Notebook Examples <https://github.com/cocotools/CoCoTools/tree/master/examples#a-collection-of-notebooks-for-using-cocotools>`_.
 
-
+To download data from the Methods paper go :ref:`here <Data Download>`
     
 Indices and tables
 ==================

@@ -76,12 +76,17 @@ Coordinate-Free Registration Examples
                                                        
 
 
-    
-.. Warning::
-    *It is hard to appreciate the complexity of the problems that must be overcome by coordinate-free registration algorithms to obtain a meaniningful final connectivity graphs. Our methods paper describes ORT and mORT in much more detail PUT REF HERE.
-    To review the basics of CoCoMac see* :ref:`CoComac in brief <Quick CoCoMac>` *. In CoCoTools, we do not claim that the algorithms that we provide will converge on the "ground truth", but rather we aim for our methods to be clearly defined and transparent,
-    but most of all, we aim for our coordinate-free registrations methods to be easy-to-use and produce sensible results given the complexity of the data.*
+Coordinate-free registration Concepts and Work-Flow
+------------------------------------------------------
 
+It is hard to appreciate the complexity of the problems that must be overcome by coordinate-free registration algorithms to obtain a meaniningful final connectivity graphs. Our methods paper describes ORT and mORT in much more detail PUT REF HERE.
+For a some-what more detailed look at the guts for how cocotools performs coordinate-free registration proceed :ref:`here <endgraph guts>` .
+
+    * We also have prepared an IPython Notebook on github that will allow you to work through the individual steps of ORT or mORT for one edge, more or less by hand. Check it out `here <https://github.com/cocotools/CoCoTools/tree/master/examples#a-collection-of-notebooks-for-using-cocotools>`_
+
+Warning::                                                       
+*In CoCoTools, we do not claim that the algorithms that we provide will converge on the "ground truth", but rather we aim for our methods to be clearly defined and transparent,
+but most of all, we aim for our coordinate-free registrations methods to be easy-to-use and produce sensible results given the complexity of the data.*
 
 
 References
