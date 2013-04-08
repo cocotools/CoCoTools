@@ -114,7 +114,7 @@ if __name__ == '__main__':
         print
         print 'Most recent 3 commits:'
         sys.stdout.flush()
-        sh('git --no-pager log --oneline HEAD~1..')
+        sh('git --no-pager log --oneline HEAD~3..')
     finally:
         cd(startdir)
 
