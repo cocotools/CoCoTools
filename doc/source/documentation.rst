@@ -15,10 +15,12 @@ Contents:
    cocomac
    details
    objects
-   infomap
    api
 
    
+Here are `Interactive Notebook Examples <https://github.com/cocotools/CoCoTools/tree/master/examples#a-collection-of-notebooks-for-using-cocotools>`_.
+   
+
 Indices and tables
 ==================
 
