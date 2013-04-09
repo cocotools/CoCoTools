@@ -17,7 +17,6 @@ something like 'current' as a stable URL for the most current version of the """
 from distutils.dir_util import copy_tree
 import os
 import re
-import shutil
 import sys
 from os import chdir as cd
 
@@ -43,7 +42,7 @@ def sh(cmd):
 def sh2(cmd):
     """Execute command in a subshell, return stdout.
 
-    Stderr is unbuffered from the subshell.x"""
+    Stderr is unbuffered from the subshell."""
     p = Popen(cmd, stdout=PIPE, shell=True)
     out = p.communicate()[0]
     retcode = p.returncode
@@ -102,19 +101,24 @@ if __name__ == '__main__':
 
     try:
         cd(pages_dir)
-        status = sh2('git status | head -1')
-        branch = re.match('\# On branch (.*)$', status).group(1)
+        stout = sh2('git status | head -1')
+        branch = re.match('\# On branch (.*)$', stout).group(1)
         if branch != pages_branch:
             e = 'On %r, git branch is %r, MUST be "%s"' % \
                 (pages_dir, branch, pages_branch)
             raise RuntimeError(e)
 
         sh('git add -A *')
-        sh('git commit -m"Updated doc release: %s"' % tag)
-        print
-        print 'Most recent 3 commits:'
-        sys.stdout.flush()
-        sh('git --no-pager log --oneline HEAD~3..')
+        to_commit = sh2('git status -z')
+        if not to_commit:
+            print "\nNo new changes to commit and upload, nothing to do."
+            sys.exit(0)
+        else:
+            sh('git commit -m"Updated doc release: %s"' % tag)
+            print
+            print 'Most recent 3 commits:'
+            sys.stdout.flush()
+            sh('git --no-pager log --oneline HEAD~3..')
     finally:
         cd(startdir)
 
