@@ -12,6 +12,7 @@ Welcome to CoCoTools!
 Using only high-level commands, users of **CoCoTools** can query, process and register the
 wealth of anatomical data on CoCoMac to create customized matrices (graphs) depicting the macro-connections of the macaque brain.
 
+
 **Contents:**
 
 .. toctree::

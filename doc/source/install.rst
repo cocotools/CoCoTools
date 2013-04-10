@@ -17,6 +17,15 @@ getting started using Python for scientific computing.
 .. _this page: http://fperez.org/py4science/starter_kit.html
 
 
+
+
+Download CoCoTools: 
+---------------------
+
+to download CoCoTools go `here <https://github.com/cocotools/CoCoTools>`_.
+
+
+
 Install CocoTools
 ----------------------
 
