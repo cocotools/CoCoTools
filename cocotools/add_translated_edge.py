@@ -1,7 +1,7 @@
 def add_translated_edge(endg, mapp, conn, desired_map, method, edge):
-        """Translate edges in conn to nomenclature of desired_bmap.
+        """This function translates one edge in conn to nomenclature of desired_bmap.
 
-        Add all desired_map nodes in mapp to this graph.
+        Useful for testing registrations of specific edges or interrogating differences between ORT and mORT.
 
         Parameters
         ----------

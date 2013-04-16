@@ -18,11 +18,12 @@ getting started using Python for scientific computing.
 
 
 
-
 Download CoCoTools: 
 ---------------------
 
-to download CoCoTools go `here <https://github.com/cocotools/CoCoTools>`_.
+You can download CoCoTools `here <https://github.com/cocotools/CoCoTools>`_.
+
+You can download a static copy or fork the repo (learn how `here <https://help.github.com/articles/fork-a-repo>`_)
 
 
 
