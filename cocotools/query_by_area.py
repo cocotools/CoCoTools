@@ -9,7 +9,8 @@ import xml.etree.ElementTree as etree
 from cStringIO import StringIO
 from socket import timeout
 
-from brain_maps import MAPPING_TIMEOUTS, CONNECTIVITY_TIMEOUTS, TIMEOUT_AREAS, CON_TO_AREAS, MAP_TO_AREAS
+from brain_maps import (MAPPING_TIMEOUTS, CONNECTIVITY_TIMEOUTS, TIMEOUT_AREAS,
+                        CON_TO_AREAS, MAP_TO_AREAS)
 
 
 PDC_HIER = ('A', 'C', 'H', 'L', 'D', 'F', 'J', 'N', 'B', 'G', 'E', 'K', 'I',
@@ -344,9 +345,10 @@ def query_maps_by_area(search_type, subset=False):
       'Mapping' or 'Connectivity'
 
     subset : sequence or string (optional)
-      Subset of BrainMaps to query.  Default is to query all BrainMaps in
-      CoCoMac.  If a string is supplied, it must be the name of a text
-      file with one BrainMap per line.  
+      Subset of BrainMaps to query.  If a string is supplied, it must be
+      the name of a text file with one BrainMap per line.  If subset is
+      not supplied, queries are made only for maps known to produce
+      timeouts (when the map, rather than individual areas, is queried).
 
     Returns
     -------
@@ -362,8 +364,8 @@ def query_maps_by_area(search_type, subset=False):
     Connectivity search type would result in its being a failure.
     Failures can also result from CoCoMac server errors.
 
-    The term ebunch, borrowed from NetworkX, refers to a sequence of
-    graph theory edges.
+    The term ebunch, borrowed from NetworkX, refers to a list of
+    edges.
     
     Integrated primary projections are returned for Connectivity queries,
     and primary relations are returned for Mapping queries.
@@ -372,6 +374,8 @@ def query_maps_by_area(search_type, subset=False):
         areas = MAP_TO_AREAS
     elif search_type == 'Connectivity':
         areas = CON_TO_AREAS
+    else:
+        raise ValueError("search_type must be 'Mapping' or 'Connectivity'.")
     if not subset:
         if search_type == 'Mapping':
             bmaps = MAPPING_TIMEOUTS

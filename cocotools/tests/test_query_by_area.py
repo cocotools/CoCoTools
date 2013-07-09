@@ -226,8 +226,8 @@ def test_single_area_ebunch():
     
 @replace('cocotools.query_by_area.single_area_ebunch', mock_single_area_ebunch)
 def test_query_maps_by_area():
-    e, f = cq.query_maps_by_area(None, ['W40', 'CP94', 'O52'])
-    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(226)])
+    e, f = cq.query_maps_by_area('Mapping', ['W40', 'CP94', 'O52'])
+    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(86 * 2)])
     nt.assert_equal(f, ['CP94-10m', 'CP94-10o', 'CP94-11l', 'CP94-11m',
                         'CP94-12l', 'CP94-12m', 'CP94-12o', 'CP94-12r',
                         'CP94-13a', 'CP94-13b', 'CP94-13L', 'CP94-13M',
@@ -237,6 +237,6 @@ def test_query_maps_by_area():
                         'CP94-AON', 'CP94-AONl', 'CP94-AONm', 'CP94-G#2',
                         'CP94-Iai', 'CP94-Ial', 'CP94-Iam', 'CP94-Iapl',
                         'CP94-Iapm', 'CP94-OT', 'CP94-PC#2', 'CP94-PrCO'])
-    e, f = cq.query_maps_by_area(None, 'cocotools/tests/sample_bmaps2.txt')
-    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(226)])
+    e, f = cq.query_maps_by_area('Mapping', 'cocotools/tests/sample_bmaps2.txt')
+    nt.assert_equal(e, [('node', 'node', 'edge_attr') for i in range(86 * 2)])
     nt.assert_equal(f, [])
