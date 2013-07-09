@@ -193,13 +193,16 @@ def directed_char_path_length(g):
     n = 1
     n_path_matrix = copy.deepcopy(A) # We don't want to f with A.
     n_path_array = np.array(n_path_matrix)
+    np.seterr(invalid='ignore')  # Don't warn about the n_path_array division.
     L = np.nan_to_num(n_path_array / n_path_array)
+    np.seterr(invalid='warn')  # Return this setting to the default.
     try:
         nonzero = np.nonzero(L)[0][0]
     except IndexError:
         nonzero = False
     else:
         nonzero = True          # If index is 0, we still want True condition.
+    np.seterr(invalid='ignore')  # Don't warn about the n_path_array division.
     while nonzero:
         D += n * L
         n += 1
@@ -214,10 +217,11 @@ def directed_char_path_length(g):
             nonzero = False
         else:
             nonzero = True
-    D[D==0] = np.inf
+    np.seterr(invalid='warn')  # Return this setting to the default.
+    D[D == 0] = np.inf
     D -= np.eye(A.shape[0])
     # Now use D to compute the characteristic path length.
-    return np.sum(np.sum(D[D!=np.inf]))/len(np.nonzero(D[D!=np.inf])[0])
+    return np.sum(np.sum(D[D != np.inf])) / len(np.nonzero(D[D != np.inf])[0])
     
 
 def directed_clustering(g):
