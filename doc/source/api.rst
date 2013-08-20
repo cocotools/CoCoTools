@@ -52,12 +52,12 @@ Main classes
 
 .. autoclass:: MapGraph
 
-.. inheritance-diagram::  MapGraph
+.. image:: images/MapGraph_inher.png
 
 .. autoclass:: ConGraph  
 
-.. inheritance-diagram:: ConGraph
+.. image:: images/ConGraph_inher.png
 
 .. autoclass:: EndGraph
 
-.. inheritance-diagram:: EndGraph
+.. image:: images/EndGraph_inher.png
