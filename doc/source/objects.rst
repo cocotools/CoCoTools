@@ -2,19 +2,22 @@
 CoCoTools Objects
 ==================
 
-*We need to give doc strings to these objects, to link in*
 
-MapGraph
+
+MapGraph: :class:`cocotools.MapGraph`
+----------
+	
+MapGraph objects hold mapping data and express brain regions as nodes, spatial relationships as directed (but always reciprocal) edges and relation codes (RCs) as edge attributes.
+
+
+ConGraph: :class:`cocotools.ConGraph`
 ----------
 
-ConGraph
+Congraph objects hold connectivity data, where each directed edge represents one "connection" with the source region being the sending and the target region being the receiving region in the same or different parcellation scheme. Each ConGraph edge contains two extension codes (ECs) as attributes. The *source EC* expresses the extent of stain present in the sending region and the *target EC* expresses the extent of stain present in the receiving region.
+	
+
+EndGraph: :class:`cocotools.EndGraph`
 ----------
 
-
-.. Congraph objects are specialized to hold connectivity data, where each directed edge represents one "connection" with the source region being the precedent and the target region being the antecedent region in the same or different parcellation scheme.
-single injection store to store your queryreceive ed listing of the connections as stated in the literature and annotated Listing of the connections When you place these results into mapgraph or congraph objects, you caWe found various ommissions and mistakes in the database that users will want to rectify. Also Also if you want to 
-
-
-
-EndGraph
-----------
+EndGraph objects contain the machinery to perform coordinate-free registration and, being graphs, hold the results as nodes representing regions in the target space and directed edges representing anatomical connections
+	
