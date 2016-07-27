@@ -363,6 +363,15 @@ def multi_map_ebunch(search_type, subset=False):
     Integrated primary projections are returned for Connectivity queries,
     and primary relations are returned for Mapping queries.
     """
+    raise ValueError(''.join(['Due to changes to the CoCoMac server, this ',
+                              'function no longer works.\n\nWe are working ',
+                              'on resolving this issue.  If getting this ',
+                              'function to work is important to you,\n\n',
+                              'PLEASE EMAIL ME AT DBLISS@BERKELEY.EDU.\n\n',
+                              'During this redevelopment, I can send you an ',
+                              'sqlite database fully populated with the raw ',
+                              'CoCoMac data that can be read using CoCoTools ',
+                              'commands.']))
     if not subset:
         if search_type == 'Mapping':
             bmaps = MAPPING_SOURCES
